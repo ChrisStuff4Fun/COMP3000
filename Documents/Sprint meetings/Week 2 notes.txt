@@ -1,0 +1,2 @@
+entra AD access levels instead of DB based 
+combine geofence polygon table into main geofence table as a list of GPS coordinates
