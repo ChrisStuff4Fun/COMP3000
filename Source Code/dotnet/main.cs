@@ -5,6 +5,6 @@ using Microsoft.Extensions.Hosting;
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-app.MapGet("/hello", () => "Hello");
+app.MapGet("/hello", () => "Hello world test!");
 
 app.Run();
