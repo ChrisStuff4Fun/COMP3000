@@ -66,5 +66,5 @@ jobs:
         with:
           app-name: 'CyberTrack'
           slot-name: 'Production'
-          package: .
+          package: ${{ github.workspace }}/.net-app
           
