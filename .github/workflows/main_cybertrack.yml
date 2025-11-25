@@ -10,7 +10,7 @@ on:
 
 env:
   PROJECT_PATH: "Source Code/dotnet"
-
+  
 jobs:
   build:
     runs-on: windows-latest
@@ -63,3 +63,4 @@ jobs:
           app-name: 'CyberTrack'
           slot-name: 'Production'
           package: .
+          remove-additional-files: true
