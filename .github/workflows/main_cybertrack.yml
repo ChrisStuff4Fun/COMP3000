@@ -9,6 +9,11 @@ on:
       - main
   workflow_dispatch:
 
+
+env:
+  PROJECT_PATH: Source Code/dotnet
+
+
 jobs:
   build:
     runs-on: windows-latest
