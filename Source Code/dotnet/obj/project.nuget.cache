@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "o+PpxgKU2Os=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\Source Code\\dotnet\\MyApiProject\\MyApiProject.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ccatl\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.0\\microsoft.aspnetcore.openapi.10.0.0.nupkg.sha512",
+    "C:\\Users\\ccatl\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
