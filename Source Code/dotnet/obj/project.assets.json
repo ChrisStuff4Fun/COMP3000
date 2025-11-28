@@ -88,11 +88,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\Source Code\\dotnet\\MyApiProject\\MyApiProject.csproj",
-      "projectName": "MyApiProject",
-      "projectPath": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\Source Code\\dotnet\\MyApiProject\\MyApiProject.csproj",
+      "projectUniqueName": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\Source Code\\dotnet\\CyberTrackAPI.csproj",
+      "projectName": "CyberTrackAPI",
+      "projectPath": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\Source Code\\dotnet\\CyberTrackAPI.csproj",
       "packagesPath": "C:\\Users\\ccatl\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\Source Code\\dotnet\\MyApiProject\\obj\\",
+      "outputPath": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\Source Code\\dotnet\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ccatl\\AppData\\Roaming\\NuGet\\NuGet.Config"

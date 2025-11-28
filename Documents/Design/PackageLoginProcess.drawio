@@ -1,0 +1,92 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="Page-1" id="obMf7D4g16Imwjh6bftY">
+    <mxGraphModel dx="1722" dy="1001" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="bZby9_Da_NWMkYGXuIj8-1" value="Entra ID&lt;br&gt;(Azure AD for user accounts)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="300" y="120" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="bZby9_Da_NWMkYGXuIj8-2" value="&lt;div&gt;Android App&lt;/div&gt;&lt;div&gt;(For GPS tracking )&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="300" y="340" width="140" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="bZby9_Da_NWMkYGXuIj8-4" value="MSSQL DB&lt;br&gt;(Hosted on Azure for application data)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="130" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bZby9_Da_NWMkYGXuIj8-5" value="&lt;div&gt;Backend API&lt;/div&gt;&lt;div&gt;(.NET hosted on Azure App Service)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="310" y="240" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bZby9_Da_NWMkYGXuIj8-3" value="Online dashboard&lt;br&gt;(Hosted on Azure App Service, or local for now)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="470" y="230" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-10" value="" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;exitX=0.368;exitY=-0.044;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="bZby9_Da_NWMkYGXuIj8-3" target="bZby9_Da_NWMkYGXuIj8-1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="520" y="220" as="sourcePoint" />
+            <mxPoint x="450" y="150" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="500" y="200" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-11" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="8iUvCZO6-aj3U55XcWmJ-10">
+          <mxGeometry x="0.1194" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-12" value="1. User accessess website and logs in using their Entra ID&lt;div&gt;2. Entra sends the logged in ID to the backend API, via the web server&lt;/div&gt;&lt;div&gt;3. API finds the matching user in the DB, and retrieves Org ID, Username and access level&lt;/div&gt;&lt;div&gt;4. API requests application data (geofences, groups, devices and policies)&lt;/div&gt;&lt;div&gt;5. Login process and API request is completed, handing the website data to be presented&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=top;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="70" y="440" width="670" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-19" value="3" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="bZby9_Da_NWMkYGXuIj8-4" target="bZby9_Da_NWMkYGXuIj8-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="260" y="280" as="sourcePoint" />
+            <mxPoint x="310" y="230" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-21" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="250" y="290" as="sourcePoint" />
+            <mxPoint x="310" y="290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-22" value="4" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="8iUvCZO6-aj3U55XcWmJ-21">
+          <mxGeometry x="-0.2611" relative="1" as="geometry">
+            <mxPoint x="8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-23" value="" style="endArrow=classic;html=1;rounded=0;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="430" y="280" as="sourcePoint" />
+            <mxPoint x="470" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-24" value="5" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="8iUvCZO6-aj3U55XcWmJ-23">
+          <mxGeometry x="-0.0583" y="3" relative="1" as="geometry">
+            <mxPoint y="3" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-25" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.125;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.998;exitY=0.89;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="bZby9_Da_NWMkYGXuIj8-1" target="bZby9_Da_NWMkYGXuIj8-3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="240" as="sourcePoint" />
+            <mxPoint x="440" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-26" value="2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="8iUvCZO6-aj3U55XcWmJ-25">
+          <mxGeometry x="-0.2011" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-27" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1.018;entryY=0.164;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="bZby9_Da_NWMkYGXuIj8-3" target="bZby9_Da_NWMkYGXuIj8-5">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="240" as="sourcePoint" />
+            <mxPoint x="470" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8iUvCZO6-aj3U55XcWmJ-28" value="2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="8iUvCZO6-aj3U55XcWmJ-27">
+          <mxGeometry x="0.2072" y="-2" relative="1" as="geometry">
+            <mxPoint x="2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
