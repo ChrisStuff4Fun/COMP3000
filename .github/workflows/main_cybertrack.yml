@@ -63,5 +63,5 @@ jobs:
         with:
           app-name: 'CyberTrack'
           slot-name: 'Production'
-          package: './publish_output'
+          package: './.net-app'
           clean: true
