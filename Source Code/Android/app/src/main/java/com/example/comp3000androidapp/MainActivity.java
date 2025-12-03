@@ -54,12 +54,13 @@ public class MainActivity extends AppCompatActivity {
     private void showPermissionsDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Location Permissions Required")
-                .setMessage("This app requires location access at all times to function. Please go to Settings → Permissions → Location → Allow all the time.")
+                .setMessage("This app requires location access at all times to function. Please go to Settings → Permissions → Location → Allow all the time. (Requires an app restart)")
                 .setPositiveButton("Settings", (dialog, which) -> {
                     Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                     Uri uri = Uri.fromParts("package", getPackageName(), null);
                     intent.setData(uri);
                     startActivity(intent);
+
                 })
                 .setNegativeButton("Exit", (dialog, which) -> finish())
                 .setCancelable(false)
