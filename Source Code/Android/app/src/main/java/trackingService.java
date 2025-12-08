@@ -18,7 +18,7 @@ public class trackingService extends Service {
     // Service initialiser, sets the callback process and starts location updates
     public void onCreate() {
         super.onCreate();
-        
+
         callback = new LocationCallback() { // Define callback for when location is given
             @Override
             public void onLocationResult(@NonNull LocationResult result) {
