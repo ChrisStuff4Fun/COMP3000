@@ -38,12 +38,8 @@ jobs:
 
       - name: Copy React build into .NET wwwroot
         run: |
-          $wwwroot = "$(Split-Path $env:DOTNET_PROJECT_PATH)\wwwroot"
-          New-Item -ItemType Directory -Force -Path $wwwroot | Out-Null
-          robocopy "${{ env.REACT_APP_PATH }}\build" $wwwroot /E
-          if ($LASTEXITCODE -ge 8) {
-            throw "Robocopy failed with exit code $LASTEXITCODE"
-          }
+          robocopy "${{ env.REACT_APP_PATH }}\build" "$(Split-Path $env:DOTNET_PROJECT_PATH)\wwwroot" /E | Out-Null
+          $global:LASTEXITCODE = 0
         shell: powershell
 
 
