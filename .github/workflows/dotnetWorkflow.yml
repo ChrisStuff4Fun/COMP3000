@@ -36,10 +36,10 @@ jobs:
           cd ${{ env.REACT_APP_PATH }}
           npm run build
 
-      - name: Copy React build to .NET wwwroot
-        run: |
-          mkdir $(dirname ${{ env.DOTNET_PROJECT_PATH }})\wwwroot
-          xcopy /E /Y "${{ env.REACT_APP_PATH }}\build\*" "$(dirname ${{ env.DOTNET_PROJECT_PATH }})\wwwroot\"
+      - name: Copy React build into .NET wwwroot
+        run: robocopy "${{ env.REACT_APP_PATH }}\build" "$(dirname $env:DOTNET_PROJECT_PATH)\wwwroot" /E
+        shell: powershell
+
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
