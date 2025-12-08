@@ -37,7 +37,7 @@ jobs:
           npm run build
 
       - name: Copy React build into .NET wwwroot
-        run: robocopy "${{ env.REACT_APP_PATH }}\build" "$(dirname $env:DOTNET_PROJECT_PATH)\wwwroot" /E
+        run: robocopy "${{ env.REACT_APP_PATH }}\build" "$(dirname $env:DOTNET_PROJECT_PATH)\wwwroot" /E || exit 0
         shell: powershell
 
 
