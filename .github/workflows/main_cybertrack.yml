@@ -61,7 +61,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'cybertrack-a6beetg9cdeyh5dp'
+          app-name: 'CyberTrack'
           slot-name: 'Production'
           package: './publish_output'
           clean: true
