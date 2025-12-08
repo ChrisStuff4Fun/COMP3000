@@ -36,8 +36,10 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
-// Tell server to also serve a HTML page
-app.MapFallbackToFile("index.html");
+
+app.UseDefaultFiles(); // Server html as default
+app.UseStaticFiles();  // Allow react
+app.MapFallbackToFile("index.html"); // Tell server to also serve a HTML page
 
 app.Run();
 
