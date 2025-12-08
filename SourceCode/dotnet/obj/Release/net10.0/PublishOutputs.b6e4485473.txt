@@ -1,8 +1,0 @@
-C:\Users\ccatl\Documents\GitHub\COMP3000\publish_output\CyberTrackAPI.exe
-C:\Users\ccatl\Documents\GitHub\COMP3000\publish_output\appsettings.json
-C:\Users\ccatl\Documents\GitHub\COMP3000\publish_output\CyberTrackAPI.dll
-C:\Users\ccatl\Documents\GitHub\COMP3000\publish_output\CyberTrackAPI.deps.json
-C:\Users\ccatl\Documents\GitHub\COMP3000\publish_output\CyberTrackAPI.runtimeconfig.json
-C:\Users\ccatl\Documents\GitHub\COMP3000\publish_output\CyberTrackAPI.pdb
-C:\Users\ccatl\Documents\GitHub\COMP3000\publish_output\Microsoft.AspNetCore.OpenApi.dll
-C:\Users\ccatl\Documents\GitHub\COMP3000\publish_output\Microsoft.OpenApi.dll
