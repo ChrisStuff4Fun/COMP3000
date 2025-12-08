@@ -3,9 +3,8 @@ name: Build and Deploy React + .NET API to Azure Web App (Linux)
 on:
   push:
     paths:
-      - 'SourceCode/**'
-    paths-ignore:
-      - 'SourceCode/Android/**'
+      - 'SourceCode/React/**'
+      - 'SourceCode/dotnet/**'
   workflow_dispatch:
 
 env:
