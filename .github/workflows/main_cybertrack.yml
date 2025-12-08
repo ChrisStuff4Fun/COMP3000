@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 env:
-  PROJECT_PATH: "Source Code/dotnet/CyberTrackAPI.csproj"
+  PROJECT_PATH: "./Source Code/dotnet/CyberTrackAPI.csproj"
   
 jobs:
   build:
