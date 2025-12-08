@@ -1,0 +1,91 @@
+name: Build and Deploy React + .NET API to Azure Web App (Linux)
+
+on:
+  push:
+    paths:
+      - 'SourceCode/**'
+    paths-ignore:
+      - 'SourceCode/Android/**'
+  workflow_dispatch:
+
+env:
+  DOTNET_PROJECT_PATH: "SourceCode/dotnet/CyberTrackAPI.csproj"
+  REACT_APP_PATH: "SourceCode/React/react-frontend"
+  PUBLISH_DIR: "publishOutput"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --- Build React frontend ---
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install React dependencies
+        run: |
+          cd ${{ env.REACT_APP_PATH }}
+          npm install
+
+      - name: Build React
+        run: |
+          cd ${{ env.REACT_APP_PATH }}
+          npm run build
+
+      # --- Copy React build into .NET wwwroot ---
+      - name: Copy React build to .NET wwwroot
+        run: |
+          mkdir -p $(dirname ${{ env.DOTNET_PROJECT_PATH }})/wwwroot
+          cp -r ${{ env.REACT_APP_PATH }}/build/* $(dirname ${{ env.DOTNET_PROJECT_PATH }})/wwwroot/
+
+      # --- Build and publish .NET API ---
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore "${{ env.DOTNET_PROJECT_PATH }}"
+
+      - name: Build API
+        run: dotnet build "${{ env.DOTNET_PROJECT_PATH }}" --configuration Release
+
+      - name: Publish API
+        run: dotnet publish "${{ env.DOTNET_PROJECT_PATH }}" -c Release -o ${{ env.PUBLISH_DIR }}
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v4
+        with:
+          name: publishOutput
+          path: ${{ env.PUBLISH_DIR }}/*
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Download published artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: publishOutput
+          path: ${{ env.PUBLISH_DIR }}
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'CyberTrack' 
+          slot-name: 'Production'
+          package: ${{ env.PUBLISH_DIR }}
+          clean: true
