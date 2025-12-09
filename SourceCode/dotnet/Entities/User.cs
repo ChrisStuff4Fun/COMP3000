@@ -1,7 +1,7 @@
 public class User
 {
-    public int userId {get; set;}
-    public int orgId {get; set;}
-    public int entraId {get; set;}
-    public int role {get; set;}
+    public int UserID {get; set;}
+    public int OrgID {get; set;}
+    public int EntraID {get; set;}
+    public int AccessLevel {get; set;}
 }
