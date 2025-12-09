@@ -17,6 +17,9 @@ jobs:
   build:
     runs-on: windows-latest
 
+    env:
+      DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

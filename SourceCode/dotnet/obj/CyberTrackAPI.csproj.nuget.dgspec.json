@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\CyberTrackAPI\\CyberTrackAPI.csproj": {}
+    "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\CyberTrackAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\CyberTrackAPI\\CyberTrackAPI.csproj": {
+    "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\CyberTrackAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\CyberTrackAPI\\CyberTrackAPI.csproj",
+        "projectUniqueName": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\CyberTrackAPI.csproj",
         "projectName": "CyberTrackAPI",
-        "projectPath": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\CyberTrackAPI\\CyberTrackAPI.csproj",
+        "projectPath": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\CyberTrackAPI.csproj",
         "packagesPath": "C:\\Users\\ccatl\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\CyberTrackAPI\\obj\\",
+        "outputPath": "C:\\Users\\ccatl\\Documents\\GitHub\\COMP3000\\SourceCode\\dotnet\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ccatl\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -43,9 +43,21 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[8.0.22, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
