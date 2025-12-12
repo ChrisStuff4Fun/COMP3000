@@ -1,12 +1,5 @@
-public class Device
+public static class EncryptionHelper
 {
-    public int DeviceID {get; set;}
-    public string DeviceName {get; set;} = string.Empty;
-    public double LastLoggedLat {get; set;}
-    public double LastLoggedLong {get; set;}
-    public int OrgID {get; set;}
-    public byte[] EncryptedDeviceKey {get; set;} = Array.Empty<byte>();
-
 
 
     public static byte[] HexToBytes(string hex)
@@ -28,9 +21,13 @@ public class Device
         return bytes;
     }
 
+
+
     public static string BytesToHex(byte[] bytes)
     {
         return BitConverter.ToString(bytes).Replace("-", "");
     }
+
+
 }
 

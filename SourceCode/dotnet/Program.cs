@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-
 
 // Get secret from GitHub - not storing any sensitive access creds inside the repo
 var tenantId         = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
@@ -18,22 +16,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-// Process to auth current user
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.Authority = $"https://login.microsoftonline.com/{tenantId}/v2.0";
-        options.Audience = clientId;
-        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
-        };
-    });
 
-builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
 
 // Connect to DB
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -60,11 +44,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// DO NOT UNCOMMENT PRE-REACT APP
-//app.UseAuthentication(); // Add authentication middleware
-//app.UseAuthorization();  // Add authorisation middleware
-
 
 // Serve React page if request is not for an API endpoint
 app.UseDefaultFiles(); 

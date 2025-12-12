@@ -1,7 +1,7 @@
 public class Policy
 {
     public int PolicyID {get; set;}
-    public required string PolicyName {get; set;}
+    public string PolicyName {get; set;} = string.Empty;
     public int GeofenceID {get; set;}
     public int DeviceGroupID {get; set;}
     public bool AlertOnLeaveRule {get; set;}
