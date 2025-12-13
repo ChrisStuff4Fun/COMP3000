@@ -40,10 +40,10 @@ var app = builder.Build();
 
 
 //app.MapKeyEndpoints();
-app.MapDeviceEndpoints();
-app.MapUserEndpoints();
-app.MapPolicyEndpoints();
-app.MapCodeEndpoints();
+//app.MapDeviceEndpoints();
+//app.MapUserEndpoints();
+//app.MapPolicyEndpoints();
+//app.MapCodeEndpoints();
 
 
 // Configure the HTTP request pipeline.
