@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
+
+using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
+using Azure.Security.KeyVault.Keys.Cryptography;
 
 public static class KeyEndpoints
 {
@@ -13,9 +13,6 @@ public static class KeyEndpoints
         keys.MapGet("/public", servePublicKey);
         keys.MapGet("/register/{inboundMessage:string}", registerDeviceKeys);
 
-        // DO NOT UNCOMMENT WITHOUT SERIOUS CONSIDERATION
-        keys.MapGet("/generateserverkeyset", generateKeys)
-
     }
 
 
@@ -23,22 +20,32 @@ public static class KeyEndpoints
     // Methods for endpoints
     private static async Task<IResult> servePublicKey( AppDbContext db, IHttpContextAccessor httpAccessor)
     {
-        return Results.Ok();
+
+        Uri keyVaultUri = new Uri("https://cybertrackserver.vault.azure.net/");
+        KeyClient keyClient = new KeyClient(keyVaultUri, new DefaultAzureCredential());
+
+        // Fetch the key
+        KeyVaultKey key = await keyClient.GetKeyAsync("CyberTrackServerKeys");
+
+        var publicKey = new
+        {
+            Curve = key.Key.CurveName,
+            X = Convert.ToBase64String(key.Key.X),
+            Y = Convert.ToBase64String(key.Key.Y)
+        };
+
+        return Results.Ok(publicKey);
     }
 
 
 
     private static async Task<IResult> registerDeviceKeys( String inboundMessage, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
+
+
         return Results.Ok();
     }
 
     
-
-    private static async Task<IResult> generateKeys()
-    {
-        return Results.Ok();
-    }
-
 
 }

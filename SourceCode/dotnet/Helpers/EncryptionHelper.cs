@@ -29,5 +29,11 @@ public static class EncryptionHelper
     }
 
 
+    public static List<String> decryptInbound()
+    {
+        return null;
+    }
+
+
 }
 
