@@ -39,11 +39,19 @@ var app = builder.Build();
 
 app.UseRouting();
 
+
+app.MapDeviceEndpoints();
+app.MapFenceEndpoints();
+app.MapGPSEndpoints();
+app.MapGroupEndpoints();
+app.MapCodeEndpoints();
 app.MapKeyEndpoints();
-//app.MapDeviceEndpoints();
-//app.MapUserEndpoints();
-//app.MapPolicyEndpoints();
-//app.MapCodeEndpoints();
+app.MapPolicyEndpoints();
+app.MapUserEndpoints();
+
+
+
+
 
 
 // Configure the HTTP request pipeline.
