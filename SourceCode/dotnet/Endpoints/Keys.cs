@@ -13,9 +13,18 @@ public static class KeyEndpoints
         keys.MapGet("/public", servePublicKey);
         keys.MapGet("/register/{inboundMessage:string}", registerDeviceKeys);
 
+        keys.MapGet("/test", test);
+
     }
 
 
+
+    private static async Task<IResult> test(AppDbContext db, IHttpContextAccessor httpAccessor)
+    {
+
+
+        return Results.Ok("hello");
+    }
 
     // Methods for endpoints
     private static async Task<IResult> servePublicKey( AppDbContext db, IHttpContextAccessor httpAccessor)
