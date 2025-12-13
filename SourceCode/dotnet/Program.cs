@@ -39,7 +39,7 @@ var app = builder.Build();
 
 
 
-//app.MapKeyEndpoints();
+app.MapKeyEndpoints();
 //app.MapDeviceEndpoints();
 //app.MapUserEndpoints();
 //app.MapPolicyEndpoints();
