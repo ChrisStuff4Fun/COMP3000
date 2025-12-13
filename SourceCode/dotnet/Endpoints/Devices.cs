@@ -30,13 +30,13 @@ public static class DeviceEndpoints
         // Reject if the user is not registered to the app or the org, or if they are not level 2 or higher
         if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
 
-        List<Policy> policies = await db.Policies.Where(p => p.OrgID == currentUser.OrgID).ToListAsync();
-        return policies.Any() ? Results.Ok(policies) : Results.NotFound();
+        List<Device> devices = await db.Devices.Where(d => d.OrgID == currentUser.OrgID).ToListAsync();
+        return devices.Any() ? Results.Ok(devices) : Results.NotFound();
         
     }
 
 
-    private static async Task<IResult> deleteDevice(int policyId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> deleteDevice(int deviceId, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
@@ -47,17 +47,17 @@ public static class DeviceEndpoints
         // Only admin and root can delete policies
         if (currentUser.AccessLevel < 3) return Results.Forbid();
 
-        // Get policy to delete
-        Policy? policy = await db.Policies.FindAsync(policyId);
+        // Get device to delete
+        Device? device = await db.Devices.FindAsync(deviceId);
 
-        // Check if policy exisits
-        if (policy == null) return Results.BadRequest("Policy does not exist.");
+        // Check if device exisits
+        if (device == null) return Results.BadRequest("Policy does not exist.");
 
-        // Prevent deletion of other orgs policies
-        if (policy.OrgID != currentUser.OrgID) return Results.Forbid();
+        // Prevent deletion of other orgs devices
+        if (device.OrgID != currentUser.OrgID) return Results.Forbid();
 
-        // Remove user and save
-        db.Policies.Remove(policy);
+        // Remove device and save
+        db.Devices.Remove(device);
         await db.SaveChangesAsync();
 
         return Results.Ok();

@@ -39,7 +39,7 @@ public static class KeyEndpoints
         }
         catch(Exception e)
         {
-            return Results.Problem(e.Message);
+            return Results.Problem(detail: e.ToString(), statusCode: 500);
         }
 
     }
