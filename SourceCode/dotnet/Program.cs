@@ -16,7 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
-
+builder.Services.AddRouting();
 
 
 builder.Services.AddHttpContextAccessor();
@@ -37,7 +37,7 @@ var app = builder.Build();
 // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  
 
 
-
+app.UseRouting();
 
 app.MapKeyEndpoints();
 //app.MapDeviceEndpoints();
