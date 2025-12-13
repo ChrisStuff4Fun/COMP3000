@@ -38,6 +38,14 @@ var app = builder.Build();
 
 
 
+
+app.MapKeyEndpoints();
+app.MapDeviceEndpoints();
+app.MapUserEndpoints();
+app.MapPolicyEndpoints();
+app.MapCodeEndpoints();
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -56,11 +64,6 @@ app.MapFallbackToFile("index.html");
 // REMOVE BEFORE FINAL VER
 app.UseDeveloperExceptionPage();
 
-app.MapKeyEndpoints();
-app.MapDeviceEndpoints();
-app.MapUserEndpoints();
-app.MapPolicyEndpoints();
-app.MapCodeEndpoints();
 
 app.Run();
 
