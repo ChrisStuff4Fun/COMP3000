@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 public static class JoinCodeEndpoints
 {
-    public static void MapUserEndpoints(this IEndpointRouteBuilder app)
+    public static void MapCodeEndpoints(this IEndpointRouteBuilder app)
     {
         var codes = app.MapGroup("/joincodes");
 
