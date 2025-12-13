@@ -1,46 +1,41 @@
 import logo from './logo.svg';
 import './App.css';
 
-import { useEffect } from "react";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
-function GoogleLoginButton() {
-  useEffect(() => {
-    if (window.google && window.google.accounts) {
-      window.google.accounts.id.initialize({
-        client_id: "824007775368-un5ifrgrig8c904rj9cgvu302rkkin9t.apps.googleusercontent.com ",
-        callback: handleCredentialResponse,
-      });
-      window.google.accounts.id.renderButton(
-        document.getElementById("google-signin"),
-        { theme: "outline", size: "large" }
-      );
-    }
-  }, []);
 
-  async function handleCredentialResponse(response) {
-    const idToken = response.credential;
+function App() {
+  const handleLoginSuccess = async (credentialResponse) => {
+    const idToken = credentialResponse.credential;
+
     const res = await fetch("/auth/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: idToken }),
     });
 
-    if (res.ok) console.log("Logged in successfully");
-    else console.error("Authentication failed");
-  }
+    if (res.ok) {
+      console.log("Logged in successfully");
+    } else {
+      console.error("Authentication failed");
+    }
+  };
 
-  return <div id="google-signin"></div>;
-}
 
-function App() {
+  const handleLoginError = () => {
+    console.error("Login Failed");
+  };
+
   return (
-    <div className="App">
-      <GoogleLoginButton />
-
-      <header className="App-header">
-        <p>Edit <code>src/App.js</code> and save to reload.</p>
-      </header>
-    </div>
+    <GoogleOAuthProvider clientId="824007775368-un5ifrgrig8c904rj9cgvu302rkkin9t.apps.googleusercontent.com">
+      <div className="App">
+        <h1>Login with Google</h1>
+        <GoogleLogin
+          onSuccess={handleLoginSuccess}
+          onError={handleLoginError}
+        />
+      </div>
+    </GoogleOAuthProvider>
   );
 }
 
