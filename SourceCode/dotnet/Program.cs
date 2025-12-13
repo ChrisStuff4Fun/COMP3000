@@ -51,6 +51,9 @@ app.UseStaticFiles();
 app.MapFallbackToFile("index.html"); 
 
 
+// REMOVE BEFORE FINAL VER
+app.UseDeveloperExceptionPage();
+
 app.MapKeyEndpoints();
 app.MapDeviceEndpoints();
 app.MapUserEndpoints();
