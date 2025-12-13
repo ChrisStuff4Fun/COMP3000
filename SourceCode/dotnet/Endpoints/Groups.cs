@@ -22,7 +22,7 @@ public static class GroupEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
         // Get current user from db
         await currentUser.getUserFromDBAsync();
 
@@ -39,7 +39,7 @@ public static class GroupEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -67,7 +67,7 @@ public static class GroupEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -89,7 +89,7 @@ public static class GroupEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
 
         // Get group to update
         DeviceGroup? group = await db.DeviceGroups.FindAsync(groupId);
@@ -111,7 +111,7 @@ public static class GroupEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
 
         // Get group and device
         DeviceGroup? group = await db.DeviceGroups.FindAsync(groupId);
@@ -143,7 +143,7 @@ public static class GroupEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
 
         // Get group and device
         DeviceGroup? group = await db.DeviceGroups.FindAsync(groupId);

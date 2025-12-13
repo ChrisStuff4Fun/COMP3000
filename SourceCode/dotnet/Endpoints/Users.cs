@@ -25,7 +25,7 @@ public static class UserEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
         // Get current user from db
         await currentUser.getUserFromDBAsync();
 
@@ -42,7 +42,7 @@ public static class UserEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -77,7 +77,7 @@ public static class UserEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -104,7 +104,7 @@ public static class UserEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -126,16 +126,16 @@ public static class UserEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
 
         // Check if user exists with this google account
         User? existsQuery = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == currentUser.GoogleSub);
         if (existsQuery != null) return Results.Conflict("User already exists");
 
-        // Create new user obj and fill with google sub and email
+        // Create new user obj and fill with google sub and name
         User newUser = new User();
         newUser.GoogleSub   = currentUser.GoogleSub;
-        newUser.Email       = currentUser.Email;
+        newUser.Name       = currentUser.Name;
         newUser.AccessLevel = 1;
 
         db.UserAccessLevels.Add(newUser);
@@ -148,7 +148,7 @@ public static class UserEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
 
         // Get user to update
         User? user = await db.UserAccessLevels.FindAsync(userId);

@@ -4,5 +4,5 @@ public class User
     public int OrgID {get; set;}
     public string GoogleSub {get; set;} = string.Empty;
     public int AccessLevel {get; set;}
-    public string Email { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 }

@@ -22,7 +22,7 @@ public static class DeviceEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
         // Get current user from db
         await currentUser.getUserFromDBAsync();
 
@@ -39,7 +39,7 @@ public static class DeviceEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -66,7 +66,7 @@ public static class DeviceEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!await currentUser.validateGoogleTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
 
         // Get device to update
         Device? device = await db.Devices.FindAsync(deviceId);

@@ -1,8 +1,8 @@
 public class DeviceGroup
 {
     public int DeviceGroupID {get; set;}
-    public required string GroupName {get; set;}
-    public required string GPSProtectionMethod {get; set;}
+    public string GroupName {get; set;} = string.Empty;
+    public string GPSProtectionMethod {get; set;} = string.Empty;
     public int GPSAccuracy {get; set;}
     public int OrgID {get; set;}
 }
