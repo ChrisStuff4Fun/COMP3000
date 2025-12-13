@@ -12,7 +12,7 @@ public static class KeyEndpoints
 
         // Map endpoints
         keys.MapGet("/public", servePublicKey);
-        keys.MapGet("/register/{inboundMessage:string}", registerDeviceKeys);
+        keys.MapGet("/register/{inboundMessage}", registerDeviceKeys);
 
         keys.MapGet("/test", test);
 
