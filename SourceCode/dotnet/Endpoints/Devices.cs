@@ -11,9 +11,9 @@ public static class DeviceEndpoints
 
         // Map endpoints
         devices.MapGet("/devices", getDevicesByOrg);
-        devices.MapGet("/delete/{deviceId:int}", deletePolicy);
-        devices.MapPut("/create", createPolicy);
-        devices.MapPut("/update/{deviceId:int}", updatePolicy);
+        devices.MapGet("/delete/{deviceId:int}", deleteDevice);
+        devices.MapPut("/create", createDevice);
+        devices.MapPut("/update/{deviceId:int}", updateDevice);
     }
 
 
@@ -64,7 +64,7 @@ public static class DeviceEndpoints
     }
 
 
-    private static async Task<IResult> createPolicy([FromBody] Policy newPolicyIn, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> createDevice([FromBody] Policy newPolicyIn, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
@@ -86,7 +86,7 @@ public static class DeviceEndpoints
         return Results.Created();
     }
 
-    private static async Task<IResult> updatePolicy(int policyId, [FromBody] Policy newPolicy, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> updateDevice(int policyId, [FromBody] Policy newPolicy, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
