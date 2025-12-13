@@ -20,21 +20,28 @@ public static class KeyEndpoints
     // Methods for endpoints
     private static async Task<IResult> servePublicKey( AppDbContext db, IHttpContextAccessor httpAccessor)
     {
+        
+        try {
+            Uri keyVaultUri = new Uri("https://cybertrackserver.vault.azure.net/");
+            KeyClient keyClient = new KeyClient(keyVaultUri, new DefaultAzureCredential());
 
-        Uri keyVaultUri = new Uri("https://cybertrackserver.vault.azure.net/");
-        KeyClient keyClient = new KeyClient(keyVaultUri, new DefaultAzureCredential());
+            // Fetch the key
+            KeyVaultKey key = await keyClient.GetKeyAsync("CyberTrackServerKeys");
 
-        // Fetch the key
-        KeyVaultKey key = await keyClient.GetKeyAsync("CyberTrackServerKeys");
+            var publicKey = new
+            {
+                Curve = key.Key.CurveName,
+                X = Convert.ToBase64String(key.Key.X),
+                Y = Convert.ToBase64String(key.Key.Y)
+            };
 
-        var publicKey = new
+            return Results.Ok(publicKey);
+        }
+        catch(Exception e)
         {
-            Curve = key.Key.CurveName,
-            X = Convert.ToBase64String(key.Key.X),
-            Y = Convert.ToBase64String(key.Key.Y)
-        };
+            return Results.Problem(e.Message);
+        }
 
-        return Results.Ok(publicKey);
     }
 
 
