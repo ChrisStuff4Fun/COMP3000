@@ -58,7 +58,7 @@ public static class KeyEndpoints
 
 
 
-    private static async Task<IResult> registerDeviceKeys( String inboundMessage, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> registerDeviceKeys( String inboundMessage, [FromServices] AppDbContext db, [FromServices] IHttpContextAccessor httpAccessor)
     {
 
 
