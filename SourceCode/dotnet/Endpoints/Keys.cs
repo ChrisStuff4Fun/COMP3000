@@ -20,6 +20,8 @@ public static class KeyEndpoints
     // Methods for endpoints
     private static async Task<IResult> servePublicKey( AppDbContext db, IHttpContextAccessor httpAccessor)
     {
+
+        Console.WriteLine("Public key requested");
         
         try {
             Uri keyVaultUri = new Uri("https://cybertrackserver.vault.azure.net/");
