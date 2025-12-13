@@ -11,11 +11,11 @@ public static class UserEndpoints
 
         // Map endpoints
         users.MapGet("/users", getUsersByOrg);
-        users.MapGet("/register/{joinCode:string}", regUserToOrg);
-        users.MapGet("/release/{userId:int}", releaseUserFromOrg);
+        users.MapGet("/register/{joinCode}", regUserToOrg);
+        users.MapGet("/release/{userId}", releaseUserFromOrg);
         users.MapGet("/delete", deleteUser);
         users.MapGet("/create", createUser);
-        users.MapPut("/update/{userId:int}/{newAL:int}", updateUserAccessLevel);
+        users.MapPut("/update/{userId}/{newAL}", updateUserAccessLevel);
     }
 
 

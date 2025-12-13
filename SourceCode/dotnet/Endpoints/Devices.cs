@@ -11,9 +11,9 @@ public static class DeviceEndpoints
 
         // Map endpoints
         devices.MapGet("/devices", getDevicesByOrg);
-        devices.MapGet("/delete/{deviceId:int}", deleteDevice);
+        devices.MapGet("/delete/{deviceId}", deleteDevice);
         devices.MapPut("/create", createDevice);
-        devices.MapPut("/update/{deviceId:int}", updateDevice);
+        devices.MapPut("/update/{deviceId}", updateDevice);
     }
 
 

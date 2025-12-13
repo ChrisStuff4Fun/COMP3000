@@ -11,9 +11,9 @@ public static class PolicyEndpoints
 
         // Map endpoints
         policies.MapGet("/policies", getPoliciesByOrg);
-        policies.MapGet("/delete/{policyId:int}", deletePolicy);
+        policies.MapGet("/delete/{policyId}", deletePolicy);
         policies.MapPut("/create", createPolicy);
-        policies.MapPut("/update/{policyId:int}", updatePolicy);
+        policies.MapPut("/update/{policyId}", updatePolicy);
     }
 
 
