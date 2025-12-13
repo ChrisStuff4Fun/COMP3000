@@ -2,6 +2,7 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
+using Microsoft.AspNetCore.Mvc;
 
 public static class KeyEndpoints
 {
@@ -19,7 +20,7 @@ public static class KeyEndpoints
 
 
 
-    private static async Task<IResult> test(AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> test()
     {
 
 
@@ -27,7 +28,7 @@ public static class KeyEndpoints
     }
 
     // Methods for endpoints
-    private static async Task<IResult> servePublicKey( AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> servePublicKey([FromServices] AppDbContext db, [FromServices] IHttpContextAccessor httpAccessor)
     {
 
         Console.WriteLine("Public key requested");
