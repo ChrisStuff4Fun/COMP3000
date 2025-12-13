@@ -50,6 +50,13 @@ app.UseDefaultFiles();
 app.UseStaticFiles();  
 app.MapFallbackToFile("index.html"); 
 
+
+app.MapKeyEndpoints();
+app.MapDeviceEndpoints();
+app.MapUserEndpoints();
+app.MapPolicyEndpoints();
+app.MapCodeEndpoints();
+
 app.Run();
 
 
