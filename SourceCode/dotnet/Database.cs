@@ -20,5 +20,14 @@ public class AppDbContext : DbContext
 
 
 
+    // Method override for dual PK table
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    modelBuilder.Entity<DeviceDeviceGroupLink>()
+        .HasKey(x => new { x.DeviceID, x.DeviceGroupID });
+
+    base.OnModelCreating(modelBuilder);
+}
+
 
 }
