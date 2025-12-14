@@ -116,8 +116,9 @@ public static class UserEndpoints
         // Reject if user does not belong to same org as out current user
         if (user.OrgID != currentUser.OrgID) return Results.Forbid();
 
-        // Set OrgId to impossible value
-        user.OrgID = -1;
+        // Set OrgId to unnasigned value and reset access.
+        user.OrgID = 0;
+        user.AccessLevel = 1;
 
         // Save back to db
         await db.SaveChangesAsync();
@@ -168,6 +169,7 @@ public static class UserEndpoints
         newUser.GoogleSub   = currentUser.GoogleSub;
         newUser.Name        = name;
         newUser.AccessLevel = 1;
+        newUser.OrgID       = 0;
 
         try
         {

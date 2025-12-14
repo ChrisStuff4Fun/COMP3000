@@ -51,6 +51,8 @@ public class CurrentUser
         User? user = await _db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == GoogleSub);
         if (user != null)
         {
+
+
             UserID      = user.UserID;
             OrgID       = user.OrgID;
             AccessLevel = user.AccessLevel; 
