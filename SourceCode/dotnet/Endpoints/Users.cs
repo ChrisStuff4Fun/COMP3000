@@ -122,7 +122,7 @@ public static class UserEndpoints
     }
 
 
-    private static async Task<IResult> createUser(string googleSub, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> createUser(AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
