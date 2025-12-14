@@ -24,7 +24,30 @@ public static class UserEndpoints
     // Methods for endpoints
 
 
-   private static async Task<IResult> getUsersByOrg(AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> getUser(int userId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    {
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        // Reject if user isnt authed by google
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        // Get current user from db
+        await currentUser.getUserFromDBAsync();
+
+        if (!currentUser.isRegistered()) return Results.BadRequest("Current API user not signed up");
+
+        // Reject if the current user is not the requested user
+        if (currentUser.UserID != userId) return Results.Forbid();
+
+        User? user = await db.UserAccessLevels.FindAsync(userId);
+        
+        return Results.Ok(user);
+        
+    }
+
+
+
+
+
+    private static async Task<IResult> getUsersByOrg(AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         try
         {
@@ -35,7 +58,7 @@ public static class UserEndpoints
 
             if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(3)) return Results.Forbid();
 
-            List<User> users = await db.UserAccessLevels.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+            var users = await db.UserAccessLevels.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
 
             return users.Any() ? Results.Ok(users) : Results.NotFound();
         }
@@ -43,26 +66,6 @@ public static class UserEndpoints
         {
             return Results.Problem(detail: ex.Message, title: "Database or server error");
         }
-    }
-
-
-
-
-
-    private static async Task<IResult> getUsersByOrg( AppDbContext db, IHttpContextAccessor httpAccessor)
-    {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
-        // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
-        // Get current user from db
-        await currentUser.getUserFromDBAsync();
-
-        // Reject if the user is not registered to the app or the org, or if they are not level 3 or higher
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(3)) return Results.Forbid();
-
-        List<User> users = await db.UserAccessLevels.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
-        return users.Any() ? Results.Ok(users) : Results.NotFound();
-        
     }
 
 
