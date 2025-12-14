@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations;
+
 public class Policy
 {
+    [Key]
     public int PolicyID {get; set;}
     public string PolicyName {get; set;} = string.Empty;
     public int GeofenceID {get; set;}

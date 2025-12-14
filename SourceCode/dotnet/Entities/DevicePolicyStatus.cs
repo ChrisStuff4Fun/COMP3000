@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations;
+
 public class DevicePolicyStatus
 {
+    [Key]
     public int DevicePolicyStatusID {get; set;}
     public int DeviceID {get; set;}
     public int PolicyID {get; set;}

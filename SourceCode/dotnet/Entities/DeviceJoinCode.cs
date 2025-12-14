@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations;
+
 public class DeviceJoinCode
 {
+    [Key]
     public int DeviceJoinCodeID {get; set;}
     public int OrgID {get; set;}
     public string Code {get; set;} = string.Empty;

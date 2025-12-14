@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations;
+
 public class Device
 {
+    [Key]
     public int DeviceID {get; set;}
     public string DeviceName {get; set;} = string.Empty;
     public double LastLoggedLat {get; set;}
