@@ -130,13 +130,10 @@ public static class UserEndpoints
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
         if (! currentUser.validateTokenAsync()) return Results.Unauthorized();
-        return Results.BadRequest($"Bad stuff here: {name}    {currentUser.GoogleSub}");
 
         // Check if user exists with this google account
         User? existsQuery = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == currentUser.GoogleSub);
         if (existsQuery != null) return Results.Conflict("User already exists");
-
-        try {
 
         // Create new user obj and fill with google sub and name
         User newUser = new User();
@@ -146,12 +143,6 @@ public static class UserEndpoints
 
         db.UserAccessLevels.Add(newUser);
         await db.SaveChangesAsync();
-
-        }
-        catch
-        {
-            return Results.BadRequest($"Bad stuff here: {name}    {currentUser.GoogleSub}");
-        }
 
         return Results.Created();
     }

@@ -14,7 +14,7 @@ public class CurrentUser
     public int AccessLevel { get; private set; } = 0;
 
     // Manual override for testing, allows all api calls to go through
-    private bool debugMode = true;
+    private bool debugMode = false;
 
     public CurrentUser(AppDbContext db, IHttpContextAccessor http)
     {
@@ -37,6 +37,7 @@ public class CurrentUser
         return false;
 
     GoogleSub = googleSub;
+    
     return true;
 }
 
