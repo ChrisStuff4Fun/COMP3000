@@ -10,6 +10,7 @@ public static class UserEndpoints
         var users = app.MapGroup("/user");
 
         // Map endpoints
+        users.MapGet("/{userId}", getUser);
         users.MapGet("/users", getUsersByOrg);
         users.MapGet("/register/{joinCode}", regUserToOrg);
         users.MapGet("/release/{userId}", releaseUserFromOrg);
@@ -21,6 +22,31 @@ public static class UserEndpoints
 
 
     // Methods for endpoints
+
+
+    private static async Task<IResult> getUser(int userId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    {
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        // Reject if user isnt authed by google
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        // Get current user from db
+        await currentUser.getUserFromDBAsync();
+
+        if (!currentUser.isRegistered()) return Results.BadRequest("Current API user not signed up");
+
+        // Reject if the current user is not the requested user
+        if (currentUser.UserID != userId) return Results.Forbid();
+
+        User? user = await db.UserAccessLevels.FindAsync(userId);
+        
+        return Results.Ok(user);
+        
+    }
+
+
+
+
+
     private static async Task<IResult> getUsersByOrg( AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
@@ -146,7 +172,7 @@ public static class UserEndpoints
         db.UserAccessLevels.Add(newUser);
         await db.SaveChangesAsync();
 
-        return Results.Created();
+        return Results.Created($"/user/{newUser.UserID}", newUser);
     }
 
     private static async Task<IResult> updateUserAccessLevel(int userId, int newAL, AppDbContext db, IHttpContextAccessor httpAccessor)
