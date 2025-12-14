@@ -135,6 +135,8 @@ public static class UserEndpoints
         User? existsQuery = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == currentUser.GoogleSub);
         if (existsQuery != null) return Results.Conflict("User already exists");
 
+        if (currentUser.GoogleSub == null) return Results.BadRequest("Google subject null");
+
         // Create new user obj and fill with google sub and name
         User newUser = new User();
         newUser.GoogleSub   = currentUser.GoogleSub;
