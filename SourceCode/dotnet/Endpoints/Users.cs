@@ -169,8 +169,22 @@ public static class UserEndpoints
         newUser.Name        = name;
         newUser.AccessLevel = 1;
 
-        db.UserAccessLevels.Add(newUser);
-        await db.SaveChangesAsync();
+        try
+        {
+            db.UserAccessLevels.Add(newUser);
+            await db.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("DB ERROR:");
+            Console.WriteLine(ex.ToString());
+
+            return Results.Problem(
+                title: "Database error",
+                detail: ex.Message,
+                statusCode: 500
+            );
+        }
 
         return Results.Created($"/user/{newUser.UserID}", newUser);
     }
