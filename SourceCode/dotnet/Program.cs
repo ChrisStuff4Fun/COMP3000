@@ -26,7 +26,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("https://cybertrack.azurewebsites.net/")
+        policy.WithOrigins("https://cybertrack.azurewebsites.net")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); 
@@ -49,9 +49,11 @@ var app = builder.Build();
 
 // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  
 
+app.UseCors();
+
 
 app.UseRouting();
-app.UseCors();
+
 
 
 app.MapDeviceEndpoints();

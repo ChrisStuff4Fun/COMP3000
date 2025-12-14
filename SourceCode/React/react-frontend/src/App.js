@@ -8,10 +8,11 @@ function App() {
   const handleLoginSuccess = async (credentialResponse) => {
     const idToken = credentialResponse.credential;
 
-    const res = await fetch("/auth/google", {
+    const res = await fetch("https://cybertrack.azurewebsites.net/auth/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: idToken }),
+      credentials: "include"
     });
 
     if (res.ok) {
