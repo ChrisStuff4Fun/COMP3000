@@ -10,7 +10,7 @@ public class CurrentUser
     public int UserID { get; private set; } = -1;
     public int OrgID { get; private set; } = 0;
     public string GoogleSub { get; private set; } = string.Empty;
-     public string Name { get; private set; } = string.Empty;
+    public string Name { get; private set; } = string.Empty;
     public int AccessLevel { get; private set; } = 0;
 
     // Manual override for testing, allows all api calls to go through

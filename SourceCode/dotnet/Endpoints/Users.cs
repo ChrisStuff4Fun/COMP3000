@@ -14,7 +14,7 @@ public static class UserEndpoints
         users.MapGet("/register/{joinCode}", regUserToOrg);
         users.MapGet("/release/{userId}", releaseUserFromOrg);
         users.MapGet("/delete", deleteUser);
-        users.MapGet("/create", createUser);
+        users.MapGet("/create/{name}", createUser);
         users.MapPut("/update/{userId}/{newAL}", updateUserAccessLevel);
     }
 
@@ -122,11 +122,14 @@ public static class UserEndpoints
     }
 
 
-    private static async Task<IResult> createUser(AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> createUser(string name, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
+
+        if (name == null) return Results.BadRequest("No name provided");
+
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (! currentUser.validateTokenAsync()) return Results.Unauthorized();
 
         // Check if user exists with this google account
         User? existsQuery = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == currentUser.GoogleSub);
@@ -135,7 +138,7 @@ public static class UserEndpoints
         // Create new user obj and fill with google sub and name
         User newUser = new User();
         newUser.GoogleSub   = currentUser.GoogleSub;
-        newUser.Name       = currentUser.Name;
+        newUser.Name        = name;
         newUser.AccessLevel = 1;
 
         db.UserAccessLevels.Add(newUser);
