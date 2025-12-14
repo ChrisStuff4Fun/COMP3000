@@ -31,9 +31,9 @@ public static class AuthEndpoints
         string token = requestBody.Token;
         payload = await GoogleJsonWebSignature.ValidateAsync(token);
     }
-    catch
+    catch (Exception e)
     {
-        return Results.Unauthorized();
+        return Results.Json(new {success = false, error = e.Message}, statusCode: 401);
     }
 
     string googleSub = payload.Subject;

@@ -15,10 +15,12 @@ function App() {
       credentials: "include"
     });
 
-    if (res.ok) {
+    const data = await res.json();
+
+    if (res.ok && data.success !== false) {
       console.log("Logged in successfully");
     } else {
-      console.error("Authentication failed");
+      console.error("Authentication failed", data.error);
     }
   };
 
