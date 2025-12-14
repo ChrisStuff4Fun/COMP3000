@@ -15,7 +15,14 @@ function App() {
       credentials: "include"
     });
 
-    const data = await res.json();
+    let data = {};
+    try {
+      data = await res.json();
+    } catch {
+      data.error = `Server returned status ${res.status} with empty body`;
+    }
+
+
 
     if (res.ok && data.success !== false) {
       console.log("Logged in successfully");

@@ -82,7 +82,7 @@ app.MapFallbackToFile("index.html");
 
 
 // REMOVE BEFORE FINAL VER
-app.UseDeveloperExceptionPage();
+//app.UseDeveloperExceptionPage();
 
 
 app.Run();
