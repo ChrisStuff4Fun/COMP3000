@@ -13,6 +13,8 @@ public static class AuthEndpoints
         // Map endpoints
         fences.MapPost("/google", issueJwt);
     
+        fences.MapPost("/test", () => Results.Json(new { success = true }));
+
     }
 
         private class GoogleTokenRequest

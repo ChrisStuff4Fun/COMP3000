@@ -5,8 +5,17 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 
 
 function App() {
+
+  
+
+
+
   const handleLoginSuccess = async (credentialResponse) => {
     const idToken = credentialResponse.credential;
+
+
+    const res1 = await fetch("/auth/test", { method: "POST" });
+    console.log(res1.status); 
 
     const res = await fetch("https://cybertrack.azurewebsites.net/auth/google", {
       method: "POST",
