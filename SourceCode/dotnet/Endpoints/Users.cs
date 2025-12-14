@@ -149,7 +149,7 @@ public static class UserEndpoints
         }
         catch
         {
-            return Results.BadRequest("Bad stuff here");
+            return Results.BadRequest($"Bad stuff here: {name}    {currentUser.GoogleSub}");
         }
 
         return Results.Created();

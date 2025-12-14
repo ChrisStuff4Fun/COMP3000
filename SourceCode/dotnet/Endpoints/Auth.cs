@@ -13,8 +13,6 @@ public static class AuthEndpoints
         // Map endpoints
         fences.MapPost("/google", issueJwt);
     
-        fences.MapPost("/test", () => Results.Json(new { success = true }));
-
     }
 
         private class GoogleTokenRequest
@@ -33,33 +31,28 @@ public static class AuthEndpoints
         string token = requestBody.Token;
         payload = await GoogleJsonWebSignature.ValidateAsync(token);
     }
-    catch (Exception e)
+    catch
     {
-        return Results.Json(new {success = false, error = e.Message}, statusCode: 401);
+        return Results.Unauthorized();
     }
 
     string googleSub = payload.Subject;
 
 
 
-    try
+
+    // Set auth cookie
+    response.Cookies.Append(
+    "auth",
+    googleSub,
+    new CookieOptions
     {
-            // Set auth cookie
-        response.Cookies.Append(
-        "auth",
-        googleSub,
-        new CookieOptions
-        {
-            HttpOnly = true,
-            Secure   = true,
-            SameSite = SameSiteMode.Lax,  // May switch to strict in the future if it works
-            Expires  = DateTimeOffset.UtcNow.AddDays(7)
-        });
-    }
-    catch (Exception e)
-    {
-        return Results.Json(new {success = false, error = e.Message}, statusCode: 401);
-    }
+        HttpOnly = true,
+        Secure   = true,
+        SameSite = SameSiteMode.Lax,  // May switch to strict in the future if it works
+        Expires  = DateTimeOffset.UtcNow.AddDays(7)
+    });
+   
     
 
     return Results.Ok();

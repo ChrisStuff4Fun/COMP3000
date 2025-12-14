@@ -14,9 +14,6 @@ function App() {
     const idToken = credentialResponse.credential;
 
 
-    const res1 = await fetch("/auth/test", { method: "POST" });
-    console.log(res1.status); 
-
     const res = await fetch("https://cybertrack.azurewebsites.net/auth/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -24,19 +21,11 @@ function App() {
       credentials: "include"
     });
 
-    let data = {};
-    try {
-      data = await res.json();
-    } catch {
-      data.error = `Server returned status ${res.status} with empty body`;
-    }
 
-
-
-    if (res.ok && data.success !== false) {
+    if (res.ok) {
       console.log("Logged in successfully");
     } else {
-      console.error("Authentication failed", data.error);
+      console.error("Authentication failed");
     }
   };
 
