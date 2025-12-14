@@ -24,23 +24,25 @@ public static class UserEndpoints
     // Methods for endpoints
 
 
-    private static async Task<IResult> getUser(int userId, AppDbContext db, IHttpContextAccessor httpAccessor)
+   private static async Task<IResult> getUsersByOrg(AppDbContext db, IHttpContextAccessor httpAccessor)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
-        // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
-        // Get current user from db
-        await currentUser.getUserFromDBAsync();
+        try
+        {
+            CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+            if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
 
-        if (!currentUser.isRegistered()) return Results.BadRequest("Current API user not signed up");
+            await currentUser.getUserFromDBAsync();
 
-        // Reject if the current user is not the requested user
-        if (currentUser.UserID != userId) return Results.Forbid();
+            if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(3)) return Results.Forbid();
 
-        User? user = await db.UserAccessLevels.FindAsync(userId);
-        
-        return Results.Ok(user);
-        
+            List<User> users = await db.UserAccessLevels.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+
+            return users.Any() ? Results.Ok(users) : Results.NotFound();
+        }
+        catch(Exception ex)
+        {
+            return Results.Problem(detail: ex.Message, title: "Database or server error");
+        }
     }
 
 
