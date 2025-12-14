@@ -176,12 +176,18 @@ public static class UserEndpoints
         }
         catch (Exception ex)
         {
-            Console.WriteLine("DB ERROR:");
+            Console.WriteLine("=== DB EXCEPTION ===");
             Console.WriteLine(ex.ToString());
+
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine("=== INNER EXCEPTION ===");
+                Console.WriteLine(ex.InnerException.ToString());
+            }
 
             return Results.Problem(
                 title: "Database error",
-                detail: ex.Message,
+                detail: ex.InnerException?.Message ?? ex.Message,
                 statusCode: 500
             );
         }
