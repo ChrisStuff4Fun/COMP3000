@@ -15,7 +15,7 @@ public static class UserEndpoints
         users.MapGet("/register/{joinCode}", regUserToOrg);
         users.MapGet("/release/{userId}", releaseUserFromOrg);
         users.MapGet("/delete", deleteUser);
-        users.MapGet("/create/{name}", createUser);
+        users.MapPost("/create/{name}", createUser);
         users.MapPut("/update/{userId}/{newAL}", updateUserAccessLevel);
     }
 
