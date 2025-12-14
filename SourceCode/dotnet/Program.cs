@@ -49,11 +49,11 @@ var app = builder.Build();
 
 // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  
 
-app.UseCors();
 
 
 app.UseRouting();
 
+app.UseCors();
 
 
 app.MapDeviceEndpoints();
