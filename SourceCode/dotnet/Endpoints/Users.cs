@@ -130,6 +130,7 @@ public static class UserEndpoints
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
         if (! currentUser.validateTokenAsync()) return Results.Unauthorized();
+        return Results.BadRequest($"Bad stuff here: {name}    {currentUser.GoogleSub}");
 
         // Check if user exists with this google account
         User? existsQuery = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == currentUser.GoogleSub);
