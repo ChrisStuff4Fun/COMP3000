@@ -20,6 +20,20 @@ builder.Services.AddRouting();
 
 builder.Services.AddHttpContextAccessor();
 
+
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("https://cybertrack.azurewebsites.net/")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials(); 
+    });
+});
+
+
 // Connect to DB
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -37,6 +51,7 @@ var app = builder.Build();
 
 
 app.UseRouting();
+app.UseCors();
 
 
 app.MapDeviceEndpoints();

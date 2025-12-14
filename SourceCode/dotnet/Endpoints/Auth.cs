@@ -1,6 +1,7 @@
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 public static class AuthEndpoints
 {
@@ -10,18 +11,25 @@ public static class AuthEndpoints
         var fences = app.MapGroup("/auth");
 
         // Map endpoints
-        fences.MapGet("/google", issueJwt);
+        fences.MapPost("/google", issueJwt);
     
     }
 
+        private class GoogleTokenRequest
+        {
+            public required string Token { get; set; }
+        }
+
 
     // Methods for endpoints
-    private static async Task<IResult> issueJwt([FromBody] string idToken, HttpRequest request, HttpResponse response, AppDbContext db)
+    private static async Task<IResult> issueJwt([FromBody] GoogleTokenRequest requestBody, HttpRequest request, HttpResponse response, AppDbContext db)
     {
         GoogleJsonWebSignature.Payload payload;
     try
     {
-        payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
+
+        string token = requestBody.Token;
+        payload = await GoogleJsonWebSignature.ValidateAsync(token);
     }
     catch
     {
