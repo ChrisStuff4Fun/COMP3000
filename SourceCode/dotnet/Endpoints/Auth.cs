@@ -39,8 +39,11 @@ public static class AuthEndpoints
     string googleSub = payload.Subject;
 
 
-    // Set auth cookie
-    response.Cookies.Append(
+
+    try
+    {
+            // Set auth cookie
+        response.Cookies.Append(
         "auth",
         googleSub,
         new CookieOptions
@@ -50,6 +53,12 @@ public static class AuthEndpoints
             SameSite = SameSiteMode.Lax,  // May switch to strict in the future if it works
             Expires  = DateTimeOffset.UtcNow.AddDays(7)
         });
+    }
+    catch (Exception e)
+    {
+        return Results.Json(new {success = false, error = e.Message}, statusCode: 401);
+    }
+    
 
     return Results.Ok();
     }
