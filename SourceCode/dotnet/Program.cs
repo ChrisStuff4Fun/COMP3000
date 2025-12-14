@@ -55,7 +55,7 @@ app.UseRouting();
 
 app.UseCors();
 
-
+app.MapAuthEndpoints();
 app.MapDeviceEndpoints();
 app.MapFenceEndpoints();
 app.MapGPSEndpoints();
