@@ -71,15 +71,49 @@ public static class OrgEndpoints
         Organisation? org = await db.Organisations.FindAsync(currentUser.OrgID);
         if (org == null) return Results.NotFound("Organisation not found");
 
-
+        // Get a list of all users
         List<User> usersInOrg = await db.UserAccessLevels.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
 
+        // Unregister them from the org
         foreach (User user in usersInOrg)
         {
             user.OrgID = 0;
             user.AccessLevel = 1;
         }
         await db.SaveChangesAsync();
+
+
+
+        // Remove ALL entities referencing this org
+        List<Policy> policiesInOrg = await db.Policies.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+        db.Policies.RemoveRange(policiesInOrg);
+        await db.SaveChangesAsync();
+
+        List<OrgJoinCode> orgJoinCodes = await db.OrgJoinCodes.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+        db.OrgJoinCodes.RemoveRange(orgJoinCodes);
+        await db.SaveChangesAsync();
+
+        List<Geofence> geofences = await db.Geofences.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+        db.Geofences.RemoveRange(geofences);
+        await db.SaveChangesAsync();
+
+        List<DevicePolicyStatus> statuses = await db.DevicePolicyStatus.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+        db.DevicePolicyStatus.RemoveRange(statuses);
+        await db.SaveChangesAsync();
+
+        List<DeviceJoinCode> deviceJoinCodes = await db.DeviceJoinCodes.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+        db.DeviceJoinCodes.RemoveRange(deviceJoinCodes);
+        await db.SaveChangesAsync();
+
+        List<DeviceGroup> groups = await db.DeviceGroups.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+        db.DeviceGroups.RemoveRange(groups);
+        await db.SaveChangesAsync();
+
+        List<Device> devices = await db.Devices.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+        db.Devices.RemoveRange(devices);
+        await db.SaveChangesAsync();
+
+
 
         db.Organisations.Remove(org);
         await db.SaveChangesAsync();

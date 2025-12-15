@@ -10,4 +10,5 @@ public class DevicePolicyStatus
     public bool AlertOnEnterTriggered {get; set;}
     public bool AlertOnLeaveTriggered {get; set;}
     public DateTime LastUpdated {get; set;}
+    public int OrgID {get; set;}
 }
