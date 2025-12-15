@@ -49,23 +49,18 @@ public static class UserEndpoints
 
     private static async Task<IResult> getUsersByOrg(AppDbContext db, IHttpContextAccessor httpAccessor)
     {
-        try
-        {
-            CurrentUser currentUser = new CurrentUser(db, httpAccessor);
-            if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+       
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
 
-            await currentUser.getUserFromDBAsync();
+        await currentUser.getUserFromDBAsync();
 
-            if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(3)) return Results.Forbid();
+        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(3) || currentUser.isRegToOrg(0)) return Results.Forbid();
 
-            var users = await db.UserAccessLevels.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
+        var users = await db.UserAccessLevels.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
 
-            return users.Any() ? Results.Ok(users) : Results.NotFound();
-        }
-        catch(Exception ex)
-        {
-            return Results.Problem(detail: ex.Message, title: "Database or server error");
-        }
+        return users.Any() ? Results.Ok(users) : Results.NotFound();
+
     }
 
 

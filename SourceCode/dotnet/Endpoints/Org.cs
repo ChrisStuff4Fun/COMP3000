@@ -54,7 +54,7 @@ public static class OrgEndpoints
 
 
 
-      private static async Task<IResult> deleteOrg( AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> deleteOrg( AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
@@ -79,6 +79,7 @@ public static class OrgEndpoints
             user.OrgID = 0;
             user.AccessLevel = 1;
         }
+        await db.SaveChangesAsync();
 
         db.Organisations.Remove(org);
         await db.SaveChangesAsync();
