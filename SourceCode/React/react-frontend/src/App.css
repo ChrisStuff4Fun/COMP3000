@@ -254,9 +254,9 @@ button:disabled {
 
 .danger-btn{
   padding: 8px 12px;
-  background-color: red;
+  background-color: rgb(107, 12, 12);
   border: none;
-  color: #9b3131;
+  color: #ebe7e7;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s;

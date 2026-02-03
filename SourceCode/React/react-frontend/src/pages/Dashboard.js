@@ -104,32 +104,42 @@ function Policies() {
 
 // ----------------------------------------------------------------------------------------------
 
-function DeleteOrgButton(accessLevel) {
-    return(
-        <button
-        className="danger-btn"
-        disabled={accessLevel < ACCESS.ROOT}
-        title="Root access required"
-        onClick={ 
-        async () => { await fetch("orgs/delete", {
-            method: "GET",
-            credentials:"include"
-            })
-        refreshAuth();
-        }}
-        >
-        Delete Organisation
-        </button>
-    )
+function DeleteOrgButton({ accessLevel, refreshAuth }) {
+  const handleDelete = async () => {
+    if (!window.confirm("This will permanently delete the organisation. Continue?")) {
+      return;
+    }
+
+    const res = await fetch("/orgs/delete", {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      alert("Failed to delete organisation");
+      return;
+    }
+
+    refreshAuth();
+  };
+
+  return (
+    <button
+      className="danger-btn"
+      disabled={accessLevel < ACCESS.ROOT}
+      title={accessLevel < ACCESS.ROOT ? "Root access required" : ""}
+      onClick={handleDelete}
+    >
+      Delete Organisation
+    </button>
+  );
 }
-
-
 
 function Organisation({accessLevel}) {
     return(
         <div>
             <p> Organisation </p>
-            <DeleteOrgButton accessLevel={accessLevel}/>
+            <DeleteOrgButton accessLevel={accessLevel} refreshAuth={refreshAuth}/>
         </div>
     )
 }
