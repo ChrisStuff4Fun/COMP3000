@@ -14,6 +14,7 @@ public static class AuthEndpoints
         // Map endpoints
         auth.MapPost("/google", issueJwt);
         auth.MapGet("/me",      authMe);
+        auth.MapPost("/logout", logout);
     
     }
 
@@ -89,6 +90,13 @@ public static class AuthEndpoints
                 registered = false
             });
         }
+    }
+
+
+     private static async Task<IResult> logout(HttpResponse response)
+    {
+        response.Cookies.Delete("auth");
+        return Results.Ok();
     }
 
 

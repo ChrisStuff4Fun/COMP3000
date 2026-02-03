@@ -42,11 +42,9 @@ export default function LoginPage({ refreshAuth, requireUsername }) {
     const createUser = async () => {
       if (!username.trim()) return alert("Enter a username");
 
-      const res = await fetch("/user/create", {
+      const res = await fetch(`/user/create/${username}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
-        credentials: "include", // JWT cookie identifies user
+        credentials: "include" // JWT cookie identifies user
       });
 
       if (!res.ok) {
@@ -55,7 +53,7 @@ export default function LoginPage({ refreshAuth, requireUsername }) {
         return;
       }
 
-      alert("Username created!");
+      alert("User created!");
       refreshAuth(); // re-fetch /auth/me
     };
 
