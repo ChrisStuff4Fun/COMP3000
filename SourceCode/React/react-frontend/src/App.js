@@ -58,7 +58,10 @@ export default function App() {
           path="/dashboard"
           element={
             authState.authenticated && authState.registered
-              ? <Dashboard username={authState.username} />
+              ? <Dashboard 
+              username={authState.username} 
+              refreshAuth={refreshAuth}
+              />
               : <Navigate to="/" />
           }
         />

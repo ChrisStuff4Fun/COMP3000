@@ -26,7 +26,7 @@ function LogoutButton({refreshAuth}) {
 
 
 
-export default function Dashboard({ username }) {
+export default function Dashboard({ username, refreshAuth }) {
   return (
     <div>
       <h1>Welcome, {username}</h1>
