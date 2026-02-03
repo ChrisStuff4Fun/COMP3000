@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 
 
-const [activeTab, setActiveTab] = useState("overview")
 
 function LogoutButton({refreshAuth}) {
     const handleLogout = async () => {
@@ -18,7 +17,7 @@ function LogoutButton({refreshAuth}) {
 
 
 
-function TopBar({ refreshAuth }) {
+function TopBar({ activeTab, setActiveTab, refreshAuth }) {
 
 
     return (
@@ -80,15 +79,14 @@ function Policies() {
 
 
 
-
-
-
-
 export default function Dashboard({ username, refreshAuth }) {
+
+    const [activeTab, setActiveTab] = useState("overview")
+
   return (
     <div>
       <h1>Welcome, {username}</h1>
-      <TopBar/>
+      <TopBar activeTab={activeTab} setActiveTab={setActiveTab} refreshAuth={refreshAuth} />
       <div className="dashboard-panel">
         {activeTab === "overview" && <Overview />}
         {activeTab === "devices" && <Devices />}
