@@ -153,7 +153,14 @@ export default function Dashboard({ username, accessLevel, refreshAuth }) {
 
   return (
     <div>
-      <h1>Welcome, {username}</h1>
+      
+        <div className="top-bar-header">
+            <h2 className="header-item">Welcome</h2>
+            <h1 className="header-item">CyberTrack Geofencing</h1>
+            <h2 className="header-item">{orgName || "No Organisation"}</h2>
+        </div>
+
+
       <TopBar accessLevel={accessLevel} activeTab={activeTab} setActiveTab={setActiveTab} refreshAuth={refreshAuth} />
       <div className="dashboard-panel">
         {activeTab === "overview" && <Overview />}

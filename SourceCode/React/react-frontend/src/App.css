@@ -63,6 +63,7 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s;
+  justify-content: center;
 }
 
 .top-bar button:hover {
@@ -260,4 +261,26 @@ button:disabled {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+.top-bar-header {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-bar-header .header-item {
+  margin: 0;
+  white-space: nowrap;
+}
+
+
+.logout-btn {
+  background-color: #ef4444;
+  justify-content: center;
+}
+
+.logout-btn:hover {
+  background-color: #dc2626;
 }
