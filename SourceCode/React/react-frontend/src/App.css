@@ -347,7 +347,7 @@ button:disabled {
 }
 
 .org-sidebar button {
-  background: none;
+  background: #2c3e50;
   color: white;
   border: none;
   text-align: left;
@@ -375,7 +375,7 @@ button:disabled {
 
 .org-content {
   flex: 1;
-  background: #020617;
+  background: #2c3e50;
   border: 1px solid #1e293b;
   border-radius: 12px;
   padding: 20px;
