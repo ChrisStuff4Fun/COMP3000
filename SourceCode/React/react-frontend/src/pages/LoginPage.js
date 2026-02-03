@@ -71,16 +71,21 @@ export default function LoginPage({ refreshAuth, requireUsername }) {
   };
 
   return (
-    <GoogleOAuthProvider clientId="824007775368-un5ifrgrig8c904rj9cgvu302rkkin9t.apps.googleusercontent.com">
-      <div className="App">
-        <h1>Login with Google</h1>
-        <GoogleLogin
-          onSuccess={handleLoginSuccess}
-          onError={handleLoginError}
-        />
+    <div className="login-page">
+        <h1> CyberTrack Geofencing </h1>
+        <div className="login-card">
 
-        {showUsernameForm && <CreateUserForm />}
-      </div>
-    </GoogleOAuthProvider>
+            <h2>Login with Google</h2>
+             <div className="google-login-wrapper">
+                <GoogleOAuthProvider clientId="824007775368-un5ifrgrig8c904rj9cgvu302rkkin9t.apps.googleusercontent.com">
+                    <GoogleLogin
+                    onSuccess={handleLoginSuccess}
+                    onError={handleLoginError}
+                    />
+                    {showUsernameForm && <CreateUserForm />}
+                </GoogleOAuthProvider>
+            </div>
+        </div>
+    </div>
   );
 }
