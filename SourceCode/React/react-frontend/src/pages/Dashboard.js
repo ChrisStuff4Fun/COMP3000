@@ -23,7 +23,7 @@ function LogoutButton({refreshAuth}) {
 
 
 
-function TopBar({ activeTab, setActiveTab, refreshAuth }) {
+function TopBar({ accessLevel, setActiveTab, refreshAuth }) {
 
 
     return (
@@ -137,7 +137,7 @@ export default function Dashboard({ username, accessLevel, refreshAuth }) {
   return (
     <div>
       <h1>Welcome, {username}</h1>
-      <TopBar activeTab={activeTab} setActiveTab={setActiveTab} refreshAuth={refreshAuth} />
+      <TopBar accessLevel={accessLevel} activeTab={activeTab} setActiveTab={setActiveTab} refreshAuth={refreshAuth} />
       <div className="dashboard-panel">
         {activeTab === "overview" && <Overview />}
         {activeTab === "devices" && <Devices />}
