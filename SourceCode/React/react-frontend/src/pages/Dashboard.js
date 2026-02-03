@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const ACCESS = {
   USER: 1,
@@ -43,7 +43,7 @@ function TopBar({ accessLevel, setActiveTab, refreshAuth }) {
         <button onClick={() => setActiveTab("users")}>Users</button>
         <button onClick={() => setActiveTab("policies")}>Policies</button>
 
-        <button disabled={accessLevel < ACCESS.ADMIN} onClick={() => setActiveTab("organisation")}>Organisation</button>
+        <button disabled={accessLevel < ACCESS.ESCALATED} onClick={() => setActiveTab("organisation")}>Organisation</button>
 
         <LogoutButton refreshAuth={refreshAuth} />
         </div>
@@ -143,15 +143,198 @@ function DeleteOrgButton({ accessLevel, refreshAuth }) {
 }
 
 
+const ORG_PANELS = {
+    USERS: "users",
+    DEVICES: "devices",
+    DANGER: "danger",
+};
 
-function Organisation({accessLevel, refreshAuth}) {
-    return(
-        <div>
-            <p> Organisation </p>
-            <DeleteOrgButton accessLevel={accessLevel} refreshAuth={refreshAuth}/>
-        </div>
-    )
+
+
+function OrgSidebar({ active, setActive, accessLevel }) {
+  return (
+    <div className="org-sidebar">
+      <button
+        className={active === "users" ? "active" : ""}
+        onClick={() => setActive("users")}
+      >
+        User Join Codes
+      </button>
+
+      <button
+        className={active === "devices" ? "active" : ""}
+        onClick={() => setActive("devices")}
+      >
+        Device Join Codes
+      </button>
+
+      <button
+        disabled={accessLevel < ACCESS.ADMIN}
+        className={active === "danger" ? "active danger" : "danger"}
+        onClick={() => setActive("danger")}
+      >
+        Danger Zone
+      </button>
+    </div>
+  );
 }
+
+
+function DeviceJoinCodeSection({accessLevel}) {
+    const [codes, setCodes] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [validHours, setValidHours] = useState(24);
+
+
+    const fetchCodes = async () => {
+        try {
+            const res = await fetch("/joincodes/getdevicecodes", { credentials: "include" });
+            const data = await res.json();
+            setCodes(data);
+        } catch (err) {
+            console.error("Failed to fetch join codes", err);
+        }
+    };
+
+    useEffect(() => {
+        fetchCodes();
+    }, []);
+
+    
+    const generateCode = async () => {
+        setLoading(true);
+
+        try {
+            const res = await fetch(`joincodes/createdevicecode/${encodeURI(hours)}`, {
+            method: "POST",
+            credentials: "include",
+            });
+
+            if (res.ok) {
+            await fetchCodes();
+            } else {
+            alert("Failed to generate code");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error generating code");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
+
+    const purgeCodes = async () => {
+        if (!window.confirm("Are you sure you want to purge all used and expired device join codes?")) return;
+
+        setLoading(true);
+        try {
+        const res = await fetch("joincodes/purgedevicecodes", {
+            method: "DELETE",
+            credentials: "include",
+        });
+        if (res.ok) {
+            await fetchCodes(); 
+        } else {
+            alert("Failed to purge codes");
+        }
+        } catch (err) {
+        console.error(err);
+        alert("Error purging codes");
+        } finally {
+        setLoading(false);
+        }
+  };
+
+
+    return (
+    <div>
+      <h3>Device Join Codes</h3>
+
+      <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+        <label>
+          Validity (hours):
+          <select value={validHours} onChange={(e) => setValidHours(Number(e.target.value))}>
+            <option value={1}>1</option>
+            <option value={6}>6</option>
+            <option value={12}>12</option>
+            <option value={24}>24</option>
+            <option value={48}>48</option>
+          </select>
+        </label>
+
+        <button
+          disabled={accessLevel < ACCESS.ADMIN || loading}
+          onClick={generateCode}
+        >
+          {loading ? "Generating..." : "Generate Code"}
+        </button>
+
+        <button
+          disabled={accessLevel < ACCESS.ADMIN || loading}
+          onClick={purgeCodes}
+        >
+          {loading ? "Purging..." : "Purge Codes"}
+        </button>
+
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Expiry</th>
+            <th>Used</th>
+          </tr>
+        </thead>
+        <tbody>
+          {codes.map((c) => (
+            <tr key={c.Code}>
+              <td>{c.Code}</td>
+              <td>{c.ExpiryDate}</td>
+              <td>{c.IsUsed}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+
+  };
+
+
+
+
+function Organisation({ accessLevel, refreshAuth }) {
+  const [activePanel, setActivePanel] = useState(ORG_PANELS.USERS);
+
+  return (
+    <div className="org-layout">
+      <OrgSidebar
+        active={activePanel}
+        setActive={setActivePanel}
+        accessLevel={accessLevel}
+      />
+
+      <div className="org-content">
+        {activePanel === ORG_PANELS.DEVICES && (
+          <DeviceJoinCodeSection accessLevel={accessLevel}/>
+        )}
+
+        {activePanel === ORG_PANELS.USERS && (
+          <UserJoinCodeSection accessLevel={accessLevel}/>
+        )}
+
+        {activePanel === ORG_PANELS.DANGER && (
+          <DeleteOrgButton accessLevel={accessLevel} refreshAuth={refreshAuth}/>
+        )}
+      </div>
+    </div>
+  );
+}
+
 
 // ----------------------------------------------------------------------------------------------
 

@@ -10,12 +10,12 @@ public static class JoinCodeEndpoints
         var codes = app.MapGroup("/joincodes");
 
         // Map endpoints
-        codes.MapGet("/createdevicecode/{duration}/", createDeviceJoinCode);
-        codes.MapGet("/createusercode/{duration}/", createUserJoinCode);
+        codes.MapPost("/createdevicecode/{duration}/", createDeviceJoinCode);
+        codes.MapPost("/createusercode/{duration}/", createUserJoinCode);
         codes.MapGet("/purgedevicecodes", purgeDeviceCodes);
         codes.MapGet("/purgeusercodes", purgeUserCodes);
-        codes.MapGet("/getusercodes", getUserCodesByOrg);
-        codes.MapGet("/getdevicecodes", getDeviceCodesByOrg);
+        codes.MapDelete("/getusercodes", getUserCodesByOrg);
+        codes.MapDelete("/getdevicecodes", getDeviceCodesByOrg);
     }
   
   

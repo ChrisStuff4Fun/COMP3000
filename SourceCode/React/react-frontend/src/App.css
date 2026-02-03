@@ -322,3 +322,61 @@ button:disabled {
   color: white;
   border-bottom: 1px solid #1e293b;
 }
+
+.join-code-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+
+
+.org-layout {
+  display: flex;
+  gap: 24px;
+}
+
+.org-sidebar {
+  width: 220px;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.org-sidebar button {
+  background: none;
+  color: white;
+  border: none;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.org-sidebar button:hover {
+  background: #1e293b;
+}
+
+.org-sidebar button.active {
+  background: #1d4ed8;
+}
+
+.org-sidebar button.danger {
+  margin-top: auto;
+  color: #f87171;
+}
+
+.org-sidebar button.danger.active {
+  background: #7f1d1d;
+}
+
+.org-content {
+  flex: 1;
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 20px;
+}
