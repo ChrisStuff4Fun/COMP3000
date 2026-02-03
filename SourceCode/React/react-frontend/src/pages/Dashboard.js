@@ -2,7 +2,7 @@ import React from "react";
 
 
 
-function logoutButton({refreshAuth}) {
+function LogoutButton({refreshAuth}) {
     const handleLogout = async () => {
         await fetch("auth/logout", {
             method: "POST",
@@ -31,7 +31,7 @@ export default function Dashboard({ username }) {
     <div>
       <h1>Welcome, {username}</h1>
       <p> test test test</p>
-    <logoutButton></logoutButton>
+    <LogoutButton refreshAuth={refreshAuth}/>
     </div>
   );
 }
