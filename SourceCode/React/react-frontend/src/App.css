@@ -182,3 +182,66 @@
 .google-login-wrapper {
   margin-top: 20px;
 }
+
+
+
+.org-page {
+  display: flex;
+  height: 100vh;
+  background: linear-gradient(135deg, #2980b9, #6dd5fa);
+  font-family: Arial, sans-serif;
+}
+
+
+.org-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: white;
+}
+
+.org-panel.left {
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.org-panel.right {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.org-panel h2 {
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+
+.org-panel input {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+}
+
+
+.org-panel button {
+  width: 100%;
+  max-width: 300px;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #3498db;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.org-panel button:hover {
+  background-color: #2980b9;
+}

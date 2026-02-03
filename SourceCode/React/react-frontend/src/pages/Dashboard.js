@@ -29,6 +29,7 @@ function TopBar({ activeTab, setActiveTab, refreshAuth }) {
         <button onClick={() => setActiveTab("map")}>Map</button>
         <button onClick={() => setActiveTab("users")}>Users</button>
         <button onClick={() => setActiveTab("policies")}>Policies</button>
+        <button onClick={() => setActiveTab("organisation")}>Organisation</button>
         <LogoutButton refreshAuth={refreshAuth} />
         </div>
     );
@@ -77,6 +78,12 @@ function Policies() {
     )
 }
 
+function Organisation() {
+    return(
+        <p> Organisation </p>
+    )
+}
+
 
 
 export default function Dashboard({ username, refreshAuth }) {
@@ -95,6 +102,7 @@ export default function Dashboard({ username, refreshAuth }) {
         {activeTab === "map" && <Map />}
         {activeTab === "users" && <Users />}
         {activeTab === "policies" && <Policies />}
+        {activeTab === "organisation" && <Organisation />}
     </div>
     </div>
   );

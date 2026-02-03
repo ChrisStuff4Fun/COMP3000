@@ -23,6 +23,7 @@ export default function App() {
         authenticated: data.authenticated || false,
         username: data.username || null,
         registered: data.registered || false,
+        orgId: data.orgId || 0
       });
     } catch (err) {
       console.error("Auth check failed", err);
@@ -31,6 +32,7 @@ export default function App() {
         authenticated: false,
         username: null,
         registered: false,
+        orgId: 0
       });
     }
   };
@@ -42,31 +44,49 @@ export default function App() {
   if (authState.loading) return <p>Loading...</p>;
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            authState.authenticated
-              ? authState.registered
-                ? <Navigate to="/dashboard" />
-                : <LoginPage refreshAuth={refreshAuth} requireUsername={true} />
-              : <LoginPage refreshAuth={refreshAuth} requireUsername={false} />
-          }
-        />
+   <BrowserRouter>
+    <Routes>
 
-        <Route
-          path="/dashboard"
-          element={
-            authState.authenticated && authState.registered
-              ? <Dashboard 
-              username={authState.username} 
-              refreshAuth={refreshAuth}
+      {/* LOGIN */}
+      <Route
+        path="/"
+        element={
+          authState.authenticated
+            ? authState.registered
+              ? authState.orgId > 0
+                ? <Navigate to="/dashboard" />
+                : <Navigate to="/org" />
+              : <LoginPage refreshAuth={refreshAuth} requireUsername={true} />
+            : <LoginPage refreshAuth={refreshAuth} requireUsername={false} />
+        }
+      />
+
+      {/* ORG CREATE / JOIN */}
+      <Route
+        path="/org"
+        element={
+          authState.authenticated && authState.registered && authState.orgId === 0
+            ? <OrgPage refreshAuth={refreshAuth} />
+            : <Navigate to="/dashboard" />
+        }
+      />
+
+      {/* DASHBOARD */}
+      <Route
+        path="/dashboard"
+        element={
+          authState.authenticated && authState.registered && authState.orgId > 0
+            ? (
+              <Dashboard
+                username={authState.username}
+                refreshAuth={refreshAuth}
               />
-              : <Navigate to="/" />
-          }
-        />
-      </Routes>
-    </BrowserRouter>
-  );
+            )
+            : <Navigate to="/" />
+        }
+      />
+
+    </Routes>
+  </BrowserRouter>
+);
 }

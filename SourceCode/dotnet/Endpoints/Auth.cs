@@ -79,7 +79,8 @@ public static class AuthEndpoints
             {
                 authenticated = true,
                 registered = true,
-                username = user.Name
+                username = user.Name,
+                orgId = user.OrgID
             });
         }
         else
