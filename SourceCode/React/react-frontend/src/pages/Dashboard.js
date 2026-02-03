@@ -135,7 +135,7 @@ function DeleteOrgButton({ accessLevel, refreshAuth }) {
   );
 }
 
-function Organisation({accessLevel}) {
+function Organisation({accessLevel, refreshAuth}) {
     return(
         <div>
             <p> Organisation </p>
