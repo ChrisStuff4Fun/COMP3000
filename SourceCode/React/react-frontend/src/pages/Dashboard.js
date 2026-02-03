@@ -153,7 +153,7 @@ export default function Dashboard({ username, accessLevel, refreshAuth }) {
         {activeTab === "map" && <Map />}
         {activeTab === "users" && <Users />}
         {activeTab === "policies" && <Policies />}
-        {activeTab === "organisation" && <Organisation accessLevel={accessLevel}/>}
+        {activeTab === "organisation" && <Organisation accessLevel={accessLevel} refreshAuth={refreshAuth}/>}
     </div>
     </div>
   );
