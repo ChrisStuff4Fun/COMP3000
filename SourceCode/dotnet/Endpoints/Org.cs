@@ -11,8 +11,8 @@ public static class OrgEndpoints
         var codes = app.MapGroup("/orgs");
 
         // Map endpoints
-        codes.MapGet("/create/{name}", createOrg);
-        codes.MapGet("/delete", deleteOrg);
+        codes.MapPost("/create/{name}", createOrg);
+        codes.MapDelete("/delete", deleteOrg);
      
     }
   

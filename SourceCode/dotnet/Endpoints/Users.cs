@@ -10,11 +10,11 @@ public static class UserEndpoints
         var users = app.MapGroup("/user");
 
         // Map endpoints
-        users.MapGet("/{userId}", getUser);
+        users.MapPost("/{userId}", getUser);
         users.MapGet("/users", getUsersByOrg);
-        users.MapGet("/register/{joinCode}", regUserToOrg);
-        users.MapGet("/release/{userId}", releaseUserFromOrg);
-        users.MapGet("/delete", deleteUser);
+        users.MapPost("/register/{joinCode}", regUserToOrg);
+        users.MapPost("/release/{userId}", releaseUserFromOrg);
+        users.MapDelete("/delete", deleteUser);
         users.MapPost("/create/{name}", createUser);
         users.MapPut("/update/{userId}/{newAL}", updateUserAccessLevel);
     }
