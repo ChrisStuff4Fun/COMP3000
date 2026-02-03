@@ -110,6 +110,13 @@ function DeleteOrgButton(accessLevel) {
         className="danger-btn"
         disabled={accessLevel < ACCESS.ROOT}
         title="Root access required"
+        onClick={ 
+        async () => { await fetch("orgs/delete", {
+            method: "GET",
+            credentials:"include"
+            })
+        refreshAuth();
+        }}
         >
         Delete Organisation
         </button>
