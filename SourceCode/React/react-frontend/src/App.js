@@ -11,6 +11,8 @@ export default function App() {
     authenticated: false,
     username: null,
     registered: false,
+    orgId: 0,
+    accessLevel: 0
   });
 
   // Fetch /auth/me to check auth & registration 
@@ -24,7 +26,8 @@ export default function App() {
         authenticated: data.authenticated || false,
         username: data.username || null,
         registered: data.registered || false,
-        orgId: data.orgId || 0
+        orgId: data.orgId || 0,
+        accessLevel: data.accessLevel || 0
       });
     } catch (err) {
       console.error("Auth check failed", err);
@@ -33,7 +36,8 @@ export default function App() {
         authenticated: false,
         username: null,
         registered: false,
-        orgId: 0
+        orgId: 0,
+        accessLevel: 0
       });
     }
   };
@@ -80,6 +84,7 @@ export default function App() {
             ? (
               <Dashboard
                 username={authState.username}
+                accessLevel={authState.accessLevel}
                 refreshAuth={refreshAuth}
               />
             )

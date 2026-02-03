@@ -245,3 +245,19 @@
 .org-panel button:hover {
   background-color: #2980b9;
 }
+
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.danger-btn{
+  padding: 8px 12px;
+  background-color: red;
+  border: none;
+  color: #9b3131;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}

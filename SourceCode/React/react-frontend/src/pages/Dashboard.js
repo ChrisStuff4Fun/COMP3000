@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 
+const ACCESS = {
+  USER: 1,
+  ESCALATED: 2,
+  ADMIN: 3,
+  ROOT: 4
+};
 
 
 function LogoutButton({refreshAuth}) {
@@ -29,7 +35,9 @@ function TopBar({ activeTab, setActiveTab, refreshAuth }) {
         <button onClick={() => setActiveTab("map")}>Map</button>
         <button onClick={() => setActiveTab("users")}>Users</button>
         <button onClick={() => setActiveTab("policies")}>Policies</button>
-        <button onClick={() => setActiveTab("organisation")}>Organisation</button>
+
+        <button disabled={accessLevel < ACCESS.ADMIN} onClick={() => setActiveTab("organisation")}>Organisation</button>
+
         <LogoutButton refreshAuth={refreshAuth} />
         </div>
     );
@@ -47,46 +55,82 @@ function Overview() {
   );
 }
 
+// ----------------------------------------------------------------------------------------------
 function Devices() {
     return(
         <p> devices </p>
     )
 }
+
+// ----------------------------------------------------------------------------------------------
+
 function Geofences() {
     return(
         <p> Geofences </p>
     )
 }
+
+// ----------------------------------------------------------------------------------------------
+
 function DeviceGroups() {
     return(
         <p> DeviceGroups </p>
     )
 }
+
+// ----------------------------------------------------------------------------------------------
+
 function Map() {
     return(
         <p> Map </p>
     )
 }
+
+// ----------------------------------------------------------------------------------------------
+
 function Users() {
     return(
         <p> Users </p>
     )
 }
+
+// ----------------------------------------------------------------------------------------------
+
 function Policies() {
     return(
         <p> Policies </p>
     )
 }
 
-function Organisation() {
+// ----------------------------------------------------------------------------------------------
+
+function DeleteOrgButton(accessLevel) {
     return(
-        <p> Organisation </p>
+        <button
+        className="danger-btn"
+        disabled={accessLevel < ACCESS.ROOT}
+        title="Root access required"
+        >
+        Delete Organisation
+        </button>
     )
 }
 
 
 
-export default function Dashboard({ username, refreshAuth }) {
+function Organisation({accessLevel}) {
+    return(
+        <div>
+            <p> Organisation </p>
+            <DeleteOrgButton accessLevel={accessLevel}/>
+        </div>
+    )
+}
+
+// ----------------------------------------------------------------------------------------------
+
+
+export default function Dashboard({ username, accessLevel, refreshAuth }) {
 
     const [activeTab, setActiveTab] = useState("overview")
 
@@ -102,7 +146,7 @@ export default function Dashboard({ username, refreshAuth }) {
         {activeTab === "map" && <Map />}
         {activeTab === "users" && <Users />}
         {activeTab === "policies" && <Policies />}
-        {activeTab === "organisation" && <Organisation />}
+        {activeTab === "organisation" && <Organisation accessLevel={accessLevel}/>}
     </div>
     </div>
   );

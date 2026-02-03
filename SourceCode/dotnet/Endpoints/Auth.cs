@@ -80,7 +80,8 @@ public static class AuthEndpoints
                 authenticated = true,
                 registered = true,
                 username = user.Name,
-                orgId = user.OrgID
+                orgId = user.OrgID,
+                accessLevel = user.AccessLevel
             });
         }
         else
