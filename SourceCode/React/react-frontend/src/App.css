@@ -338,7 +338,7 @@ button:disabled {
 
 .org-sidebar {
   width: 220px;
-  background: #020617;
+  background: #2c3e50;;
   border: 1px solid #1e293b;
   border-radius: 12px;
   padding: 12px;
@@ -347,7 +347,7 @@ button:disabled {
 }
 
 .org-sidebar button {
-  background: #2c3e50;
+  background: #34495e;
   color: white;
   border: none;
   text-align: left;

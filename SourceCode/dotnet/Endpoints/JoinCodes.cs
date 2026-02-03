@@ -12,10 +12,10 @@ public static class JoinCodeEndpoints
         // Map endpoints
         codes.MapPost("/createdevicecode/{duration}/", createDeviceJoinCode);
         codes.MapPost("/createusercode/{duration}/", createUserJoinCode);
-        codes.MapGet("/purgedevicecodes", purgeDeviceCodes);
-        codes.MapGet("/purgeusercodes", purgeUserCodes);
-        codes.MapDelete("/getusercodes", getUserCodesByOrg);
-        codes.MapDelete("/getdevicecodes", getDeviceCodesByOrg);
+        codes.MapDelete("/purgedevicecodes", purgeDeviceCodes);
+        codes.MapDelete("/purgeusercodes", purgeUserCodes);
+        codes.MapGet("/getusercodes", getUserCodesByOrg);
+        codes.MapGet("/getdevicecodes", getDeviceCodesByOrg);
     }
   
   
