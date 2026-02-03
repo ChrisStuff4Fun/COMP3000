@@ -7,7 +7,7 @@ export default function OrgPage({ refreshAuth }) {
   const createOrg = async () => {
     if (!orgName.trim()) return alert("Enter an organisation name");
 
-    const res = await fetch(`/orgs/create/${orgName}`, {
+    const res = await fetch(`/orgs/create/${encodeURIComponent(orgName)}`, {
       method: "POST",
       credentials: "include"
     });
@@ -19,7 +19,7 @@ export default function OrgPage({ refreshAuth }) {
   const joinOrg = async () => {
     if (!joinCode.trim()) return alert("Enter a join code");
 
-    const res = await fetch(`/user/register/${joinCode}`, {
+    const res = await fetch(`/user/register/${encodeURIComponent(joinCode)}`, {
       method: "POST",
       credentials: "include"
     });
