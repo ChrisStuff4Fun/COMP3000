@@ -164,7 +164,7 @@ export default function Dashboard({ authState, refreshAuth }) {
     <div>
       
         <div className="header-row">
-            <h1 className="app-title">CyberTrack</h1>
+            <h1 className="app-title">CyberTrack Geofencing</h1>
 
             <div className="user-info">
                 <div className="username">{authState.username}</div>
