@@ -75,12 +75,15 @@ public static class AuthEndpoints
 
         if (user != null)
         {
+            Organisation? organisation = await db.Organisations.FindAsync(user.OrgID);
+
             return Results.Ok(new
             {
                 authenticated = true,
                 registered = true,
                 username = user.Name,
                 orgId = user.OrgID,
+                orgName = organisation.OrgName,
                 accessLevel = user.AccessLevel
             });
         }

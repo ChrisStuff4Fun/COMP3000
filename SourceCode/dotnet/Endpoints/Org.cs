@@ -8,15 +8,37 @@ public static class OrgEndpoints
 {
     public static void MapOrgEndpoints(this IEndpointRouteBuilder app)
     {
-        var codes = app.MapGroup("/orgs");
+        var orgs = app.MapGroup("/orgs");
 
         // Map endpoints
-        codes.MapPost("/create/{name}", createOrg);
-        codes.MapDelete("/delete", deleteOrg);
+
+        orgs.MapGet("/get/{orgId}", getOrg);
+        orgs.MapPost("/create/{name}", createOrg);
+        orgs.MapDelete("/delete", deleteOrg);
      
     }
   
-  
+
+  private static async Task<IResult> getOrg(int orgId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    {
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        // Reject if user isnt authed by google
+        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        // Get current user from db
+        await currentUser.getUserFromDBAsync();
+
+        if (!currentUser.isRegistered()) return Results.BadRequest("Current API user not signed up");
+
+        // Reject if the current user is not in the same org
+        if (currentUser.OrgID != orgId) return Results.Forbid();
+
+        Organisation? organisation = await db.Organisations.FindAsync(orgId);
+        
+        return Results.Ok(organisation);
+        
+    }
+
+
   private static async Task<IResult> createOrg(string name, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
 

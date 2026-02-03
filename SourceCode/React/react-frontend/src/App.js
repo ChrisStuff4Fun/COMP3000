@@ -12,6 +12,7 @@ export default function App() {
     username: null,
     registered: false,
     orgId: 0,
+    orgName: null,
     accessLevel: 0
   });
 
@@ -27,6 +28,7 @@ export default function App() {
         username: data.username || null,
         registered: data.registered || false,
         orgId: data.orgId || 0,
+        orgName: data.orgName || null,
         accessLevel: data.accessLevel || 0
       });
     } catch (err) {
@@ -37,6 +39,7 @@ export default function App() {
         username: null,
         registered: false,
         orgId: 0,
+        orgName: null,
         accessLevel: 0
       });
     }
@@ -83,8 +86,7 @@ export default function App() {
           authState.authenticated && authState.registered && authState.orgId > 0
             ? (
               <Dashboard
-                username={authState.username}
-                accessLevel={authState.accessLevel}
+                authState={authState}
                 refreshAuth={refreshAuth}
               />
             )

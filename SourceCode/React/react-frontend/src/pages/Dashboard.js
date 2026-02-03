@@ -7,6 +7,13 @@ const ACCESS = {
   ROOT: 4
 };
 
+const ACCESS_LEVEL_NAME = {
+  1: "User",
+  2: "Escalated",
+  3: "Admin",
+  4: "Root",
+};
+
 
 function LogoutButton({refreshAuth}) {
     const handleLogout = async () => {
@@ -135,6 +142,8 @@ function DeleteOrgButton({ accessLevel, refreshAuth }) {
   );
 }
 
+
+
 function Organisation({accessLevel, refreshAuth}) {
     return(
         <div>
@@ -147,21 +156,25 @@ function Organisation({accessLevel, refreshAuth}) {
 // ----------------------------------------------------------------------------------------------
 
 
-export default function Dashboard({ username, accessLevel, refreshAuth }) {
+export default function Dashboard({ authState, refreshAuth }) {
 
     const [activeTab, setActiveTab] = useState("overview")
 
   return (
     <div>
       
-        <div className="top-bar-header">
-            <h2 className="header-item">Welcome</h2>
-            <h1 className="header-item">CyberTrack Geofencing</h1>
-            <h2 className="header-item">{orgName || "No Organisation"}</h2>
+        <div className="header-row">
+            <h1 className="app-title">CyberTrack</h1>
+
+            <div className="user-info">
+                <div className="username">{authState.username}</div>
+                <div className="access-level">Access: {ACCESS_LEVEL_NAME[authState.accessLevel]}</div>
+                <div className="org-name">{authState.orgName}</div>
+            </div>
         </div>
 
 
-      <TopBar accessLevel={accessLevel} activeTab={activeTab} setActiveTab={setActiveTab} refreshAuth={refreshAuth} />
+      <TopBar accessLevel={authState.accessLevel} activeTab={activeTab} setActiveTab={setActiveTab} refreshAuth={refreshAuth} />
       <div className="dashboard-panel">
         {activeTab === "overview" && <Overview />}
         {activeTab === "devices" && <Devices />}
@@ -170,7 +183,7 @@ export default function Dashboard({ username, accessLevel, refreshAuth }) {
         {activeTab === "map" && <Map />}
         {activeTab === "users" && <Users />}
         {activeTab === "policies" && <Policies />}
-        {activeTab === "organisation" && <Organisation accessLevel={accessLevel} refreshAuth={refreshAuth}/>}
+        {activeTab === "organisation" && <Organisation accessLevel={authState.accessLevel} refreshAuth={refreshAuth}/>}
     </div>
     </div>
   );
