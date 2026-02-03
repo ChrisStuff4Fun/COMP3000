@@ -1,6 +1,7 @@
 import React from "react";
 
 
+const [activeTab, setActiveTab] = useState("overview")
 
 function LogoutButton({refreshAuth}) {
     const handleLogout = async () => {
@@ -17,8 +18,65 @@ function LogoutButton({refreshAuth}) {
 
 
 
+function TopBar({ refreshAuth }) {
 
 
+    return (
+        <div className="top-bar">
+        <button onClick={() => setActiveTab("overview")}>Overview</button>
+        <button onClick={() => setActiveTab("devices")}>Devices</button>
+        <button onClick={() => setActiveTab("geofences")}>Geofences</button>
+        <button onClick={() => setActiveTab("groups")}>Device Groups</button>
+        <button onClick={() => setActiveTab("map")}>Map</button>
+        <button onClick={() => setActiveTab("users")}>Users</button>
+        <button onClick={() => setActiveTab("policies")}>Policies</button>
+        <LogoutButton refreshAuth={refreshAuth} />
+        </div>
+    );
+}
+
+
+function Overview() {
+  return (
+    <div className="dashboard-overview">
+      <div className="box"> <Devices/> </div>
+      <div className="box"> <Geofences/> </div>
+      <div className="box"> <DeviceGroups/> </div>
+      <div className="box"> <Map/> </div>
+    </div>
+  );
+}
+
+function Devices() {
+    return(
+        <p> devices </p>
+    )
+}
+function Geofences() {
+    return(
+        <p> Geofences </p>
+    )
+}
+function DeviceGroups() {
+    return(
+        <p> DeviceGroups </p>
+    )
+}
+function Map() {
+    return(
+        <p> Map </p>
+    )
+}
+function Users() {
+    return(
+        <p> Users </p>
+    )
+}
+function Policies() {
+    return(
+        <p> Policies </p>
+    )
+}
 
 
 
@@ -30,8 +88,16 @@ export default function Dashboard({ username, refreshAuth }) {
   return (
     <div>
       <h1>Welcome, {username}</h1>
-      <p> test test test</p>
-    <LogoutButton refreshAuth={refreshAuth}/>
+      <TopBar/>
+      <div className="dashboard-panel">
+        {activeTab === "overview" && <Overview />}
+        {activeTab === "devices" && <Devices />}
+        {activeTab === "geofences" && <Geofences />}
+        {activeTab === "groups" && <DeviceGroups />}
+        {activeTab === "map" && <Map />}
+        {activeTab === "users" && <Users />}
+        {activeTab === "policies" && <Policies />}
+    </div>
     </div>
   );
 }
