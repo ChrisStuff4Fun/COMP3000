@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 
@@ -41,26 +41,28 @@ export default function App() {
   if (authState.loading) return <p>Loading...</p>;
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          authState.authenticated
-            ? authState.registered
-              ? <Navigate to="/dashboard" />
-              : <LoginPage refreshAuth={refreshAuth} requireUsername={true} />
-            : <LoginPage refreshAuth={refreshAuth} requireUsername={false} />
-        }
-      />
-      
-      <Route
-        path="/dashboard"
-        element={
-          authState.authenticated && authState.registered
-            ? <Dashboard username={authState.username} />
-            : <Navigate to="/" />
-        }
-      />
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            authState.authenticated
+              ? authState.registered
+                ? <Navigate to="/dashboard" />
+                : <LoginPage refreshAuth={refreshAuth} requireUsername={true} />
+              : <LoginPage refreshAuth={refreshAuth} requireUsername={false} />
+          }
+        />
+
+        <Route
+          path="/dashboard"
+          element={
+            authState.authenticated && authState.registered
+              ? <Dashboard username={authState.username} />
+              : <Navigate to="/" />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
