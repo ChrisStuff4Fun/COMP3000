@@ -318,6 +318,7 @@ function UserJoinCodeSection({accessLevel}) {
             const res = await fetch("/joincodes/getusercodes", { credentials: "include" });
             const data = await res.json();
             setCodes(data);
+            console.log(data);
         } catch (err) {
             console.error("Failed to fetch join codes", err);
         }
