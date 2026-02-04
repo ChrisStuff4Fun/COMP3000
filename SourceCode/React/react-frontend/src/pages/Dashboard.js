@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Polygon, Popup } from "react-leaflet";
+import { MapContainer, TileLayer} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -127,7 +127,16 @@ function Map() {
 
 
     return(
-        <p> Map </p>
+      <MapContainer
+        center={[50.375, -4.139]} 
+        zoom={13}
+        style={{ height: '100vh', width: '100%' }}
+      >
+      <TileLayer
+        attribution='&copy; OpenStreetMap contributors'
+        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      />
+      </MapContainer>
     )
 }
 
