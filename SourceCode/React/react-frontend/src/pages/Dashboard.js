@@ -100,7 +100,7 @@ function Map() {
         shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
     });
 
-
+/*
     const [devices, setDevices] = useState([]);
     const [geofences, setGeofences] = useState([]);
 
@@ -123,7 +123,7 @@ function Map() {
         fetchData();
     }, []);
 
-
+*/
 
 
     return(
