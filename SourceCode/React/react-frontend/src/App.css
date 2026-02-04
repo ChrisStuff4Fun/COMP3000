@@ -404,3 +404,10 @@ tbody td {
 tbody tr:hover {
   background-color: #f0f0f0;
 }
+
+.map-wrapper {
+  height: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
