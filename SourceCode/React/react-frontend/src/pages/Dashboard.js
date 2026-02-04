@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { MapContainer, TileLayer, Marker, Polygon, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 const ACCESS = {
   USER: 1,
@@ -88,6 +92,41 @@ function DeviceGroups() {
 // ----------------------------------------------------------------------------------------------
 
 function Map() {
+
+    delete L.Icon.Default.prototype._getIconUrl;
+    L.Icon.Default.mergeOptions({
+        iconRetinaUrl:
+            "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    });
+
+
+    const [devices, setDevices] = useState([]);
+    const [geofences, setGeofences] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+        try {
+            const devicesRes = await fetch("/device/devices", { credentials: "include" });
+            const geofencesRes = await fetch("geofence/geofences", { credentials: "include" });
+
+            const devicesData = await devicesRes.json();
+            const geofencesData = await geofencesRes.json();
+
+            setDevices(devicesData);
+            setGeofences(geofencesData);
+        } catch (err) {
+            console.error("Failed to load map data", err);
+        }
+        };
+
+        fetchData();
+    }, []);
+
+
+
+
     return(
         <p> Map </p>
     )
@@ -293,7 +332,7 @@ function DeviceJoinCodeSection({accessLevel}) {
             <tr key={c.code}>
               <td>{c.code}</td>
               <td>{c.expiryDate}</td>
-              <td>{c.isUsed}</td>
+              <td>{c.isUsed ? "Yes" : "No"}</td>
             </tr>
           ))}
         </tbody>
@@ -420,7 +459,7 @@ function UserJoinCodeSection({accessLevel}) {
             <tr key={c.code}>
               <td>{c.code}</td>
               <td>{c.expiryDate}</td>
-              <td>{c.isUsed}</td>
+              <td>{c.isUsed ? "Yes" : "No"}</td>
             </tr>
           ))}
         </tbody>
