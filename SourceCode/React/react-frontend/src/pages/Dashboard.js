@@ -290,10 +290,10 @@ function DeviceJoinCodeSection({accessLevel}) {
         </thead>
         <tbody>
           {codes.map((c) => (
-            <tr key={c.Code}>
-              <td>{c.Code}</td>
-              <td>{c.ExpiryDate}</td>
-              <td>{c.IsUsed}</td>
+            <tr key={c.code}>
+              <td>{c.code}</td>
+              <td>{c.expiryDate}</td>
+              <td>{c.isUsed}</td>
             </tr>
           ))}
         </tbody>
@@ -318,7 +318,6 @@ function UserJoinCodeSection({accessLevel}) {
             const res = await fetch("/joincodes/getusercodes", { credentials: "include" });
             const data = await res.json();
             setCodes(data);
-            console.log(data);
         } catch (err) {
             console.error("Failed to fetch join codes", err);
         }
@@ -418,10 +417,10 @@ function UserJoinCodeSection({accessLevel}) {
         </thead>
         <tbody>
           {codes.map((c) => (
-            <tr key={c.Code}>
-              <td>{c.Code}</td>
-              <td>{c.ExpiryDate}</td>
-              <td>{c.IsUsed}</td>
+            <tr key={c.code}>
+              <td>{c.code}</td>
+              <td>{c.expiryDate}</td>
+              <td>{c.isUsed}</td>
             </tr>
           ))}
         </tbody>
