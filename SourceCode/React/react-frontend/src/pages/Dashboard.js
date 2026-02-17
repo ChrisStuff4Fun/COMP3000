@@ -203,9 +203,8 @@ function Users(accessLevel) {
           const targetLevel = user.accessLevel;
           const canAct = canModify(targetLevel);
 
-          console.log(user)
+          console.log(user);
 
-          return (
             <tr key={user.id}>
               <td>{user.name}</td>
 
@@ -237,10 +236,10 @@ function Users(accessLevel) {
               </td>
 
               <td>
-                <button onClick={() => releaseUser(user)} className="danger-btn" disabled={(accessLevel < user.accessLevel) || (accessLevel < ACCESS.ADMIN)}>Release</button>
+                <button onClick={() => releaseUser(user.id)} className="danger-btn" disabled={(accessLevel <= user.accessLevel) || (accessLevel < ACCESS.ADMIN)}>Release</button>
               </td>
             </tr>
-          );
+ 
         })}
       </tbody>
       </table>
