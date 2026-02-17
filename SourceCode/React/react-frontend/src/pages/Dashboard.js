@@ -166,7 +166,7 @@ function Users({accessLevel}) {
 
   const releaseUser = async (userId) => {
     await fetch(`/user/release/${userId}`, {
-      method: "PUT"
+      method: "POST"
     });
     await fetchUsers();
   };
@@ -214,30 +214,27 @@ function Users({accessLevel}) {
               <td>{user.name}</td>
 
               <td>
-                <span>{ACCESS_LEVEL_NAME[targetLevel]}</span>
-                {canAct && (
-                  <select
-                    value={targetLevel}
-                    onChange={(e) =>
-                      updateAccessLevel(user.userID, Number(e.target.value))
-                    }
-                  >
-                    {/* only roles you can assign */}
-                    {accessLevel === ACCESS.ROOT && (
-                      <>
-                        <option value={ACCESS.ADMIN}>Admin</option>
-                        <option value={ACCESS.ESCALATED}>Escalated</option>
-                        <option value={ACCESS.USER}>User</option>
-                      </>
-                    )}
-                    {accessLevel === ACCESS.ADMIN && (
-                      <>
-                        <option value={ACCESS.ESCALATED}>Escalated</option>
-                        <option value={ACCESS.USER}>User</option>
-                      </>
-                    )}
-                  </select>
-                )}
+                <select disabled={accessLevel<3}
+                  value={targetLevel}
+                  onChange={(e) =>
+                    updateAccessLevel(user.userID, Number(e.target.value))
+                  }
+                >
+                  {/* only roles you can assign */}
+                  {accessLevel === ACCESS.ROOT && (
+                    <>
+                      <option value={ACCESS.ADMIN}>Admin</option>
+                      <option value={ACCESS.ESCALATED}>Escalated</option>
+                      <option value={ACCESS.USER}>User</option>
+                    </>
+                  )}
+                  {accessLevel === ACCESS.ADMIN && (
+                    <>
+                      <option value={ACCESS.ESCALATED}>Escalated</option>
+                      <option value={ACCESS.USER}>User</option>
+                    </>
+                  )}
+                </select>
               </td>
 
               <td>
