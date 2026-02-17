@@ -221,7 +221,7 @@ function Users(accessLevel) {
                       }
                     >
                       {/* ROOT can assign ADMIN + ESCALATED + USER */}
-                      {authState.accessLevel === ACCESS.ROOT && (
+                      {accessLevel === ACCESS.ROOT && (
                         <>
                           <option value={ACCESS.ADMIN}>Admin</option>
                           <option value={ACCESS.ESCALATED}>Escalated</option>
@@ -230,7 +230,7 @@ function Users(accessLevel) {
                       )}
 
                       {/* ADMIN can assign ESCALATED + USER */}
-                      {authState.accessLevel === ACCESS.ADMIN && (
+                      {accessLevel === ACCESS.ADMIN && (
                         <>
                           <option value={ACCESS.ESCALATED}>Escalated</option>
                           <option value={ACCESS.USER}>User</option>
