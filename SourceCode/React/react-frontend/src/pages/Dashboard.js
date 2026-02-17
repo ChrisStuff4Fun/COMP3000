@@ -206,7 +206,7 @@ function Users({accessLevel}) {
           console.log(user)
 
           return (
-            <tr key={user.id}>
+            <tr key={user.userID}>
               <td>{user.name}</td>
 
               <td>
@@ -215,7 +215,7 @@ function Users({accessLevel}) {
                   <select
                     value={targetLevel}
                     onChange={(e) =>
-                      updateAccessLevel(user.id, Number(e.target.value))
+                      updateAccessLevel(user.userID, Number(e.target.value))
                     }
                   >
                     {/* only roles you can assign */}
@@ -237,7 +237,7 @@ function Users({accessLevel}) {
               </td>
 
               <td>
-                <button onClick={() => releaseUser(user.id)} className="danger-btn" disabled={(accessLevel <= user.accessLevel) || (accessLevel < ACCESS.ADMIN)}>Release</button>
+                <button onClick={() => releaseUser(user.userID)} className="danger-btn" disabled={(accessLevel <= user.accessLevel) || (accessLevel < ACCESS.ADMIN)}>Release</button>
               </td>
             </tr>
           );
