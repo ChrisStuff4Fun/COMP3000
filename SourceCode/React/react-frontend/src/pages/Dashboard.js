@@ -178,7 +178,7 @@ function Users({accessLevel}) {
 
       await fetchUsers();
     } catch {
-      console.error("Failed to update user")
+      console.error("Failed to update user", res)
     }
   }
 
