@@ -13,10 +13,10 @@ public static class UserEndpoints
         users.MapPost("/{userId}", getUser);
         users.MapGet("/users", getUsersByOrg);
         users.MapPost("/register/{joinCode}", regUserToOrg);
-        users.MapPost("/release/{userId}", releaseUserFromOrg);
+        users.MapPut("/release/{userId}", releaseUserFromOrg);
         users.MapDelete("/delete", deleteUser);
         users.MapPost("/create/{name}", createUser);
-        users.MapPost("/update/{userId}/{newAL}", updateUserAccessLevel);
+        users.MapPut("/update/{userId}/{newAL}", updateUserAccessLevel);
     }
 
 
@@ -210,8 +210,10 @@ public static class UserEndpoints
         if (user == null) return Results.Conflict("User does not exists");
 
         // Reject if current user is in different org or is lower level of access or attempting to change their own access level, or is not an admin
-        if (user.OrgID != currentUser.OrgID || user.AccessLevel >= currentUser.AccessLevel || currentUser.UserID == user.UserID || currentUser.AccessLevel <= 3) return Results.Forbid();
+        if (user.OrgID != currentUser.OrgID || user.AccessLevel >= currentUser.AccessLevel || currentUser.UserID == user.UserID || currentUser.AccessLevel < 3) return Results.Forbid();
 
+        // Cannot edit root user's access level
+        if (user.AccessLevel == 4) return Results.Forbid();
 
         // If the new access level is legitimate and does not exceed the current users level, set and save
         if (newAL >= 1 && newAL <= currentUser.AccessLevel )
