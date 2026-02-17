@@ -203,37 +203,36 @@ function Users(accessLevel) {
           const targetLevel = user.accessLevel;
           const canAct = canModify(targetLevel);
 
+          console.log(user)
+
           return (
             <tr key={user.id}>
               <td>{user.name}</td>
 
               <td>
-                {canAct ? (
+                <span>{levelToLabel[targetLevel]}</span>
+                {canAct && (
                   <select
                     value={targetLevel}
                     onChange={(e) =>
                       updateAccessLevel(user.id, Number(e.target.value))
                     }
                   >
-                    {/* ROOT can assign ADMIN + ESCALATED + USER */}
-                    {accessLevel === ACCESS.ROOT && (
+                    {/* only roles you can assign */}
+                    {currentLevel === ACCESS.ROOT && (
                       <>
                         <option value={ACCESS.ADMIN}>Admin</option>
                         <option value={ACCESS.ESCALATED}>Escalated</option>
                         <option value={ACCESS.USER}>User</option>
                       </>
                     )}
-
-                    {/* ADMIN can assign ESCALATED + USER */}
-                    {accessLevel === ACCESS.ADMIN && (
+                    {currentLevel === ACCESS.ADMIN && (
                       <>
                         <option value={ACCESS.ESCALATED}>Escalated</option>
                         <option value={ACCESS.USER}>User</option>
                       </>
                     )}
                   </select>
-                ) : (
-                  ACCESS_LEVEL_NAME[targetLevel]
                 )}
               </td>
 
