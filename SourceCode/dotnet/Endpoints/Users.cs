@@ -56,7 +56,7 @@ public static class UserEndpoints
 
         await currentUser.getUserFromDBAsync();
 
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(3) || currentUser.isRegToOrg(0)) return Results.Forbid();
+        if (!currentUser.isRegistered() || currentUser.isRegToOrg(0)) return Results.Forbid();
 
         var users = await db.UserAccessLevels.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
 
