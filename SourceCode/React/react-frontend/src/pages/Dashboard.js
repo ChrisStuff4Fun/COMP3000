@@ -210,7 +210,7 @@ function Users(accessLevel) {
               <td>{user.name}</td>
 
               <td>
-                <span>{levelToLabel[targetLevel]}</span>
+                <span>{ACCESS_LEVEL_NAME[targetLevel]}</span>
                 {canAct && (
                   <select
                     value={targetLevel}
@@ -219,14 +219,14 @@ function Users(accessLevel) {
                     }
                   >
                     {/* only roles you can assign */}
-                    {currentLevel === ACCESS.ROOT && (
+                    {accessLevel === ACCESS.ROOT && (
                       <>
                         <option value={ACCESS.ADMIN}>Admin</option>
                         <option value={ACCESS.ESCALATED}>Escalated</option>
                         <option value={ACCESS.USER}>User</option>
                       </>
                     )}
-                    {currentLevel === ACCESS.ADMIN && (
+                    {accessLevel === ACCESS.ADMIN && (
                       <>
                         <option value={ACCESS.ESCALATED}>Escalated</option>
                         <option value={ACCESS.USER}>User</option>
