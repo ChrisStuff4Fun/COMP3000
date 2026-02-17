@@ -74,7 +74,7 @@ function Devices() {
 
 // ----------------------------------------------------------------------------------------------
 
-function Geofences({accessLevel}) {
+function GeofenceSection({accessLevel}) {
 
   const [geofences, setGeofences] = useState([]);
 
@@ -125,7 +125,6 @@ function Geofences({accessLevel}) {
     return (
     <div>
       <h2>Geofences</h2>
-      <button disabled={!canModify}> Create New Geofence </button>
       <table>
         <thead>
           <tr>
@@ -157,6 +156,70 @@ function Geofences({accessLevel}) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+
+
+function CreateFenceSection ({accessLevel}) {
+
+  return(<p>test</p>);
+}
+
+
+
+
+
+const GEOFENCE_PANELS = {
+    OVERVIEW: "overview",
+    CREATE: "create",
+};
+
+
+function GeofenceSidebar({ active, setActive, accessLevel }) {
+  return (
+    <div className="org-sidebar">
+      <button
+        className={active === "overview" ? "active" : ""}
+        onClick={() => setActive("overview")}
+      >
+        Geofences
+      </button>
+
+      <button
+        className={active === "create" ? "active" : ""}
+        onClick={() => setActive("create")}
+        disabled={accessLevel<ACCESS.ADMIN}
+      >
+        Create
+      </button>
+    </div>
+  );
+}
+
+
+function Geofences({ accessLevel }) {
+  const [activePanel, setActivePanel] = useState(ORG_PANELS.USERS);
+
+  return (
+    <div className="org-layout">
+      <GeofenceSidebar
+        active={activePanel}
+        setActive={setActivePanel}
+        accessLevel={accessLevel}
+      />
+
+      <div className="org-content">
+        {activePanel === GEOFENCE_PANELS.OVERVIEW && (
+          <GeofenceSection accessLevel={accessLevel}/>
+        )}
+
+        {activePanel === GEOFENCE_PANELS.CREATE && (
+          <CreateFenceSection accessLevel={accessLevel}/>
+        )}
+
+      </div>
     </div>
   );
 }
