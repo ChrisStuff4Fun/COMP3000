@@ -217,11 +217,11 @@ function Users(accessLevel) {
                     <select
                       value={targetLevel}
                       onChange={(e) =>
-                        updateAccess(user.id, Number(e.target.value))
+                        updateAccessLevel(user.id, Number(e.target.value))
                       }
                     >
                       {/* ROOT can assign ADMIN + ESCALATED + USER */}
-                      {currentLevel === ACCESS.ROOT && (
+                      {authState.accessLevel === ACCESS.ROOT && (
                         <>
                           <option value={ACCESS.ADMIN}>Admin</option>
                           <option value={ACCESS.ESCALATED}>Escalated</option>
@@ -230,7 +230,7 @@ function Users(accessLevel) {
                       )}
 
                       {/* ADMIN can assign ESCALATED + USER */}
-                      {currentLevel === ACCESS.ADMIN && (
+                      {authState.accessLevel === ACCESS.ADMIN && (
                         <>
                           <option value={ACCESS.ESCALATED}>Escalated</option>
                           <option value={ACCESS.USER}>User</option>
