@@ -109,6 +109,18 @@ function Geofences({accessLevel}) {
       console.error("Failed to delete geofence", err);
     }
   };
+
+  const updateGeofenceName = async (id, newName) => {
+    try{
+      const res = await fetch(`/geofence/update/${id}/${newName}`, {method:"PUT", credentials:"include"});
+      if (!res.ok) throw new Error("Failed to update geofence");
+
+      await fetchGeofences();
+    } catch {
+      console.error("Failed to update geofence");
+    }
+    
+  };
   
     return (
     <div>
