@@ -16,7 +16,7 @@ public static class UserEndpoints
         users.MapPost("/release/{userId}", releaseUserFromOrg);
         users.MapDelete("/delete", deleteUser);
         users.MapPost("/create/{name}", createUser);
-        users.MapPut("/update/{userId}/{newAL}", updateUserAccessLevel);
+        users.MapPost("/update/{userId}/{newAL}", updateUserAccessLevel);
     }
 
 

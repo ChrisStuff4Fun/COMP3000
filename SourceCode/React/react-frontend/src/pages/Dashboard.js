@@ -173,7 +173,7 @@ function Users({accessLevel}) {
 
   const updateAccessLevel = async (userId, newAL) => {
     try {
-      const res = await fetch(`/update/${userId}/${newAL}`, {method: "PUT", credentials:"include"});
+      const res = await fetch(`/update/${userId}/${newAL}`, {method: "POST", credentials:"include"});
       if (!res.ok) throw new Error("Failed to update user");
 
       await fetchUsers();
