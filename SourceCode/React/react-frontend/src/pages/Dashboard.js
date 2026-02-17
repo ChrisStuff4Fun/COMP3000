@@ -144,10 +144,125 @@ function Map() {
 
 // ----------------------------------------------------------------------------------------------
 
-function Users() {
+function Users(accessLevel) {
+  const [users, setUsers] = useState([]);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch("/user/users", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch users");
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      console.error("Failed to fetch users", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const canModify = (targetLevel) => accessLevel > targetLevel;
+
+  const canCreate = (roleToCreate) => 
+    (accessLevel === ACCESS.ROOT && (roleToCreate === ACCESS.ADMIN || roleToCreate === ACCESS.ESCALATED)) ||
+    (accessLevel === ACCESS.ADMIN && roleToCreate === ACCESS.ESCALATED);
+
+
+  const releaseUser = async (userId) => {
+    await fetch(`/release/${userId}`, {
+      method: "POST"
+    });
+    await fetchUsers();
+  };
+
+  const updateAccessLevel = async (userId, newAL) => {
+    try {
+      const res = await fetch(`/update/${userId}/${newAL}`, {method: "PUT", credentials:"include"});
+      if (!res.ok) throw new Error("Failed to update user");
+
+      await fetchUsers();
+    } catch {
+      console.error("Failed to update user")
+    }
+  }
+
+    
+
     return(
-        <p> Users </p>
+      <div>
+      <h2>Organisation Users</h2>
+
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Access Level</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+          {users.map(user => {
+            const targetLevel = user.accessLevel;
+            const canAct = canModify(targetLevel);
+
+            return (
+              <tr key={user.id}>
+                <td>{user.name}</td>
+
+                <td>
+                  {canAct ? (
+                    <select
+                      value={targetLevel}
+                      onChange={(e) =>
+                        updateAccess(user.id, Number(e.target.value))
+                      }
+                    >
+                      {/* ROOT can assign ADMIN + ESCALATED + USER */}
+                      {currentLevel === ACCESS.ROOT && (
+                        <>
+                          <option value={ACCESS.ADMIN}>Admin</option>
+                          <option value={ACCESS.ESCALATED}>Escalated</option>
+                          <option value={ACCESS.USER}>User</option>
+                        </>
+                      )}
+
+                      {/* ADMIN can assign ESCALATED + USER */}
+                      {currentLevel === ACCESS.ADMIN && (
+                        <>
+                          <option value={ACCESS.ESCALATED}>Escalated</option>
+                          <option value={ACCESS.USER}>User</option>
+                        </>
+                      )}
+                    </select>
+                  ) : (
+                    targetLevel
+                  )}
+                </td>
+
+                <td>
+                  {canAct && (
+                    <button
+                      onClick={() => releaseUser(user)}
+                      className="danger-btn"
+                    >
+                      Release
+                    </button>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+        </table>
+      </div>
+    </div>
     )
+
+    
+
 }
 
 // ----------------------------------------------------------------------------------------------
@@ -540,7 +655,7 @@ export default function Dashboard({ authState, refreshAuth }) {
         {activeTab === "geofences" && <Geofences />}
         {activeTab === "groups" && <DeviceGroups />}
         {activeTab === "map" && <Map />}
-        {activeTab === "users" && <Users />}
+        {activeTab === "users" && <Users accessLevel={authState.accessLevel}/>}
         {activeTab === "policies" && <Policies />}
         {activeTab === "organisation" && <Organisation accessLevel={authState.accessLevel} refreshAuth={refreshAuth}/>}
     </div>

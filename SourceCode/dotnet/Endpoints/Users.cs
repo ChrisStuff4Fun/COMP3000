@@ -115,6 +115,8 @@ public static class UserEndpoints
         if (user == null) return Results.BadRequest("User does not exist.");
         // Reject if user does not belong to same org as out current user
         if (user.OrgID != currentUser.OrgID) return Results.Forbid();
+        // Reject if user is root or admin
+        if (user.AccessLevel >= 3) return Results.Forbid();
 
         // Set OrgId to unnasigned value and reset access.
         user.OrgID = 0;
@@ -208,7 +210,7 @@ public static class UserEndpoints
         if (user == null) return Results.Conflict("User does not exists");
 
         // Reject if current user is in different org or is lower level of access or attempting to change their own access level, or is not an admin
-        if (user.OrgID != currentUser.OrgID || user.AccessLevel > currentUser.AccessLevel || currentUser.UserID == user.UserID || currentUser.AccessLevel >= 3) return Results.Forbid();
+        if (user.OrgID != currentUser.OrgID || user.AccessLevel >= currentUser.AccessLevel || currentUser.UserID == user.UserID || currentUser.AccessLevel <= 3) return Results.Forbid();
 
 
         // If the new access level is legitimate and does not exceed the current users level, set and save
