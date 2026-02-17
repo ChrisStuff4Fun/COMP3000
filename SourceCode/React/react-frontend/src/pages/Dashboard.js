@@ -144,7 +144,7 @@ function Map() {
 
 // ----------------------------------------------------------------------------------------------
 
-function Users(accessLevel) {
+function Users({accessLevel}) {
   const [users, setUsers] = useState([]);
 
   const fetchUsers = async () => {
@@ -203,8 +203,9 @@ function Users(accessLevel) {
           const targetLevel = user.accessLevel;
           const canAct = canModify(targetLevel);
 
-          console.log(user);
+          console.log(user)
 
+          return (
             <tr key={user.id}>
               <td>{user.name}</td>
 
@@ -239,7 +240,7 @@ function Users(accessLevel) {
                 <button onClick={() => releaseUser(user.id)} className="danger-btn" disabled={(accessLevel <= user.accessLevel) || (accessLevel < ACCESS.ADMIN)}>Release</button>
               </td>
             </tr>
- 
+          );
         })}
       </tbody>
       </table>
