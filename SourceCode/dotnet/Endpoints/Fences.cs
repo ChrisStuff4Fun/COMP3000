@@ -11,7 +11,7 @@ public static class FenceEndpoints
         fences.MapGet("/geofences", getFencesByOrg);
         fences.MapGet("/delete/{fenceId}", deleteFence);
         fences.MapPut("/create", createFence);
-        fences.MapPut("/update/{fenceId}", updateFence);
+        fences.MapPut("/update/{fenceId}/{newName}", updateFence);
     }
 
 
@@ -83,7 +83,7 @@ public static class FenceEndpoints
         return Results.Created();
     }
 
-    private static async Task<IResult> updateFence(int fenceId, [FromBody] Geofence newFence, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> updateFence(int fenceId, string newName, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
@@ -96,11 +96,8 @@ public static class FenceEndpoints
         // Reject if current user is in different org or is not an admin
         if (fence.OrgID != currentUser.OrgID || currentUser.AccessLevel >= 3) return Results.Forbid();
 
-        // Edit current fence
-        fence.GeofenceName   = newFence.GeofenceName;
-        fence.ShapeType      = newFence.ShapeType;
-        fence.GPSCoordinates = newFence.GPSCoordinates;
-        fence.CircleRadius   = newFence.CircleRadius;
+        // Edit current fence name
+        fence.GeofenceName = newName;
 
         await db.SaveChangesAsync();
         return Results.Ok();

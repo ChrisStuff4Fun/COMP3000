@@ -74,10 +74,79 @@ function Devices() {
 
 // ----------------------------------------------------------------------------------------------
 
-function Geofences() {
-    return(
-        <p> Geofences </p>
-    )
+function Geofences({accessLevel}) {
+
+  const [geofences, setGeofences] = useState([]);
+
+  const fetchGeofences = async() => {
+    try { 
+      const res = await fetch("/geofence/geofences", {credentials: "include"});
+      if (!res.ok) throw new Error("Failed to fetch geofences");
+
+      const data = await res.json();
+      setGeofences(data);
+    } catch {
+      console.error("Failed to fetch geofences");
+    }
+  }
+
+    useEffect(() => {
+      fetchGeofences();
+    }, []);
+
+
+  const canModify = (accessLevel >= ACCESS.ADMIN);
+
+  const deleteGeofence = async (id) => {
+    try {
+      const res = await fetch(`/geofence/delete/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to delete geofence");
+      await fetchGeofences();
+    } catch (err) {
+      console.error("Failed to delete geofence", err);
+    }
+  };
+  
+    return (
+    <div>
+      <h2>Geofences</h2>
+      <button disabled={!canModify}> Create New Geofence </button>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Shape</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {geofences.map((fence) => (
+            <tr key={fence.id}>
+              <td>
+                {canModify() ? (
+                  <input
+                    type="text"
+                    value={fence.name}
+                    onChange={(e) => setGeofences((prev) => prev.map((oldFence) => oldFence.id === fence.id ? { ...oldFence, name: e.target.value } : oldFence) )}
+                    onBlur={(e) => updateGeofenceName(fence.id, e.target.value)}
+                  />
+                ) : (
+                  fence.name
+                )}
+              </td>
+              <td>{fence.shape}</td>
+              <td>
+                <button onClick={() => deleteGeofence(fence.id)} className="danger-btn" disabled={!canModify}> Delete </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 // ----------------------------------------------------------------------------------------------
@@ -638,7 +707,7 @@ export default function Dashboard({ authState, refreshAuth }) {
       <div className="dashboard-panel">
         {activeTab === "overview" && <Overview />}
         {activeTab === "devices" && <Devices />}
-        {activeTab === "geofences" && <Geofences />}
+        {activeTab === "geofences" && <Geofences accessLevel={authState.accessLevel}/>}
         {activeTab === "groups" && <DeviceGroups />}
         {activeTab === "map" && <Map />}
         {activeTab === "users" && <Users accessLevel={authState.accessLevel}/>}
