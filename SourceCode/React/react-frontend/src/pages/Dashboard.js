@@ -162,8 +162,6 @@ function Users({accessLevel}) {
     fetchUsers();
   }, []);
 
-  const canModify = (targetLevel) => accessLevel > targetLevel;
-
   const releaseUser = async (userId) => {
     await fetch(`/user/release/${userId}`, {
       method: "POST"
@@ -186,8 +184,6 @@ function Users({accessLevel}) {
     }
   }
 
-  console.log(accessLevel)
-
   return(
     <div>
     <h2>Organisation Users</h2>
@@ -205,9 +201,6 @@ function Users({accessLevel}) {
         <tbody>
         {users.map(user => {
           const targetLevel = user.accessLevel;
-          const canAct = canModify(targetLevel);
-
-          console.log(user)
 
           return (
             <tr key={user.userID}>
