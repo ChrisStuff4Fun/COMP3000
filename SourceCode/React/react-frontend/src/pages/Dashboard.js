@@ -164,11 +164,6 @@ function Users(accessLevel) {
 
   const canModify = (targetLevel) => accessLevel > targetLevel;
 
-  const canCreate = (roleToCreate) => 
-    (accessLevel === ACCESS.ROOT && (roleToCreate === ACCESS.ADMIN || roleToCreate === ACCESS.ESCALATED)) ||
-    (accessLevel === ACCESS.ADMIN && roleToCreate === ACCESS.ESCALATED);
-
-
   const releaseUser = async (userId) => {
     await fetch(`/release/${userId}`, {
       method: "POST"
