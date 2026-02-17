@@ -207,12 +207,17 @@ function Users({accessLevel}) {
               <td>{user.name}</td>
 
               <td>
-                <select disabled={accessLevel<3}
+                <select disabled={(accessLevel<3) || (targetLevel == 4)}
                   value={targetLevel}
                   onChange={(e) =>
                     updateAccessLevel(user.userID, Number(e.target.value))
                   }
                 >
+                  {targetLevel == ACCESS.ROOT && (
+                    <>
+                      <option value={ACCESS.ROOT}>Root</option>
+                    </>
+                  )}
                   {/* only roles you can assign */}
                   {accessLevel === ACCESS.ROOT && (
                     <>
