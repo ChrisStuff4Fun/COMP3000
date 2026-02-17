@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer} from "react-leaflet";
+import { FeatureGroup, MapContainer, TileLayer} from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -202,23 +202,25 @@ function CreateFenceSection ({accessLevel}) {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        <EditControl
-          position="topright"
-          onCreated={(e) => {
-            const layer = e.layer;
-            // Save GeoJSON shape
-            setShape(layer.toGeoJSON());
-          }}
-          onDeleted={() => setShape(null)}
-          draw={{
-            rectangle: false,
-            marker: false,
-            polyline: false,
-            circlemarker: false,
-            polygon: true,
-            circle: true,
-          }}
-        />
+        <FeatureGroup>
+          <EditControl
+            position="topright"
+            onCreated={(e) => {
+              const layer = e.layer;
+              // Save GeoJSON shape
+              setShape(layer.toGeoJSON());
+            }}
+            onDeleted={() => setShape(null)}
+            draw={{
+              rectangle: false,
+              marker: false,
+              polyline: false,
+              circlemarker: false,
+              polygon: true,
+              circle: true,
+            }}
+          />
+        </FeatureGroup>
       </MapContainer>
 
       <button
@@ -264,7 +266,7 @@ function GeofenceSidebar({ active, setActive, accessLevel }) {
 
 
 function Geofences({ accessLevel }) {
-  const [activePanel, setActivePanel] = useState(ORG_PANELS.USERS);
+  const [activePanel, setActivePanel] = useState(GEOFENCE_PANELS.OVERVIEW);
 
   return (
     <div className="org-layout">
