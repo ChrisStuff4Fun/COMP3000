@@ -17,7 +17,7 @@ public static class UserEndpoints
         users.MapPut("/release/{userId}", releaseUserFromOrg);
         users.MapDelete("/delete", deleteUser);
         users.MapPost("/create/{name}", createUser);
-        users.MapPut("/update/{userId}/{newAL}", updateUserAccessLevel);
+        users.MapPost("/update/{userId}/{newAL}", updateUserAccessLevel);
     }
 
 
@@ -208,6 +208,9 @@ public static class UserEndpoints
             CurrentUser currentUser = new CurrentUser(db, httpAccessor);
             // Reject if user isnt authed by google
             if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+
+            // Get current user from DB
+            await currentUser.getUserFromDBAsync();
 
             // Get user to update
             User? user = await db.UserAccessLevels.FindAsync(userId);
