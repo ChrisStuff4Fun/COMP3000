@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FeatureGroup, MapContainer, TileLayer} from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import 'leaflet-draw/dist/leaflet.draw.css';
-import L from "leaflet";
+import L, { featureGroup } from "leaflet";
 
 const ACCESS = {
   USER: 1,
@@ -164,25 +164,65 @@ function GeofenceSection({accessLevel}) {
 
 
 
-function createNewFence({name, shape}) {
-  return;
-}
+
 
 function CreateFenceSection ({accessLevel}) {
   const [name, setName] = useState("");
   // shape is GeoJSON obj
   const [shape, setShape] = useState(null);
+  const fgRef = useRef(null);
 
 
-  const handleCreate = () => {
+  const handleSave = async () => {
     if (!name || !shape) {
       alert("No name or shape.")
     }
 
-    createNewFence({name, shape});
-    setName("");
-    setShape(null)
+
+    try {
+      const res = await fetch(`/geofence/create/${encodeURIComponent(name)}`, {
+        method: "POST",
+        credentials: "include", 
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(shape), 
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || "Failed to create geofence");
+      }
+
+      alert("Geofence created successfully!");
+
+
+      setName("");
+      setShape(null);
+
+
+      fetchGeofences();
+    } catch (err) {
+      console.error("Error creating geofence:", err);
+    }
+
   }
+
+
+  const handleCreate = (e) => {
+    const layer = e.layer;
+
+    const featureGroup = fgRef.current;
+    if (featureGroup) {
+      featureGroup.eachLayer((layer) => featureGroup.removeLayer(layer));
+    }
+
+    layer.addTo(fgRef.current);
+
+    setShape(layer.toGeoJSON());
+  }
+
+
 
    return (
     <div>
@@ -202,14 +242,10 @@ function CreateFenceSection ({accessLevel}) {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        <FeatureGroup>
+        <FeatureGroup ref={fgRef}>
           <EditControl
             position="topright"
-            onCreated={(e) => {
-              const layer = e.layer;
-              // Save GeoJSON shape
-              setShape(layer.toGeoJSON());
-            }}
+            onCreated={handleCreate}
             onDeleted={() => setShape(null)}
             draw={{
               rectangle: false,
@@ -219,13 +255,16 @@ function CreateFenceSection ({accessLevel}) {
               polygon: true,
               circle: true,
             }}
+            edit={{
+            featureGroup: fgRef.current,
+            }}
           />
         </FeatureGroup>
       </MapContainer>
 
       <button
         style={{ marginTop: "12px" }}
-        onClick={handleCreate}
+        onClick={handleSave}
       >
         Create Geofence
       </button>
@@ -824,7 +863,6 @@ function Organisation({ accessLevel, refreshAuth }) {
 
 
 // ----------------------------------------------------------------------------------------------
-
 
 export default function Dashboard({ authState, refreshAuth }) {
 

@@ -10,7 +10,7 @@ public static class FenceEndpoints
         // Map endpoints
         fences.MapGet("/geofences", getFencesByOrg);
         fences.MapGet("/delete/{fenceId}", deleteFence);
-        fences.MapPut("/create", createFence);
+        fences.MapPut("/create/{name}", createFence);
         fences.MapPut("/update/{fenceId}/{newName}", updateFence);
     }
 
@@ -61,7 +61,7 @@ public static class FenceEndpoints
     }
 
 
-    private static async Task<IResult> createFence([FromBody] Geofence newFence, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> createFence(string name, [FromBody] string newFence, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
@@ -72,12 +72,14 @@ public static class FenceEndpoints
         // Only admin and root can create fences
         if (currentUser.AccessLevel < 3) return Results.Forbid();
 
-        // Set group Id to impossible value so that db server autofills it
-        newFence.GeofenceID = 0;
-        // Force ordId to be that of the user creating it 
-        newFence.OrgID    = currentUser.OrgID;
 
-        db.Geofences.Add(newFence);
+        Geofence fence = new Geofence();
+        // Force ordId to be that of the user creating it 
+        fence.OrgID        = currentUser.OrgID;
+        fence.GeoJSON      = newFence;
+        fence.GeofenceName = name;
+        
+        db.Geofences.Add(fence);
         await db.SaveChangesAsync();
 
         return Results.Created();
