@@ -32,7 +32,7 @@ jobs:
       - name: Install React dependencies
         run: |
           cd ${{ env.REACT_APP_PATH }}
-          npm install
+          npm install --legacy-peer-deps
 
       - name: Build React
         run: |
