@@ -23,7 +23,7 @@ public class CurrentUser
     }
 
     // Check if user is authed with google, checking if the user is even logged in
-   public bool validateTokenAsync()
+   public bool validateToken()
 {
     if (debugMode) return true;
 

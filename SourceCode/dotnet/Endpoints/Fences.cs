@@ -20,7 +20,7 @@ public static class FenceEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db
         await currentUser.getUserFromDBAsync();
 
@@ -37,7 +37,7 @@ public static class FenceEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -65,7 +65,7 @@ public static class FenceEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -87,7 +87,7 @@ public static class FenceEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
 
         // Get fence to update
         Geofence? fence = await db.Geofences.FindAsync(fenceId);

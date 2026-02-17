@@ -23,7 +23,7 @@ public static class PolicyEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db
         await currentUser.getUserFromDBAsync();
 
@@ -40,7 +40,7 @@ public static class PolicyEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -68,7 +68,7 @@ public static class PolicyEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -90,7 +90,7 @@ public static class PolicyEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
 
         // Get policy to update
         Policy? policy = await db.Policies.FindAsync(policyId);

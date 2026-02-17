@@ -29,7 +29,7 @@ public static class UserEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db
         await currentUser.getUserFromDBAsync();
 
@@ -52,7 +52,7 @@ public static class UserEndpoints
     {
        
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
 
         await currentUser.getUserFromDBAsync();
 
@@ -69,7 +69,7 @@ public static class UserEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -102,31 +102,39 @@ public static class UserEndpoints
 
     private static async Task<IResult> releaseUserFromOrg(int userId, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
-        // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
-        // Get current user from DB
-        await currentUser.getUserFromDBAsync();
+        try {
+            CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+            // Reject if user isnt authed by google
+            if (!currentUser.validateToken()) return Results.Unauthorized();
+            // Get current user from DB
+            await currentUser.getUserFromDBAsync();
 
-        // Reject if the user is not registered to the app or is not an admin
-        if (!currentUser.isRegistered() || currentUser.hasAccessLevel(3)) return Results.Forbid();
-   
-        User? user = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.UserID == userId);
+            // Reject if the user is not registered to the app or is not an admin
+            if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(3)) return Results.Forbid();
+    
+            User? user = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.UserID == userId);
 
-        if (user == null) return Results.BadRequest("User does not exist.");
-        // Reject if user does not belong to same org as out current user
-        if (user.OrgID != currentUser.OrgID) return Results.Forbid();
-        // Reject if user is root or admin
-        if (user.AccessLevel >= 3) return Results.Forbid();
+            if (user == null) return Results.BadRequest("User does not exist.");
+            // Reject if user does not belong to same org as out current user
+            if (user.OrgID != currentUser.OrgID) return Results.Forbid();
+            // Reject if user is root or admin
+            if (user.AccessLevel >= 3) return Results.Forbid();
 
-        // Set OrgId to unnasigned value and reset access.
-        user.OrgID = 0;
-        user.AccessLevel = 1;
+            // Set OrgId to unnasigned value and reset access.
+            user.OrgID = 0;
+            user.AccessLevel = 1;
 
-        // Save back to db
-        await db.SaveChangesAsync();
+            // Save back to db
+            await db.SaveChangesAsync();
 
-        return Results.Ok();
+            return Results.Ok();
+        } catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            return Results.Ok();
+        }
+
+
     }
 
 
@@ -134,7 +142,7 @@ public static class UserEndpoints
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
@@ -159,7 +167,7 @@ public static class UserEndpoints
 
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
-        if (! currentUser.validateTokenAsync()) return Results.Unauthorized();
+        if (! currentUser.validateToken()) return Results.Unauthorized();
 
         // Check if user exists with this google account
         User? existsQuery = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == currentUser.GoogleSub);
@@ -207,7 +215,7 @@ public static class UserEndpoints
         {
             CurrentUser currentUser = new CurrentUser(db, httpAccessor);
             // Reject if user isnt authed by google
-            if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+            if (!currentUser.validateToken()) return Results.Unauthorized();
 
             // Get current user from DB
             await currentUser.getUserFromDBAsync();
