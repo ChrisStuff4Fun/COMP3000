@@ -182,79 +182,79 @@ function Users(accessLevel) {
     }
   }
 
-    
+  console.log(accessLevel)
 
-    return(
-      <div>
-      <h2>Organisation Users</h2>
+  return(
+    <div>
+    <h2>Organisation Users</h2>
 
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Access Level</th>
-              <th>Actions</th>
+    <div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Access Level</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+        {users.map(user => {
+          const targetLevel = user.accessLevel;
+          const canAct = canModify(targetLevel);
+
+          return (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+
+              <td>
+                {canAct ? (
+                  <select
+                    value={targetLevel}
+                    onChange={(e) =>
+                      updateAccessLevel(user.id, Number(e.target.value))
+                    }
+                  >
+                    {/* ROOT can assign ADMIN + ESCALATED + USER */}
+                    {accessLevel === ACCESS.ROOT && (
+                      <>
+                        <option value={ACCESS.ADMIN}>Admin</option>
+                        <option value={ACCESS.ESCALATED}>Escalated</option>
+                        <option value={ACCESS.USER}>User</option>
+                      </>
+                    )}
+
+                    {/* ADMIN can assign ESCALATED + USER */}
+                    {accessLevel === ACCESS.ADMIN && (
+                      <>
+                        <option value={ACCESS.ESCALATED}>Escalated</option>
+                        <option value={ACCESS.USER}>User</option>
+                      </>
+                    )}
+                  </select>
+                ) : (
+                  ACCESS_LEVEL_NAME[targetLevel]
+                )}
+              </td>
+
+              <td>
+                {canAct && (
+                  <button
+                    onClick={() => releaseUser(user)}
+                    className="danger-btn"
+                  >
+                    Release
+                  </button>
+                )}
+              </td>
             </tr>
-          </thead>
-
-          <tbody>
-          {users.map(user => {
-            const targetLevel = user.accessLevel;
-            const canAct = canModify(targetLevel);
-
-            return (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-
-                <td>
-                  {canAct ? (
-                    <select
-                      value={targetLevel}
-                      onChange={(e) =>
-                        updateAccessLevel(user.id, Number(e.target.value))
-                      }
-                    >
-                      {/* ROOT can assign ADMIN + ESCALATED + USER */}
-                      {accessLevel === ACCESS.ROOT && (
-                        <>
-                          <option value={ACCESS.ADMIN}>Admin</option>
-                          <option value={ACCESS.ESCALATED}>Escalated</option>
-                          <option value={ACCESS.USER}>User</option>
-                        </>
-                      )}
-
-                      {/* ADMIN can assign ESCALATED + USER */}
-                      {accessLevel === ACCESS.ADMIN && (
-                        <>
-                          <option value={ACCESS.ESCALATED}>Escalated</option>
-                          <option value={ACCESS.USER}>User</option>
-                        </>
-                      )}
-                    </select>
-                  ) : (
-                    targetLevel
-                  )}
-                </td>
-
-                <td>
-                  {canAct && (
-                    <button
-                      onClick={() => releaseUser(user)}
-                      className="danger-btn"
-                    >
-                      Release
-                    </button>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-        </table>
-      </div>
+          );
+        })}
+      </tbody>
+      </table>
     </div>
-    )
+  </div>
+  )
 
     
 
