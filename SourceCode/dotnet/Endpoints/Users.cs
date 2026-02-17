@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata.Ecma335;
 
 public static class UserEndpoints
 {
@@ -201,29 +202,37 @@ public static class UserEndpoints
 
     private static async Task<IResult> updateUserAccessLevel(int userId, int newAL, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
-        // Reject if user isnt authed by google
-        if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
 
-        // Get user to update
-        User? user = await db.UserAccessLevels.FindAsync(userId);
-        if (user == null) return Results.Conflict("User does not exists");
-
-        // Reject if current user is in different org or is lower level of access or attempting to change their own access level, or is not an admin
-        if (user.OrgID != currentUser.OrgID || user.AccessLevel >= currentUser.AccessLevel || currentUser.UserID == user.UserID || currentUser.AccessLevel < 3) return Results.Forbid();
-
-        // Cannot edit root user's access level
-        if (user.AccessLevel == 4) return Results.Forbid();
-
-        // If the new access level is legitimate and does not exceed the current users level, set and save
-        if (newAL >= 1 && newAL <= currentUser.AccessLevel )
+        try
         {
-            user.AccessLevel = newAL;
-            await db.SaveChangesAsync();
-            return Results.Ok();
+            CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+            // Reject if user isnt authed by google
+            if (!currentUser.validateTokenAsync()) return Results.Unauthorized();
+
+            // Get user to update
+            User? user = await db.UserAccessLevels.FindAsync(userId);
+            if (user == null) return Results.Conflict("User does not exists");
+
+            // Reject if current user is in different org or is lower level of access or attempting to change their own access level, or is not an admin
+            if (user.OrgID != currentUser.OrgID || user.AccessLevel >= currentUser.AccessLevel || currentUser.UserID == user.UserID || currentUser.AccessLevel < 3) return Results.Forbid();
+
+            // Cannot edit root user's access level
+            if (user.AccessLevel == 4) return Results.Forbid();
+
+            // If the new access level is legitimate and does not exceed the current users level, set and save
+            if (newAL >= 1 && newAL <= currentUser.AccessLevel )
+            {
+                user.AccessLevel = newAL;
+                await db.SaveChangesAsync();
+                return Results.Ok();
+            }
+                    
+            return Results.Forbid();
+        } catch (Exception e)
+        {
+            return Results.Problem(e.InnerException.Message);
         }
-                
-        return Results.Forbid();
+        
         
     }
 
