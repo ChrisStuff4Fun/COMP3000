@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer} from "react-leaflet";
+import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
@@ -162,9 +163,71 @@ function GeofenceSection({accessLevel}) {
 
 
 
-function CreateFenceSection ({accessLevel}) {
+function createNewFence({name, shape}) {
+  return;
+}
 
-  return(<p>test</p>);
+function CreateFenceSection ({accessLevel}) {
+  const [name, setName] = useState("");
+  // shape is GeoJSON obj
+  const [shape, setShape] = useState(null);
+
+
+  const handleCreate = () => {
+    if (!name || !shape) {
+      alert("No name or shape.")
+    }
+
+    createNewFence({name, shape});
+    setName("");
+    setShape(null)
+  }
+
+   return (
+    <div>
+      <label>
+        Geofence Name:
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+
+      <MapContainer
+        center={[50.375, -4.139]}
+        zoom={13}
+        style={{ height: '100vh', width: '100%' }}
+      >
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        <EditControl
+          position="topright"
+          onCreated={(e) => {
+            const layer = e.layer;
+            // Save GeoJSON shape
+            setShape(layer.toGeoJSON());
+          }}
+          onDeleted={() => setShape(null)}
+          draw={{
+            rectangle: false,
+            marker: false,
+            polyline: false,
+            circlemarker: false,
+            polygon: true,
+            circle: true,
+          }}
+        />
+      </MapContainer>
+
+      <button
+        style={{ marginTop: "12px" }}
+        onClick={handleCreate}
+      >
+        Create Geofence
+      </button>
+    </div>
+  );
 }
 
 
