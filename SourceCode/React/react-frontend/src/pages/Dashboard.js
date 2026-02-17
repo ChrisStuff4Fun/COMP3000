@@ -237,14 +237,7 @@ function Users(accessLevel) {
               </td>
 
               <td>
-                {canAct && (
-                  <button
-                    onClick={() => releaseUser(user)}
-                    className="danger-btn"
-                  >
-                    Release
-                  </button>
-                )}
+                <button onClick={() => releaseUser(user)} className="danger-btn" disabled={(accessLevel < user.accessLevel) || (accessLevel < ACCESS.ADMIN)}>Release</button>
               </td>
             </tr>
           );
