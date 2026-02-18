@@ -87,6 +87,8 @@ function GeofenceSection({accessLevel}) {
 
       const data = await res.json();
       setGeofences(data);
+
+      console.log(data);
     } catch {
       console.error("Failed to fetch geofences");
     }
