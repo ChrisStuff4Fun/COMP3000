@@ -217,7 +217,20 @@ function CreateFenceSection ({accessLevel}) {
 
     layer.addTo(featureGroup);
 
-    setShape(layer.toGeoJSON());
+
+    if (layer instanceof L.Circle) {
+      const circleGeo = layer.toGeoJSON();
+      circleGeo.properties = {
+        ...circleGeo.properties,
+        radius: layer.getRadius()}
+      
+      setShape(circleGeo);
+    }
+    else {
+      setShape(layer.toGeoJSON());
+    }
+
+    
   }
 
 
