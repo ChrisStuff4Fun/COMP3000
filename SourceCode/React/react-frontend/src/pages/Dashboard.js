@@ -3,7 +3,7 @@ import { FeatureGroup, MapContainer, TileLayer} from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import 'leaflet-draw/dist/leaflet.draw.css';
-import L, { featureGroup } from "leaflet";
+import L from "leaflet";
 
 const ACCESS = {
   USER: 1,
