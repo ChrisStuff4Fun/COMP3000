@@ -352,15 +352,6 @@ function DeviceGroups() {
 
 function Map() {
 
-    delete L.Icon.Default.prototype._getIconUrl;
-    L.Icon.Default.mergeOptions({
-        iconRetinaUrl:
-            "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    });
-
-/*
     const [devices, setDevices] = useState([]);
     const [geofences, setGeofences] = useState([]);
 
@@ -368,7 +359,7 @@ function Map() {
         const fetchData = async () => {
         try {
             const devicesRes = await fetch("/device/devices", { credentials: "include" });
-            const geofencesRes = await fetch("geofence/geofences", { credentials: "include" });
+            const geofencesRes = await fetch("/geofence/geofences", { credentials: "include" });
 
             const devicesData = await devicesRes.json();
             const geofencesData = await geofencesRes.json();
@@ -383,7 +374,7 @@ function Map() {
         fetchData();
     }, []);
 
-*/
+
 
 
     return(
@@ -393,10 +384,51 @@ function Map() {
           zoom={13}
           style={{ height: '100vh', width: '100%' }}
         >
-        <TileLayer
-          attribution='&copy; OpenStreetMap contributors'
-          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-        />
+          <TileLayer
+            attribution='&copy; OpenStreetMap contributors'
+            url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          />
+
+          {geofences.map((fence) => {
+          const geo = JSON.parse(fence.geoJSON);
+
+          // Circles
+          if (geo.geometry.type === "Point" && geo.properties?.radius) {
+            return (
+              <Circle
+                key={fence.geofenceID}
+                center={[geo.geometry.coordinates[1], geo.geometry.coordinates[0]]}
+                radius={geo.properties.radius}
+                pathOptions={{ color: "red", fillOpacity: 0.3 }}
+              >
+                <Popup>{fence.geofenceName}</Popup>
+              </Circle>
+            );
+          }
+
+            // Polygons 
+            return (
+              <GeoJSON
+                key={fence.geofenceID}
+                data={geo}
+                style={{ color: "blue", weight: 2, fillOpacity: 0.2 }}
+                onEachFeature={(feature, layer) => layer.bindPopup(fence.geofenceName)}
+              />
+            );
+          })}
+
+          {/* Render devices as markers */}
+          {devices.map((device) => (
+            <Marker
+              key={device.deviceID}
+              position={[device.lastLoggedLat, device.lastLoggedLong]}
+            >
+              <Popup>{device.deviceName}</Popup>
+            </Marker>
+          ))}
+
+
+
         </MapContainer>
       </div>
     )
