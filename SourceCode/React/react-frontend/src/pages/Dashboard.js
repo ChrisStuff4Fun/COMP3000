@@ -138,7 +138,7 @@ function GeofenceSection({accessLevel}) {
           {geofences.map((fence) => (
             <tr key={fence.GeofenceID}>
               <td>
-                {canModify() ? (
+                {canModify ? (
                   <input
                     type="text"
                     value={fence.GeofenceName}
