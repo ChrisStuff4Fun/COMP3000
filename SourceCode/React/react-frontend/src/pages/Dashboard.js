@@ -199,7 +199,7 @@ function CreateFenceSection ({accessLevel}) {
 
       setName("");
       setShape(null);
-      
+
     } catch (err) {
       console.error("Error creating geofence:", err);
     }
@@ -215,7 +215,7 @@ function CreateFenceSection ({accessLevel}) {
       featureGroup.eachLayer((layer) => featureGroup.removeLayer(layer));
     }
 
-    layer.addTo(fgRef.current);
+    layer.addTo(featureGroup);
 
     setShape(layer.toGeoJSON());
   }
