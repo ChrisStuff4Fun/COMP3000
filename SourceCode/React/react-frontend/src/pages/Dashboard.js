@@ -199,9 +199,7 @@ function CreateFenceSection ({accessLevel}) {
 
       setName("");
       setShape(null);
-
-
-      fetchGeofences();
+      
     } catch (err) {
       console.error("Error creating geofence:", err);
     }
