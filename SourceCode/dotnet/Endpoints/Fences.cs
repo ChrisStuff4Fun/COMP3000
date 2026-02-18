@@ -10,7 +10,7 @@ public static class FenceEndpoints
 
         // Map endpoints
         fences.MapGet("/geofences", getFencesByOrg);
-        fences.MapGet("/delete/{fenceId}", deleteFence);
+        fences.MapDelete("/delete/{fenceId}", deleteFence);
         fences.MapPost("/create/{name}", createFence);
         fences.MapPut("/update/{fenceId}/{newName}", updateFence);
     }
