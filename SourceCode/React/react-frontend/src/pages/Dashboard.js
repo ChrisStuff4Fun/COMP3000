@@ -356,22 +356,34 @@ function Map() {
     const [geofences, setGeofences] = useState([]);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchFenceData = async () => {
         try {
-            const devicesRes = await fetch("/device/devices", { credentials: "include" });
             const geofencesRes = await fetch("/geofence/geofences", { credentials: "include" });
-
-            const devicesData = await devicesRes.json();
             const geofencesData = await geofencesRes.json();
-
-            setDevices(devicesData);
             setGeofences(geofencesData);
+
         } catch (err) {
-            console.error("Failed to load map data", err);
+            console.error("Failed to fence map data", err);
         }
         };
 
-        fetchData();
+        fetchFenceData();
+    }, []);
+
+
+    useEffect(() => {
+        const fetchDeviceData = async () => {
+        try {
+            const devicesRes = await fetch("/device/devices", { credentials: "include" });
+            const devicesData = await devicesRes.json();
+            setDevices(devicesData);
+
+        } catch (err) {
+            console.error("Failed to device map data", err);
+        }
+        };
+
+        fetchDeviceData();
     }, []);
 
 
