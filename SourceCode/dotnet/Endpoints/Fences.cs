@@ -62,7 +62,7 @@ public static class FenceEndpoints
     }
 
 
-    private static async Task<IResult> createFence(string name, [FromBody] JsonElement newFence, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> createFence(string name, [FromBody] string newFence, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor);
         // Reject if user isnt authed by google
