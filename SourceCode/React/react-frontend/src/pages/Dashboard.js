@@ -131,28 +131,26 @@ function GeofenceSection({accessLevel}) {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Shape</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {geofences.map((fence) => (
-            <tr key={fence.id}>
+            <tr key={fence.GeofenceID}>
               <td>
                 {canModify() ? (
                   <input
                     type="text"
-                    value={fence.name}
-                    onChange={(e) => setGeofences((prev) => prev.map((oldFence) => oldFence.id === fence.id ? { ...oldFence, name: e.target.value } : oldFence) )}
-                    onBlur={(e) => updateGeofenceName(fence.id, e.target.value)}
+                    value={fence.GeofenceName}
+                    onChange={(e) => setGeofences((prev) => prev.map((oldFence) => oldFence.GeofenceID === fence.GeofenceID ? { ...oldFence, GeofenceName: e.target.value } : oldFence) )}
+                    onBlur={(e) => updateGeofenceName(fence.GeofenceID, e.target.value)}
                   />
                 ) : (
-                  fence.name
+                  fence.GeofenceName
                 )}
               </td>
-              <td>{fence.shape}</td>
               <td>
-                <button onClick={() => deleteGeofence(fence.id)} className="danger-btn" disabled={!canModify}> Delete </button>
+                <button onClick={() => deleteGeofence(fence.GeofenceID)} className="danger-btn" disabled={!canModify}> Delete </button>
               </td>
             </tr>
           ))}
