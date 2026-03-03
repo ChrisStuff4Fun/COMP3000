@@ -49,7 +49,7 @@ var container      = client.GetContainerReference("dataprotectionkeys");
 await container.CreateIfNotExistsAsync();
 
 builder.Services.AddDataProtection()
-    .PersistKeysToAzureBlobStorage(container, "keys.xml")
+    //.PersistKeysToAzureBlobStorage(container, "keys.xml")
     .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 
