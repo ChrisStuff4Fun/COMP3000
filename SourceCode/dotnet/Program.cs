@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Blob;
 
 // Get secret from GitHub - not storing any sensitive access creds inside the repo
 var tenantId          = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
@@ -40,15 +42,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 
+// Connect to BLOB storage for JWT key storage
+var storageAccount = CloudStorageAccount.Parse(blobString);
+var client         = storageAccount.CreateCloudBlobClient();
+var container      = client.GetContainerReference("dataprotectionkeys");
+await container.CreateIfNotExistsAsync();
+
 builder.Services.AddDataProtection()
-    .PersistKeysToAzureBlobStorage(
-        new Uri("https://<your-storage-account>.blob.core.windows.net/<container>/DataProtectionKeys.xml"),
-        blobl
-    )
-    .ProtectKeysWithAzureKeyVault(
-        new Uri("https://<your-keyvault>.vault.azure.net/keys/<your-key-name>"),
-        new DefaultAzureCredential()
-    )
+    .PersistKeysToAzureBlobStorage(container, "keys.xml")
     .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 

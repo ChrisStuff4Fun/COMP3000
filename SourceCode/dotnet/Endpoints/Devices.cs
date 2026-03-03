@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.DataProtection;
 
 public static class DeviceEndpoints
 {
@@ -18,9 +19,9 @@ public static class DeviceEndpoints
 
 
     // Methods for endpoints
-    private static async Task<IResult> getDevicesByOrg( AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> getDevicesByOrg( AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db
@@ -35,9 +36,9 @@ public static class DeviceEndpoints
     }
 
 
-    private static async Task<IResult> deleteDevice(int deviceId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> deleteDevice(int deviceId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -62,9 +63,9 @@ public static class DeviceEndpoints
         return Results.Ok();
     }
 
-    private static async Task<IResult> updateDevice(int deviceId, string newName, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> updateDevice(int deviceId, string newName, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
 

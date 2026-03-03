@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.DataProtection;
 
 public static class JoinCodeEndpoints
 {
@@ -19,9 +19,9 @@ public static class JoinCodeEndpoints
     }
   
   
-  private static async Task<IResult> createUserJoinCode(int duration, AppDbContext db, IHttpContextAccessor httpAccessor)
+  private static async Task<IResult> createUserJoinCode(int duration, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -47,9 +47,9 @@ public static class JoinCodeEndpoints
 
 
 
-      private static async Task<IResult> createDeviceJoinCode(int duration, AppDbContext db, IHttpContextAccessor httpAccessor)
+      private static async Task<IResult> createDeviceJoinCode(int duration, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -73,9 +73,9 @@ public static class JoinCodeEndpoints
         return Results.Created();
     }
 
-    private static async Task<IResult> purgeDeviceCodes(AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> purgeDeviceCodes(AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -97,9 +97,9 @@ public static class JoinCodeEndpoints
     }
 
 
-        private static async Task<IResult> purgeUserCodes(AppDbContext db, IHttpContextAccessor httpAccessor)
+        private static async Task<IResult> purgeUserCodes(AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -121,9 +121,9 @@ public static class JoinCodeEndpoints
     }
 
 
-    private static async Task<IResult> getUserCodesByOrg( AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> getUserCodesByOrg( AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db
@@ -137,9 +137,9 @@ public static class JoinCodeEndpoints
         
     }
 
-    private static async Task<IResult> getDeviceCodesByOrg( AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> getDeviceCodesByOrg( AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db

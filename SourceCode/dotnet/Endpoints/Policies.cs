@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.DataProtection;
 
 public static class PolicyEndpoints
 {
@@ -19,9 +20,9 @@ public static class PolicyEndpoints
 
 
     // Methods for endpoints
-    private static async Task<IResult> getPoliciesByOrg(AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> getPoliciesByOrg(AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db
@@ -36,9 +37,9 @@ public static class PolicyEndpoints
     }
 
 
-    private static async Task<IResult> deletePolicy(int policyId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> deletePolicy(int policyId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -64,9 +65,9 @@ public static class PolicyEndpoints
     }
 
 
-    private static async Task<IResult> createPolicy([FromBody] Policy newPolicyIn, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> createPolicy([FromBody] Policy newPolicyIn, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -86,9 +87,9 @@ public static class PolicyEndpoints
         return Results.Created();
     }
 
-    private static async Task<IResult> updatePolicy(int policyId, [FromBody] Policy newPolicy, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> updatePolicy(int policyId, [FromBody] Policy newPolicy, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
 

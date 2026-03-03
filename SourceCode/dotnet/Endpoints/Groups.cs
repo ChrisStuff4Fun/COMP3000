@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.DataProtection;
 public static class GroupEndpoints
 {
     public static void MapGroupEndpoints(this IEndpointRouteBuilder app)
@@ -18,9 +18,9 @@ public static class GroupEndpoints
 
 
     // Methods for endpoints
-    private static async Task<IResult> getGroupsByOrg( AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> getGroupsByOrg( AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db
@@ -35,9 +35,9 @@ public static class GroupEndpoints
     }
 
 
-    private static async Task<IResult> deleteGroup(int groupId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> deleteGroup(int groupId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -63,9 +63,9 @@ public static class GroupEndpoints
     }
 
 
-    private static async Task<IResult> createGroup([FromBody] DeviceGroup newGroup, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> createGroup([FromBody] DeviceGroup newGroup, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -85,9 +85,9 @@ public static class GroupEndpoints
         return Results.Created();
     }
 
-    private static async Task<IResult> updateGroup(int groupId, [FromBody] DeviceGroup newGroup, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> updateGroup(int groupId, [FromBody] DeviceGroup newGroup, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
 
@@ -107,9 +107,9 @@ public static class GroupEndpoints
         
     }
 
-    private static async Task<IResult> addDeviceToGroup(int groupId, int deviceId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> addDeviceToGroup(int groupId, int deviceId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
 
@@ -139,9 +139,9 @@ public static class GroupEndpoints
     }
 
 
-      private static async Task<IResult> removeDeviceFromGroup(int groupId, int deviceId, AppDbContext db, IHttpContextAccessor httpAccessor)
+      private static async Task<IResult> removeDeviceFromGroup(int groupId, int deviceId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
 

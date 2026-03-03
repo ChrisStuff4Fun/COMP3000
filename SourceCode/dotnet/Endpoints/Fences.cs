@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.DataProtection;
 public static class FenceEndpoints
 {
     public static void MapFenceEndpoints(this IEndpointRouteBuilder app)
@@ -17,9 +17,9 @@ public static class FenceEndpoints
 
 
     // Methods for endpoints
-    private static async Task<IResult> getFencesByOrg( AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> getFencesByOrg( AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db
@@ -34,9 +34,9 @@ public static class FenceEndpoints
     }
 
 
-    private static async Task<IResult> deleteFence(int fenceId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> deleteFence(int fenceId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -62,9 +62,9 @@ public static class FenceEndpoints
     }
 
 
-    private static async Task<IResult> createFence(string name, [FromBody] JsonElement newFence, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> createFence(string name, [FromBody] JsonElement newFence, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -86,9 +86,9 @@ public static class FenceEndpoints
         return Results.Created();
     }
 
-    private static async Task<IResult> updateFence(int fenceId, string newName, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> updateFence(int fenceId, string newName, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
 
