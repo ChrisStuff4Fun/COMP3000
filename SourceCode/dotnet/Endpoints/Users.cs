@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.DataProtection;
 using System.Reflection.Metadata.Ecma335;
 
 public static class UserEndpoints
@@ -25,9 +25,9 @@ public static class UserEndpoints
     // Methods for endpoints
 
 
-    private static async Task<IResult> getUser(int userId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> getUser(int userId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from db
@@ -48,10 +48,10 @@ public static class UserEndpoints
 
 
 
-    private static async Task<IResult> getUsersByOrg(AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> getUsersByOrg(AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
        
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         if (!currentUser.validateToken()) return Results.Unauthorized();
 
         await currentUser.getUserFromDBAsync();
@@ -65,9 +65,9 @@ public static class UserEndpoints
     }
 
 
-    private static async Task<IResult> regUserToOrg(string joinCode, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> regUserToOrg(string joinCode, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -100,10 +100,10 @@ public static class UserEndpoints
     }
 
 
-    private static async Task<IResult> releaseUserFromOrg(int userId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> releaseUserFromOrg(int userId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
 
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -134,9 +134,9 @@ public static class UserEndpoints
     }
 
 
-    private static async Task<IResult> deleteUser(AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> deleteUser(AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
         // Get current user from DB
@@ -156,12 +156,12 @@ public static class UserEndpoints
     }
 
 
-    private static async Task<IResult> createUser(string name, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> createUser(string name, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
 
         if (name == null) return Results.BadRequest("No name provided");
 
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (! currentUser.validateToken()) return Results.Unauthorized();
 
@@ -204,12 +204,12 @@ public static class UserEndpoints
         return Results.Created($"/user/{newUser.UserID}", newUser);
     }
 
-    private static async Task<IResult> updateUserAccessLevel(int userId, int newAL, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> updateUserAccessLevel(int userId, int newAL, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
 
         try
         {
-            CurrentUser currentUser = new CurrentUser(db, httpAccessor);
+            CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
             // Reject if user isnt authed by google
             if (!currentUser.validateToken()) return Results.Unauthorized();
 
