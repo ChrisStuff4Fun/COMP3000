@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 var tenantId          = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
 var clientId          = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
 var connectionString  = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-var blobString        = Environment.GetEnvironmentVariable("AZURE_BLOB_CONNECTION_STRING");
+//var blobString        = Environment.GetEnvironmentVariable("AZURE_BLOB_CONNECTION_STRING");
 
 // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER 
 
