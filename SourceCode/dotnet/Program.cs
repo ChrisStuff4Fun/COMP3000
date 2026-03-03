@@ -66,6 +66,27 @@ var app = builder.Build();
 
 app.UseRouting();
 
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (Exception ex)
+    {
+        // Log to console (visible in Kudu/Console or App Service logs)
+        Console.WriteLine("Unhandled Exception:");
+        Console.WriteLine(ex.ToString());
+
+        // Return 500 to client
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "text/plain";
+        await context.Response.WriteAsync("Internal Server Error. Check server logs.");
+    }
+});
+
+app.UseDeveloperExceptionPage();
+
 app.UseCors();
 
 app.MapOrgEndpoints();
