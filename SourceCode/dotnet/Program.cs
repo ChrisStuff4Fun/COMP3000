@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 
 // Get secret from GitHub - not storing any sensitive access creds inside the repo
 var tenantId          = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
 var clientId          = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
 var connectionString  = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-
+var blobString        = Environment.GetEnvironmentVariable("AZURE_BLOB_CONNECTION_STRING");
 
 // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER 
 
@@ -37,6 +38,18 @@ builder.Services.AddCors(options =>
 // Connect to DB
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
+
+
+builder.Services.AddDataProtection()
+    .PersistKeysToAzureBlobStorage(
+        new Uri("https://<your-storage-account>.blob.core.windows.net/<container>/DataProtectionKeys.xml"),
+        blobl
+    )
+    .ProtectKeysWithAzureKeyVault(
+        new Uri("https://<your-keyvault>.vault.azure.net/keys/<your-key-name>"),
+        new DefaultAzureCredential()
+    )
+    .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 
 // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER 

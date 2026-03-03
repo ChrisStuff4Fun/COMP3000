@@ -1,11 +1,13 @@
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 
 public class CurrentUser
 {
     private readonly AppDbContext _db;
     private readonly IHttpContextAccessor _http;
+    private readonly IDataProtector _protector;
 
     public int UserID { get; private set; } = -1;
     public int OrgID { get; private set; } = 0;
@@ -16,30 +18,40 @@ public class CurrentUser
     // Manual override for testing, allows all api calls to go through
     private bool debugMode = false;
 
-    public CurrentUser(AppDbContext db, IHttpContextAccessor http)
+    public CurrentUser(AppDbContext db, IHttpContextAccessor http, IDataProtector protector)
     {
         _db = db;
         _http = http;
+        _protector = protector;
     }
 
     // Check if user is authed with google, checking if the user is even logged in
-   public bool validateToken()
-{
-    if (debugMode) return true;
+    public bool validateToken()
+    {
+        if (debugMode) return true;
 
-    var context = _http.HttpContext;
-    if (context == null) return false;
+        var context = _http.HttpContext;
+        if (context == null) return false;
 
-    if (!context.Request.Cookies.TryGetValue("auth", out var googleSub))
-        return false;
+        if (!context.Request.Cookies.TryGetValue("auth", out var protectedValue))
+            return false;
 
-    if (string.IsNullOrWhiteSpace(googleSub))
-        return false;
+        if (string.IsNullOrWhiteSpace(protectedValue))
+            return false;
 
-    GoogleSub = googleSub;
-    
-    return true;
-}
+        try
+        {
+            // Unprotect the cookie value
+            GoogleSub = _protector.Unprotect(protectedValue);
+        }
+        catch
+        {
+            // Cookie was tampered with or invalid
+            return false;
+        }
+
+        return true;
+    }
 
     // Check if user is signed up to the app, if so, load data into vars
     public async Task getUserFromDBAsync()

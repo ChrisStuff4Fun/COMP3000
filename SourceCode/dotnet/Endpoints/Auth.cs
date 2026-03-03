@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 
 public static class AuthEndpoints
 {
@@ -25,14 +26,12 @@ public static class AuthEndpoints
 
 
     // Methods for endpoints
-    private static async Task<IResult> issueJwt([FromBody] GoogleTokenRequest requestBody, HttpRequest request, HttpResponse response, AppDbContext db)
+    private static async Task<IResult> issueJwt([FromBody] GoogleTokenRequest requestBody, HttpRequest request, HttpResponse response, AppDbContext db, IDataProtectionProvider dataProtectionProvider)
     {
         GoogleJsonWebSignature.Payload payload;
         try
         {
-
-            string token = requestBody.Token;
-            payload = await GoogleJsonWebSignature.ValidateAsync(token);
+            payload = await GoogleJsonWebSignature.ValidateAsync(requestBody.Token);
         }
         catch
         {
@@ -41,71 +40,70 @@ public static class AuthEndpoints
 
         string googleSub = payload.Subject;
 
+        // Use Data Protection to sign cookie
+        var protector = dataProtectionProvider.CreateProtector("AuthCookieProtector");
+        string protectedValue = protector.Protect(googleSub);
 
-
-
-        // Set auth cookie
         response.Cookies.Append(
-        "auth",
-        googleSub,
-        new CookieOptions
-        {
-            HttpOnly = true,
-            Secure   = true,
-            SameSite = SameSiteMode.Lax,  // May switch to strict in the future if it works
-            Expires  = DateTimeOffset.UtcNow.AddDays(7)
-        });
-    
-        
+            "auth",
+            protectedValue,
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
 
         return Results.Ok();
     }
 
-    private static async Task<IResult> authMe(HttpRequest request, AppDbContext db)
+    private static async Task<IResult> authMe(HttpRequest request, AppDbContext db, IDataProtectionProvider dataProtectionProvider)
     {
-        // make sure current user is definitely authed with google
-        
-        if (!request.Cookies.TryGetValue("auth", out var googleSub) || string.IsNullOrWhiteSpace(googleSub))
+        if (!request.Cookies.TryGetValue("auth", out var protectedValue) || string.IsNullOrWhiteSpace(protectedValue))
+            return Results.Ok(new { authenticated = false });
+
+        try
+        {
+            var protector = dataProtectionProvider.CreateProtector("AuthCookieProtector");
+            string googleSub = protector.Unprotect(protectedValue);
+
+            User? user = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == googleSub);
+
+            if (user != null)
+            {
+                Organisation? organisation = await db.Organisations.FindAsync(user.OrgID);
+
+                return Results.Ok(new
+                {
+                    authenticated = true,
+                    registered = true,
+                    username = user.Name,
+                    orgId = user.OrgID,
+                    orgName = organisation?.OrgName,
+                    accessLevel = user.AccessLevel
+                });
+            }
+            else
+            {
+                return Results.Ok(new
+                {
+                    authenticated = true,
+                    registered = false
+                });
+            }
+        }
+        catch
         {
             return Results.Ok(new { authenticated = false });
         }
-
-        // Check if user exists in db
-        User? user = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == googleSub);
-
-        if (user != null)
-        {
-            Organisation? organisation = await db.Organisations.FindAsync(user.OrgID);
-
-            return Results.Ok(new
-            {
-                authenticated = true,
-                registered = true,
-                username = user.Name,
-                orgId = user.OrgID,
-                orgName = organisation.OrgName,
-                accessLevel = user.AccessLevel
-            });
-        }
-        else
-        {
-            return Results.Ok(new
-            {
-                authenticated = true,
-                registered = false
-            });
-        }
     }
 
-
-     private static async Task<IResult> logout(HttpResponse response)
+    private static IResult logout(HttpResponse response)
     {
         response.Cookies.Delete("auth");
         return Results.Ok();
     }
-
-
-
 
 
 }
