@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.DataProtection;
+//using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Logging;
 
 
 // Get secret from GitHub - not storing any sensitive access creds inside the repo
@@ -53,7 +54,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 
 // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER 
-
 
 
 var app = builder.Build();
