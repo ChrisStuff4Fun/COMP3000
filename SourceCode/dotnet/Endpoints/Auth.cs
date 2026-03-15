@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.DataProtection;
+//using Microsoft.AspNetCore.DataProtection;
 
 public static class AuthEndpoints
 {
@@ -26,7 +26,7 @@ public static class AuthEndpoints
 
 
     // Methods for endpoints
-    private static async Task<IResult> issueJwt([FromBody] GoogleTokenRequest requestBody, HttpRequest request, HttpResponse response, AppDbContext db, IDataProtectionProvider dataProtectionProvider)
+    private static async Task<IResult> issueJwt([FromBody] GoogleTokenRequest requestBody, HttpRequest request, HttpResponse response, AppDbContext db ) //IDataProtectionProvider dataProtectionProvider
     {
         GoogleJsonWebSignature.Payload payload;
         try
@@ -41,12 +41,12 @@ public static class AuthEndpoints
         string googleSub = payload.Subject;
 
         // Use Data Protection to sign cookie
-        var protector = dataProtectionProvider.CreateProtector("AuthCookieProtector");
-        string protectedValue = protector.Protect(googleSub);
+        //var protector = dataProtectionProvider.CreateProtector("AuthCookieProtector");
+        //string protectedValue = protector.Protect(googleSub);
 
         response.Cookies.Append(
             "auth",
-            protectedValue,
+            googleSub,
             new CookieOptions
             {
                 HttpOnly = true,
@@ -58,15 +58,15 @@ public static class AuthEndpoints
         return Results.Ok();
     }
 
-    private static async Task<IResult> authMe(HttpRequest request, AppDbContext db, IDataProtectionProvider dataProtectionProvider)
+    private static async Task<IResult> authMe(HttpRequest request, AppDbContext db) //  IDataProtectionProvider dataProtectionProvider
     {
-        if (!request.Cookies.TryGetValue("auth", out var protectedValue) || string.IsNullOrWhiteSpace(protectedValue))
+        if (!request.Cookies.TryGetValue("auth", out var googleSub) || string.IsNullOrWhiteSpace(googleSub))
             return Results.Ok(new { authenticated = false });
 
         try
         {
-            var protector = dataProtectionProvider.CreateProtector("AuthCookieProtector");
-            string googleSub = protector.Unprotect(protectedValue);
+            //var protector = dataProtectionProvider.CreateProtector("AuthCookieProtector");
+            //string googleSub = protector.Unprotect(protectedValue);
 
             User? user = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.GoogleSub == googleSub);
 
