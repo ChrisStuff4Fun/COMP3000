@@ -63,9 +63,6 @@ var app = builder.Build();
 // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  // APP  
 
 
-
-app.UseRouting();
-
 app.Use(async (context, next) =>
 {
     try
@@ -85,9 +82,17 @@ app.Use(async (context, next) =>
     }
 });
 
-app.UseDeveloperExceptionPage();
+
+app.UseHttpsRedirection();
+
+app.UseDefaultFiles(); 
+app.UseStaticFiles();  
+
+app.UseRouting();
 
 app.UseCors();
+
+app.UseDeveloperExceptionPage();
 
 app.MapOrgEndpoints();
 app.MapAuthEndpoints();
@@ -108,11 +113,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 
 // Serve React page if request is not for an API endpoint
-app.UseDefaultFiles(); 
-app.UseStaticFiles();  
 app.MapFallbackToFile("index.html"); 
 
 
