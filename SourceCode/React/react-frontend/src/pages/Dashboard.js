@@ -40,11 +40,10 @@ function TopBar({ accessLevel, setActiveTab, refreshAuth }) {
 
     return (
         <div className="top-bar">
-        <button onClick={() => setActiveTab("overview")}>Overview</button>
+        <button onClick={() => setActiveTab("map")}>Map</button>
         <button onClick={() => setActiveTab("devices")}>Devices</button>
         <button onClick={() => setActiveTab("geofences")}>Geofences</button>
         <button onClick={() => setActiveTab("groups")}>Device Groups</button>
-        <button onClick={() => setActiveTab("map")}>Map</button>
         <button onClick={() => setActiveTab("users")}>Users</button>
         <button onClick={() => setActiveTab("policies")}>Policies</button>
 
@@ -55,17 +54,6 @@ function TopBar({ accessLevel, setActiveTab, refreshAuth }) {
     );
 }
 
-
-function Overview() {
-  return (
-    <div className="dashboard-overview">
-      <div className="box"> <Devices/> </div>
-      <div className="box"> <Geofences/> </div>
-      <div className="box"> <DeviceGroups/> </div>
-      <div className="box"> <Map/> </div>
-    </div>
-  );
-}
 
 // ----------------------------------------------------------------------------------------------
 function Devices() {
@@ -921,7 +909,7 @@ function Organisation({ accessLevel, refreshAuth }) {
 
 export default function Dashboard({ authState, refreshAuth }) {
 
-    const [activeTab, setActiveTab] = useState("overview")
+    const [activeTab, setActiveTab] = useState("map")
 
   return (
     <div>
@@ -939,7 +927,6 @@ export default function Dashboard({ authState, refreshAuth }) {
 
       <TopBar accessLevel={authState.accessLevel} activeTab={activeTab} setActiveTab={setActiveTab} refreshAuth={refreshAuth} />
       <div className="dashboard-panel">
-        {activeTab === "overview" && <Overview />}
         {activeTab === "devices" && <Devices />}
         {activeTab === "geofences" && <Geofences accessLevel={authState.accessLevel}/>}
         {activeTab === "groups" && <DeviceGroups />}
