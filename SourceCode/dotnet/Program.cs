@@ -49,6 +49,11 @@ builder.Services.AddDataProtection()
     .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 
+builder.Services.AddSingleton<IDataProtector>(provider =>
+    provider.GetRequiredService<IDataProtectionProvider>()
+            .CreateProtector("AuthCookieProtector"));
+
+
 // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER 
 
 
