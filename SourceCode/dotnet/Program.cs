@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 
 
 // Get secret from GitHub - not storing any sensitive access creds inside the repo
-var tenantId          = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
-var clientId          = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
+//var tenantId          = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
+//var clientId          = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
 var connectionString  = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 //var blobString        = Environment.GetEnvironmentVariable("AZURE_BLOB_CONNECTION_STRING");
 
