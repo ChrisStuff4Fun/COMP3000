@@ -74,7 +74,7 @@ app.Use(async (context, next) =>
         // Return 500 to client
         context.Response.StatusCode = 500;
         context.Response.ContentType = "text/plain";
-        await context.Response.WriteAsync("Internal Server Error. Check server logs.");
+        await context.Response.WriteAsync(ex.ToString());
     }
 });
 
