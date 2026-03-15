@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-//using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
+
 
 
 // Get secret from GitHub - not storing any sensitive access creds inside the repo
 //var tenantId          = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
 //var clientId          = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
 var connectionString  = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-//var blobString        = Environment.GetEnvironmentVariable("AZURE_BLOB_CONNECTION_STRING");
 
 // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER 
 
@@ -42,15 +43,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 
-// Connect to BLOB storage for JWT key storage
-//var storageAccount = CloudStorageAccount.Parse(blobString);
-//var client         = storageAccount.CreateCloudBlobClient();
-//var container      = client.GetContainerReference("dataprotectionkeys");
-//await container.CreateIfNotExistsAsync();
-
-//builder.Services.AddDataProtection()
-    //.PersistKeysToAzureBlobStorage(container, "keys.xml")
-//    .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+// JWT key storage
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(@"C:\home\dataprotection-keys"))
+    .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 
 // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER 
