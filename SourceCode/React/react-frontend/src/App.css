@@ -57,7 +57,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   padding: 10px 20px;
-  background-color: linear-gradient(135deg, #2980b9, #6dd5fa);;
+  background-color:linear-gradient(135deg, #2980b9, #6dd5fa);
   color: #fff;
   gap: 10px;
   flex-wrap: wrap;
