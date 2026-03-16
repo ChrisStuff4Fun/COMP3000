@@ -57,7 +57,7 @@ html, body, #root {
   display: flex;
   align-items: center;
   padding: 10px 20px;
-  background-color: #2c3e50;
+  background-color: linear-gradient(135deg, #2980b9, #6dd5fa);;
   color: #fff;
   gap: 10px;
   flex-wrap: wrap;
@@ -434,8 +434,8 @@ tbody tr:hover {
 }
 
 .app-logo {
-  height: 6rem;     
-  width: 6rem;                
+  height: 4rem;     
+  width: 4rem;                
   border-radius: 50%;         
   object-fit: cover;       
   margin-right: 1rem;          
