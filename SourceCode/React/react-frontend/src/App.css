@@ -135,7 +135,7 @@ html, body, #root {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 10vh0; 
+  height: 100vh; 
   background: linear-gradient(135deg, #2980b9, #6dd5fa);
   font-family: Arial, sans-serif;
   color: #fff;
