@@ -23,7 +23,7 @@ html, body, #root {
 
 .App-header {
   background-color: #282c34;
-  min-height: 100vh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,7 +49,7 @@ html, body, #root {
 .dashboard {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 0;
   font-family: Arial, sans-serif;
 }
 
@@ -135,7 +135,7 @@ html, body, #root {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh; 
+  height: 10vh0; 
   background: linear-gradient(135deg, #2980b9, #6dd5fa);
   font-family: Arial, sans-serif;
   color: #fff;
@@ -423,4 +423,12 @@ tbody tr:hover {
   min-height: 0;        
   border-radius: 8px;      
   overflow: hidden;        
+}
+
+.full-screen-wrapper {
+  height: 100vh;       
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }

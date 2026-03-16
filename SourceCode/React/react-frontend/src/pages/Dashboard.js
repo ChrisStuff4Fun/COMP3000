@@ -911,7 +911,7 @@ export default function Dashboard({ authState, refreshAuth }) {
     const [activeTab, setActiveTab] = useState("map")
 
   return (
-    <div>
+    <div className="full-screen-wrapper">
       
         <div className="header-row">
             <h1 className="app-title">CyberTrack Geofencing</h1>
@@ -933,7 +933,7 @@ export default function Dashboard({ authState, refreshAuth }) {
         {activeTab === "users" && <Users accessLevel={authState.accessLevel}/>}
         {activeTab === "policies" && <Policies />}
         {activeTab === "organisation" && <Organisation accessLevel={authState.accessLevel} refreshAuth={refreshAuth}/>}
-    </div>
+      </div>
     </div>
   );
 }
