@@ -432,3 +432,12 @@ tbody tr:hover {
   display: flex;
   flex-direction: column;
 }
+
+.app-logo {
+  height: 3rem;     
+  width: 3rem;                
+  border-radius: 50%;         
+  object-fit: cover;       
+  margin-right: 1rem;          
+  flex-shrink: 0;               
+}

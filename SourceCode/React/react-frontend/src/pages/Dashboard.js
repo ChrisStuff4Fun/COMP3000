@@ -914,6 +914,7 @@ export default function Dashboard({ authState, refreshAuth }) {
     <div className="full-screen-wrapper">
       
         <div className="header-row">
+            <img className="app-logo" src="/logo.png"/>
             <h1 className="app-title">CyberTrack Geofencing</h1>
 
             <div className="user-info">
