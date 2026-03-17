@@ -64,6 +64,155 @@ function Devices() {
 
 // ----------------------------------------------------------------------------------------------
 
+// Circle approximation - get grid
+function getBoundingBox(coords) {
+  let minLat = Infinity, maxLat = -Infinity;
+  let minLon = Infinity, maxLon = -Infinity;
+
+  coords.forEach(([lon, lat]) => {
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+    if (lon < minLon) minLon = lon;
+    if (lon > maxLon) maxLon = lon;
+  });
+
+  return { minLat, maxLat, minLon, maxLon };
+}
+
+// Circle approximation - check if given point is within given polygon
+function pointInPolygon(point, polygon) {
+  const [x, y] = point;
+  let inside = false;
+
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const [xi, yi] = polygon[i];
+    const [xj, yj] = polygon[j];
+
+    const intersect =
+      yi > y !== yj > y &&
+      x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+
+    if (intersect) inside = !inside;
+  }
+
+  return inside;
+}
+
+// Check if two line segments [p1,p2] and [q1,q2] intersect
+function segmentsIntersect(p1, p2, q1, q2) {
+  function ccw(a, b, c) {
+    return (c[1]-a[1])*(b[0]-a[0]) > (b[1]-a[1])*(c[0]-a[0]);
+  }
+  return ccw(p1,q1,q2) !== ccw(p2,q1,q2) && ccw(p1,p2,q1) !== ccw(p1,p2,q2);
+}
+
+
+// Check if any polygon edge intersects a square
+function polygonIntersectsSquare(polygon, squareCorners) {
+  // polygon: array of [lon, lat]
+  // squareCorners: array of [lon, lat] (4 corners in order)
+  
+  const squareEdges = [
+    [squareCorners[0], squareCorners[1]],
+    [squareCorners[1], squareCorners[3]],
+    [squareCorners[3], squareCorners[2]],
+    [squareCorners[2], squareCorners[0]]
+  ];
+
+  for (let i=0, j=polygon.length-1; i<polygon.length; j=i++) {
+    const polyEdge = [polygon[j], polygon[i]];
+    for (const sqEdge of squareEdges) {
+      if (segmentsIntersect(polyEdge[0], polyEdge[1], sqEdge[0], sqEdge[1])) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+
+// Circle approximation - take polygon array and amount of grid cells to compute array of approx circles
+function generateApproxCircles(polygonCoords, gridSize) {
+
+  const { minLat, maxLat, minLon, maxLon } =
+    getBoundingBox(polygonCoords);
+
+  const latStep = (maxLat - minLat) / gridSize;
+  const lonStep = (maxLon - minLon) / gridSize;
+
+  const circles = [];
+
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+
+      const cellMinLat = minLat + i * latStep;
+      const cellMaxLat = cellMinLat + latStep;
+
+      const cellMinLon = minLon + j * lonStep;
+      const cellMaxLon = cellMinLon + lonStep;
+
+      const centreLat = (cellMinLat + cellMaxLat) / 2;
+      const centreLon = (cellMinLon + cellMaxLon) / 2;
+
+      // corners
+      const corners = [
+        [cellMinLon, cellMinLat],
+        [cellMaxLon, cellMinLat],
+        [cellMinLon, cellMaxLat],
+        [cellMaxLon, cellMaxLat]
+      ];
+
+      let overlaps = false;
+
+      // check if square centre is inside polygon
+      if (pointInPolygon([centreLon, centreLat], polygonCoords)) {
+        overlaps = true;
+      }
+
+      // check for square's corners inside polygon
+      if (!overlaps) {
+        for (const c of corners) {
+          if (pointInPolygon(c, polygonCoords)) {
+            overlaps = true;
+            break;
+          }
+        }
+      }
+
+      // check if polygon enters the square at all
+      if (!overlaps) {
+        if (polygonIntersectsSquare(polygonCoords, corners)) {
+          overlaps = true;
+        }
+      }
+
+      if (overlaps) {
+
+        // radius = half diagonal
+        const latMeters = latStep * 111320;
+        const lonMeters = lonStep * 111320 *
+          Math.cos(centreLat * Math.PI / 180);
+
+        const cellWidthMeters = Math.sqrt(
+          latMeters ** 2 + lonMeters ** 2
+        );
+
+        const radius = cellWidthMeters / 2;
+
+        circles.push({
+          lat: centreLat,
+          lon: centreLon,
+          radius
+        });
+      }
+    }
+  }
+
+  return circles;
+}
+
+
+
 function GeofenceSection({accessLevel}) {
 
   const [geofences, setGeofences] = useState([]);
@@ -163,7 +312,8 @@ function CreateFenceSection ({accessLevel}) {
 
   const handleSave = async () => {
     if (!name || !shape) {
-      alert("No name or shape.")
+      alert("No name or shape.");
+      return;
     }
 
 
@@ -215,7 +365,27 @@ function CreateFenceSection ({accessLevel}) {
       setShape(circleGeo);
     }
     else {
-      setShape(layer.toGeoJSON());
+      const geo = layer.toGeoJSON();
+
+      // extract actual coords from GeoJSON
+      const polygonCoords = geo.geometry.coordinates[0];
+
+      const approxCircles = generateApproxCircles( polygonCoords, 5); // grid resolution (make configurable later)
+
+      const approxShape = {type: "approxMultiCircle", circles: approxCircles};
+
+      setShape(approxShape);
+
+      // render approx circles 
+      const featureGroup = fgRef.current;
+
+      approxCircles.forEach(c => {
+        L.circle([c.lat, c.lon], {
+          radius: c.radius,
+          color: "blue",
+          fillOpacity: 0.2
+        }).addTo(featureGroup);
+      });
     }
 
     
