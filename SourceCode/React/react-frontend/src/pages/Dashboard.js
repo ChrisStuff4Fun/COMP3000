@@ -407,7 +407,7 @@ function CreateFenceSection ({accessLevel}) {
       <MapContainer
         center={[50.375, -4.139]}
         zoom={13}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '60vh', width: '100%' }}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
