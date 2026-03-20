@@ -571,50 +571,46 @@ function Map() {
             url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           />
 
-          {geofences.map((fence) => {
-            const geo = JSON.parse(fence.geoJSON);
+          {geofences.flatMap((fence) => {
+          if (!fence.geoJSON) return [];
 
-            // Circles
-            if (geo.geometry.type === "Point" && geo.properties?.radius) {
-              return (
-                <Circle
-                  key={fence.geofenceID}
-                  center={[geo.geometry.coordinates[1], geo.geometry.coordinates[0]]}
-                  radius={geo.properties.radius}
-                  pathOptions={{ color: "red", fillOpacity: 0.3 }}
-                >
-                  <Popup>{fence.geofenceName}</Popup>
-                </Circle>
-              );
-            } 
+          let geo;
+          try {
+            geo = JSON.parse(fence.geoJSON);
+          } catch (e) {
+            return [];
+          }
 
-            // FeatureCollection = approximated polygon fence
-            if (geo.type === "FeatureCollection") {
-              return geo.features.map((feature, i) => (
-                <Circle
-                  key={`${fence.geofenceID}-${i}`}
-                  center={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
-                  radius={feature.properties.radius}
-                  pathOptions={{ color: "blue", fillOpacity: 0.15, weight: 1 }}
-                >
-                  {i === 0 && <Popup>{fence.geofenceName}</Popup>}
-                </Circle>
-              ));
-            }
+          // FeatureCollection = approximated polygon fence
+          if (geo.type === "FeatureCollection") {
+            return geo.features.map((feature, i) => (
+              <Circle
+                key={`${fence.geofenceID}-${i}`}
+                center={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
+                radius={feature.properties.radius}
+                pathOptions={{ color: "blue", fillOpacity: 0.15, weight: 1 }}
+              >
+                {i === 0 && <Popup>{fence.geofenceName}</Popup>}
+              </Circle>
+            ));
+          }
 
-            return;
-            
-          })}
+          // Single circle
+          if (geo.geometry?.type === "Point" && geo.properties?.radius) {
+            return [(
+              <Circle
+                key={fence.geofenceID}
+                center={[geo.geometry.coordinates[1], geo.geometry.coordinates[0]]}
+                radius={geo.properties.radius}
+                pathOptions={{ color: "red", fillOpacity: 0.3 }}
+              >
+                <Popup>{fence.geofenceName}</Popup>
+              </Circle>
+            )];
+          }
 
-          {/* Render devices as markers */}
-          {devices.map((device) => (
-            <Marker
-              key={device.deviceID}
-              position={[device.lastLoggedLat, device.lastLoggedLong]}
-            >
-              <Popup>{device.deviceName}</Popup>
-            </Marker>
-          ))}
+          return [];
+        })}
 
 
 
