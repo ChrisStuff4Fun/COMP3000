@@ -370,9 +370,21 @@ function CreateFenceSection ({accessLevel}) {
       // extract actual coords from GeoJSON
       const polygonCoords = geo.geometry.coordinates[0];
 
-      const approxCircles = generateApproxCircles( polygonCoords, 5); // grid resolution (make configurable later)
+      const approxCircles = generateApproxCircles( polygonCoords, 12); // grid resolution (make configurable later)
 
-      const approxShape = {type: "approxMultiCircle", circles: approxCircles};
+      const approxShape = {
+        type: "FeatureCollection",
+        features: approxCircles.map(c => ({
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [c.lon, c.lat]
+          },
+          properties: {
+            radius: c.radius
+          }
+        }))
+      };
 
       setShape(approxShape);
 
@@ -560,31 +572,35 @@ function Map() {
           />
 
           {geofences.map((fence) => {
-          const geo = JSON.parse(fence.geoJSON);
+            const geo = JSON.parse(fence.geoJSON);
 
-          // Circles
-          if (geo.geometry.type === "Point" && geo.properties?.radius) {
-            return (
-              <Circle
-                key={fence.geofenceID}
-                center={[geo.geometry.coordinates[1], geo.geometry.coordinates[0]]}
-                radius={geo.properties.radius}
-                pathOptions={{ color: "red", fillOpacity: 0.3 }}
-              >
-                <Popup>{fence.geofenceName}</Popup>
-              </Circle>
-            );
-          }
-
-            // Polygons 
-            return (
-              <GeoJSON
-                key={fence.geofenceID}
-                data={geo}
-                style={{ color: "blue", weight: 2, fillOpacity: 0.2 }}
-                onEachFeature={(feature, layer) => layer.bindPopup(fence.geofenceName)}
-              />
-            );
+            // Circles
+            if (geo.geometry.type === "Point" && geo.properties?.radius) {
+              return (
+                <Circle
+                  key={fence.geofenceID}
+                  center={[geo.geometry.coordinates[1], geo.geometry.coordinates[0]]}
+                  radius={geo.properties.radius}
+                  pathOptions={{ color: "red", fillOpacity: 0.3 }}
+                >
+                  <Popup>{fence.geofenceName}</Popup>
+                </Circle>
+              );
+            } else {
+              // FeatureCollection = approximated polygon fence
+              if (geo.type === "FeatureCollection") {
+                return geo.features.map((feature, i) => (
+                  <Circle
+                    key={`${fence.geofenceID}-${i}`}
+                    center={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
+                    radius={feature.properties.radius}
+                    pathOptions={{ color: "blue", fillOpacity: 0.15, weight: 1 }}
+                  >
+                    {i === 0 && <Popup>{fence.geofenceName}</Popup>}
+                  </Circle>
+                ));
+              }
+            }
           })}
 
           {/* Render devices as markers */}
