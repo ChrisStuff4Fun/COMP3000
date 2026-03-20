@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FeatureGroup, MapContainer, TileLayer, Marker, Popup, Circle, GeoJSON} from "react-leaflet";
+import { FeatureGroup, MapContainer, TileLayer, Marker, Popup, Circle} from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -586,21 +586,24 @@ function Map() {
                   <Popup>{fence.geofenceName}</Popup>
                 </Circle>
               );
-            } else {
-              // FeatureCollection = approximated polygon fence
-              if (geo.type === "FeatureCollection") {
-                return geo.features.map((feature, i) => (
-                  <Circle
-                    key={`${fence.geofenceID}-${i}`}
-                    center={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
-                    radius={feature.properties.radius}
-                    pathOptions={{ color: "blue", fillOpacity: 0.15, weight: 1 }}
-                  >
-                    {i === 0 && <Popup>{fence.geofenceName}</Popup>}
-                  </Circle>
-                ));
-              }
+            } 
+
+            // FeatureCollection = approximated polygon fence
+            if (geo.type === "FeatureCollection") {
+              return geo.features.map((feature, i) => (
+                <Circle
+                  key={`${fence.geofenceID}-${i}`}
+                  center={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
+                  radius={feature.properties.radius}
+                  pathOptions={{ color: "blue", fillOpacity: 0.15, weight: 1 }}
+                >
+                  {i === 0 && <Popup>{fence.geofenceName}</Popup>}
+                </Circle>
+              ));
             }
+
+            return;
+            
           })}
 
           {/* Render devices as markers */}
