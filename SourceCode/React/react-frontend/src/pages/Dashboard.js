@@ -571,6 +571,16 @@ function Map() {
             url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           />
 
+          {devices.map((device) => (
+            <Marker
+              key={device.deviceID}
+              position={[device.lastLoggedLat, device.lastLoggedLong]}
+            >
+              <Popup>{device.deviceName}</Popup>
+            </Marker>
+          ))}
+
+
           {geofences.flatMap((fence) => {
           if (!fence.geoJSON) return [];
 
