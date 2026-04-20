@@ -1,6 +1,7 @@
 package com.example.comp3000androidapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -56,14 +57,20 @@ public class RegisterFragment extends Fragment {
                 new apiManager.RegisterCallback() {
 
                     @Override
-                    public void onSuccess(String response) {
-
-                        requireActivity().getSharedPreferences("app", Context.MODE_PRIVATE).edit().putBoolean("registered", true).apply();
+                    public void onSuccess(String deviceId) {
 
                         new Handler(Looper.getMainLooper()).post(() -> {
                             Toast.makeText(getContext(), "Registered!", Toast.LENGTH_SHORT).show();
                             ((MainActivity) requireActivity()).loadTracking();
                         });
+
+                        // store returned deviceId locally
+                        SharedPreferences prefs = requireActivity().getSharedPreferences("cybertrackClient", Context.MODE_PRIVATE);
+
+                        prefs.edit()
+                                .putBoolean("registered", true)
+                                .putString("device_id", deviceId)
+                                .apply();
                     }
 
                     @Override

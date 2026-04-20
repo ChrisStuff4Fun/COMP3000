@@ -5,24 +5,40 @@
     android:layout_height="match_parent"
     tools:context=".RegisterFragment">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="24dp">
+        android:padding="24dp"
+        android:background="@drawable/gradient_background"
+        android:textColor="#FFFFFF">
 
         <!-- Title -->
+
+        <!-- Input -->
+
         <TextView
             android:id="@+id/titleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/register_device"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="32dp"/>
+            android:layout_marginBottom="32dp"
+            android:text="CyberTrack Geofencing Client"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold" />
 
-        <!-- Input -->
+        <TextView
+            android:id="@+id/titleText2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:text="@string/register_device"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"/>
+
         <EditText
             android:id="@+id/codeInput"
             android:layout_width="match_parent"
@@ -39,7 +55,8 @@
             android:id="@+id/registerButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/register"/>
+            android:text="@string/register"
+            android:backgroundTint="#2980b9"/>
 
     </LinearLayout>
 

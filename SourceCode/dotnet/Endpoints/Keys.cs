@@ -79,7 +79,7 @@ public static class KeyEndpoints
         // Save 
         await db.SaveChangesAsync();
 
-        return Results.Ok();
+        return Results.Ok(new {deviceId = device.DeviceID});
 
     }
 

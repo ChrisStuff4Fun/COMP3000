@@ -1,11 +1,15 @@
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.IBinder;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
+import com.example.comp3000androidapp.encryptionManager;
+import com.example.comp3000androidapp.apiManager;
 
 public class trackingService extends Service {
 
@@ -28,8 +32,21 @@ public class trackingService extends Service {
                 // Stop here if location failed (possible but unlikely)
                 if (location == null) return;
 
-                double latitude  = location.getLatitude();
-                double longitude = location.getLongitude();
+                // instantiate managers
+                encryptionManager crypto = encryptionManager.getInstance();
+                apiManager api = new apiManager();
+
+                encryptionManager.EncryptedLocation enc = crypto.encryptLocation(location.getLatitude(), location.getLongitude());
+
+                Context context = getApplicationContext();
+
+                SharedPreferences prefs =
+                        context.getSharedPreferences("cybertrackClient", Context.MODE_PRIVATE);
+
+                String deviceId = prefs.getString("device_id", null);
+
+
+                api.sendLocation(deviceId, enc.lat, enc.lon);
             }
         };
 

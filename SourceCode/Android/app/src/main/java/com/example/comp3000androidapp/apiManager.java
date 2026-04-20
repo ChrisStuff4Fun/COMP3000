@@ -88,7 +88,7 @@ public class apiManager {
 
 
     public interface RegisterCallback {
-        void onSuccess(String response);
+        void onSuccess(String deviceId);
         void onFailure(int statusCode, String errorMessage);
         void onError(Exception e);
     }
@@ -141,12 +141,111 @@ public class apiManager {
                 conn.disconnect();
 
                 if (status >= 200 && status < 300) {
-                    callback.onSuccess(response.toString());
+                    // extract returned deviceId
+                    JSONObject obj = new JSONObject(response.toString());
+                    String deviceId = obj.getString("deviceId");
+
+                    callback.onSuccess(deviceId);
                 } else {
                     // pass server message back
 
                     String errorText = response.toString();
                     callback.onFailure(status, errorText);
+                }
+
+            } catch (Exception e) {
+                if (conn != null) conn.disconnect();
+                callback.onError(e);
+            }
+        }).start();
+    }
+
+
+    public void sendLocation(String deviceId, String lat, String lon) {
+
+        new Thread(() -> {
+            try {
+
+                URL url = new URL(baseURL + "/gps/update/" + deviceId);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                JSONObject json = new JSONObject();
+                json.put("lat", lat);
+                json.put("lon", lon);
+
+                OutputStream os = conn.getOutputStream();
+                os.write(json.toString().getBytes());
+                os.close();
+
+                conn.getResponseCode();
+                conn.disconnect();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+
+    public static class DeviceInfoResponse {
+        public String orgName;
+        public String deviceName;
+    }
+
+    public interface DeviceInfoCallback {
+        void onSuccess(DeviceInfoResponse response);
+        void onError(Exception e);
+    }
+
+    public void getDeviceInfo(int deviceId, DeviceInfoCallback callback) {
+
+        new Thread(() -> {
+            HttpURLConnection conn = null;
+
+            try {
+                URL url = new URL(baseURL + "/device/getinfo/" + deviceId);
+                conn = (HttpURLConnection) url.openConnection();
+
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+
+                int status = conn.getResponseCode();
+
+                BufferedReader reader;
+
+                if (status >= 200 && status < 300) {
+                    reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                } else {
+                    reader = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                }
+
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                reader.close();
+                conn.disconnect();
+
+                if (status >= 200 && status < 300) {
+
+                    JSONObject json = new JSONObject(response.toString());
+
+                    DeviceInfoResponse result = new DeviceInfoResponse();
+                    result.orgName = json.getString("orgName");
+                    result.deviceName = json.getString("deviceName");
+
+                    callback.onSuccess(result);
+
+                } else {
+                    throw new RuntimeException("HTTP " + status + ": " + response);
                 }
 
             } catch (Exception e) {
