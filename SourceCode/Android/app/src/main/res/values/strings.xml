@@ -10,4 +10,7 @@
     <string name="lorem_ipsum">
         hello
     </string>
+    <string name="register_device">Register Device</string>
+    <string name="register">Register</string>
+    <string name="enter_join_code">Enter join code</string>
 </resources>

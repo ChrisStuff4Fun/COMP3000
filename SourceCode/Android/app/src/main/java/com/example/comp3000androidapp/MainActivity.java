@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -23,29 +24,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        checkPerms();
+        checkPerms(savedInstanceState);
 
     }
 
     // onResume
     // Used to refresh permissions state after switching back in to the app
-    protected void onResume() {
+    protected void onResume(Bundle savedInstanceState) {
         super.onResume();
-        checkPerms();
+        checkPerms(savedInstanceState);
     }
 
     // checkPerms
     // Checks if precise location and background location are enabled
     // Either asks user to enable them, or starts background app process
-    private void checkPerms() {
+    private void checkPerms( Bundle savedInstanceState ) {
         boolean foreground = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
         boolean background = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
 
         if (!foreground || !background) {
             showPermissionsDialog();
         } else {
-            startApp();
+            startApp(savedInstanceState);
         }
     }
 
@@ -69,7 +69,39 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Placeholder function for now
-    private void startApp() {
+    private void startApp(Bundle savedInstanceState) {
+
+        if (savedInstanceState == null) {
+            boolean registered = getSharedPreferences("app", MODE_PRIVATE)
+                    .getBoolean("registered", false);
+
+            if (registered) {
+                loadTracking();
+            } else {
+                loadRegister();
+            }
+        }
+
+
         // Start background service
     }
+
+
+
+    public void loadRegister() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new RegisterFragment())
+                .commit();
+    }
+
+    public void loadTracking() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new TrackingFragment())
+                .commit();
+    }
+
+
+
 }
