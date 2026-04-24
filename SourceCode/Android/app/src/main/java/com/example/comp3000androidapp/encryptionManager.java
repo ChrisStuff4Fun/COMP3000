@@ -104,7 +104,7 @@ public class encryptionManager {
     public String encrypt(String data) {
         try {
             byte[] key = getDerivedKey();
-            // ⚠️ this should come from ECDH + HKDF later
+            // this should come from ECDH + HKDF later
 
             SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -130,6 +130,11 @@ public class encryptionManager {
         }
     }
 
+
+    public byte[] getDerivedKey() {
+        byte[] temp = new byte[32];
+        return temp;
+    }
 
     public EncryptedLocation encryptLocation(double lat, double lon) {
 

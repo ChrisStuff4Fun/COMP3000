@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +26,12 @@ public class RegisterFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        Crypto crypto = new Crypto();
+        String result = crypto.testCall();
+        Log.d("TEST", "Result = " + result);
+
+
         codeInput = view.findViewById(R.id.codeInput);
         registerButton = view.findViewById(R.id.registerButton);
 

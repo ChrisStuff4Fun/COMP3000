@@ -45,6 +45,22 @@ jobs:
           $global:LASTEXITCODE = 0
         shell: powershell
 
+      - name: Clone SEAL
+        run: git clone https://github.com/microsoft/SEAL.git SourceCode/dotnet/Native/seal/external/SEAL
+
+      - name: Install CMake
+        run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+
+      - name: Build SEAL native library
+        run: |
+          mkdir cpp_build
+          cd cpp_build
+          cmake ../SourceCode/dotnet/Native/seal -DCMAKE_BUILD_TYPE=Release
+          cmake --build . --config Release
+
+      - name: Copy native DLL into publish folder
+        run: |
+          copy cpp_build\Release\seal_wrapper.dll ${{ env.PUBLISH_DIR }}\seal_wrapper.dll
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4

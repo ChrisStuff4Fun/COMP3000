@@ -1,12 +1,8 @@
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-public class inboundMessage
+public class InboundMessage
 {
-    public int deviceId;
-    public double xGPS;
-    public double yGPS; 
-    public DateTime timestamp;
-    public required byte[] signature;
-
+    public required string lat { get; set; }
+    public required string lon { get; set; }
 
 }
