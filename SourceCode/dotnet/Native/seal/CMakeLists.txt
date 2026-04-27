@@ -12,7 +12,7 @@ add_subdirectory(external/SEAL)
 
 add_library(seal_wrapper SHARED
     cpp/seal_wrapper.cpp
-    cpp/geofence.cpp
+    cpp/homomorphic_processing.cpp
 )
 
 target_include_directories(seal_wrapper PRIVATE
