@@ -82,7 +82,7 @@ public static class JoinCodeEndpoints
         await currentUser.getUserFromDBAsync();
 
         // If current user is not admin or root, reject
-        if (!currentUser.hasAccessLevel(3)) return Results.Forbid();
+        if (!currentUser.hasAccessLevel(2)) return Results.Forbid();
 
         // Get list of codes to delete
         List<DeviceJoinCode> codesToDelete = await db.DeviceJoinCodes.Where(j => j.OrgID == currentUser.OrgID && (j.IsUsed || j.ExpiryDate < DateTime.UtcNow)).ToListAsync();
@@ -106,7 +106,7 @@ public static class JoinCodeEndpoints
         await currentUser.getUserFromDBAsync();
 
         // If current user is not admin or root, reject
-        if (!currentUser.hasAccessLevel(3)) return Results.Forbid();
+        if (!currentUser.hasAccessLevel(2)) return Results.Forbid();
 
         // Get list of codes to delete
         List<OrgJoinCode> codesToDelete = await db.OrgJoinCodes.Where(j => j.OrgID == currentUser.OrgID && (j.IsUsed || j.ExpiryDate < DateTime.UtcNow)).ToListAsync();

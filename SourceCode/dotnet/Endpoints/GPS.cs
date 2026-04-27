@@ -8,14 +8,20 @@ public static class GPSEndpoints
         var fences = app.MapGroup("/gps");
 
         // Map endpoints
-        fences.MapGet("/update/{deviceId}", updateGPS);
+        fences.MapPost("/update/{deviceId}", updateGPS);
     
     }
 
 
     // Methods for endpoints
-    private static async Task<IResult> updateGPS( int deviceId, AppDbContext db, IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> updateGPS( InboundMessage payload, AppDbContext db, IHttpContextAccessor httpAccessor)
     {
+
+
+
+
+
+
         return Results.Ok();
         
     }

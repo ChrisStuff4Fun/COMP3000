@@ -19,7 +19,7 @@ set_target_properties(zlib PROPERTIES
         ${CMAKE_SOURCE_DIR}/lib/arm64-v8a/libz.a
 )
 
-# JNI library 
+# JNI library
 add_library(seal_jni SHARED seal_jni.cpp)
 
 target_include_directories(seal_jni PRIVATE

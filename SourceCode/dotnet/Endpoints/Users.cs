@@ -109,16 +109,23 @@ public static class UserEndpoints
         // Get current user from DB
         await currentUser.getUserFromDBAsync();
 
-        // Reject if the user is not registered to the app or is not an admin
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(3)) return Results.Forbid();
+        // Reject if the user is not registered to the app
+        if (!currentUser.isRegistered()) return Results.Forbid();
+
+        // Reject if user is not releasing themself, and does not have admin perms
+        if ( (currentUser.UserID != userId) && !currentUser.hasAccessLevel(3) ) return Results.Forbid();
+
+        // Reject if user is root, root users cannot leave, only delete organisations
+        if (currentUser.hasAccessLevel(4)) return Results.Forbid();
 
         User? user = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.UserID == userId);
 
         if (user == null) return Results.BadRequest("User does not exist.");
         // Reject if user does not belong to same org as out current user
         if (user.OrgID != currentUser.OrgID) return Results.Forbid();
-        // Reject if user is root or admin
-        if (user.AccessLevel >= 3) return Results.Forbid();
+        
+        // Reject if target is root or admin, and they are not releasing themselves
+        if ( (user.AccessLevel >= 3) && (currentUser.UserID != userId) )return Results.Forbid();
 
         // Set OrgId to unnasigned value and reset access.
         user.OrgID = 0;

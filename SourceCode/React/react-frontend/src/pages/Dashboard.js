@@ -7,14 +7,14 @@ import L from "leaflet";
 
 const ACCESS = {
   USER: 1,
-  ESCALATED: 2,
+  ELEVATED: 2,
   ADMIN: 3,
   ROOT: 4
 };
 
 const ACCESS_LEVEL_NAME = {
   1: "User",
-  2: "Escalated",
+  2: "Elevated",
   3: "Admin",
   4: "Root",
 };
@@ -47,7 +47,9 @@ function TopBar({ accessLevel, setActiveTab, refreshAuth }) {
         <button onClick={() => setActiveTab("users")}>Users</button>
         <button onClick={() => setActiveTab("policies")}>Policies</button>
 
-        <button disabled={accessLevel < ACCESS.ESCALATED} onClick={() => setActiveTab("organisation")}>Organisation</button>
+        <button disabled={accessLevel < ACCESS.ELEVATED} onClick={() => setActiveTab("organisation")}>Join Codes</button>
+
+        <button disabled={accessLevel < ACCESS.ROOT} onClick={() => setActiveTab("root")}>Root User Menu</button>
 
         <LogoutButton refreshAuth={refreshAuth} />
         </div>
@@ -709,13 +711,13 @@ function Users({accessLevel}) {
                   {accessLevel === ACCESS.ROOT && (
                     <>
                       <option value={ACCESS.ADMIN}>Admin</option>
-                      <option value={ACCESS.ESCALATED}>Escalated</option>
+                      <option value={ACCESS.ELEVATED}>Elevated</option>
                       <option value={ACCESS.USER}>User</option>
                     </>
                   )}
                   {accessLevel === ACCESS.ADMIN && (
                     <>
-                      <option value={ACCESS.ESCALATED}>Escalated</option>
+                      <option value={ACCESS.ELEVATED}>Elevated</option>
                       <option value={ACCESS.USER}>User</option>
                     </>
                   )}
@@ -748,42 +750,10 @@ function Policies() {
 
 // ----------------------------------------------------------------------------------------------
 
-function DeleteOrgButton({ accessLevel, refreshAuth }) {
-  const handleDelete = async () => {
-    if (!window.confirm("This will permanently delete the organisation. Continue?")) {
-      return;
-    }
-
-    const res = await fetch("/orgs/delete", {
-      method: "DELETE",
-      credentials: "include",
-    });
-
-    if (!res.ok) {
-      alert("Failed to delete organisation");
-      return;
-    }
-
-    refreshAuth();
-  };
-
-  return (
-    <button
-      className="danger-btn"
-      disabled={accessLevel < ACCESS.ROOT}
-      title={accessLevel < ACCESS.ROOT ? "Root access required" : ""}
-      onClick={handleDelete}
-    >
-      Delete Organisation
-    </button>
-  );
-}
-
 
 const ORG_PANELS = {
     USERS: "users",
     DEVICES: "devices",
-    DANGER: "danger",
 };
 
 
@@ -803,14 +773,6 @@ function OrgSidebar({ active, setActive, accessLevel }) {
         onClick={() => setActive("devices")}
       >
         Device Join Codes
-      </button>
-
-      <button
-        disabled={accessLevel < ACCESS.ADMIN}
-        className={active === "danger" ? "active danger" : "danger"}
-        onClick={() => setActive("danger")}
-      >
-        Danger Zone
       </button>
     </div>
   );
@@ -1090,8 +1052,78 @@ function Organisation({ accessLevel, refreshAuth }) {
         {activePanel === ORG_PANELS.USERS && (
           <UserJoinCodeSection accessLevel={accessLevel}/>
         )}
+      </div>
+    </div>
+  );
+}
 
-        {activePanel === ORG_PANELS.DANGER && (
+
+// ----------------------------------------------------------------------------------------------
+
+const ROOT_PANELS = {
+    DANGER: "danger"
+};
+
+function DeleteOrgButton({ accessLevel, refreshAuth }) {
+  const handleDelete = async () => {
+    if (!window.confirm("This will permanently delete the organisation. Continue?")) {
+      return;
+    }
+
+    const res = await fetch("/orgs/delete", {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      alert("Failed to delete organisation");
+      return;
+    }
+
+    refreshAuth();
+  };
+
+  return (
+    <button
+      className="danger-btn"
+      disabled={accessLevel < ACCESS.ROOT}
+      title={accessLevel < ACCESS.ROOT ? "Root access required" : ""}
+      onClick={handleDelete}
+    >
+      Delete Organisation
+    </button>
+  );
+}
+
+function RootSidebar({ active, setActive, accessLevel }) {
+  return (
+    <div className="org-sidebar">
+
+      <button
+        disabled={accessLevel < ACCESS.ADMIN}
+        className={active === "danger" ? "active danger" : "danger"}
+        onClick={() => setActive("danger")}
+      >
+        Danger Zone
+      </button>
+    </div>
+  );
+}
+
+
+function RootMenu({ accessLevel, refreshAuth }) {
+  const [activePanel, setActivePanel] = useState(ROOT_PANELS.DANGER);
+
+  return (
+    <div className="org-layout">
+      <RootSidebar
+        active={activePanel}
+        setActive={setActivePanel}
+        accessLevel={accessLevel}
+      />
+
+      <div className="org-content">
+        {activePanel === ROOT_PANELS.DANGER && (
           <DeleteOrgButton accessLevel={accessLevel} refreshAuth={refreshAuth}/>
         )}
       </div>
@@ -1130,6 +1162,7 @@ export default function Dashboard({ authState, refreshAuth }) {
         {activeTab === "users" && <Users accessLevel={authState.accessLevel}/>}
         {activeTab === "policies" && <Policies />}
         {activeTab === "organisation" && <Organisation accessLevel={authState.accessLevel} refreshAuth={refreshAuth}/>}
+        {activeTab === "root" && <RootMenu accessLevel={authState.accessLevel} refreshAuth={refreshAuth}/>}
       </div>
     </div>
   );
