@@ -58,10 +58,6 @@ jobs:
           cmake ../SourceCode/dotnet/Native/seal -DCMAKE_BUILD_TYPE=Release
           cmake --build . --config Release
 
-      - name: Copy native DLL into publish folder
-        run: |
-          copy cpp_build\Release\seal_wrapper.dll ${{ env.PUBLISH_DIR }}\seal_wrapper.dll
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -75,6 +71,11 @@ jobs:
 
       - name: Publish .NET API
         run: dotnet publish "${{ env.DOTNET_PROJECT_PATH }}" -c Release -o ${{ env.PUBLISH_DIR }}
+
+      - name: Copy native DLL into publish folder
+        run: |
+          copy cpp_build\Release\seal_wrapper.dll ${{ env.PUBLISH_DIR }}\seal_wrapper.dll
+
 
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
