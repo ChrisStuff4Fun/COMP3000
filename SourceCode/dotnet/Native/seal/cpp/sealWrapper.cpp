@@ -18,7 +18,7 @@ bool initSeal()
     {
         EncryptionParameters parms(scheme_type::bfv);
 
-        size_t poly_modulus_degree = 8192;
+        size_t poly_modulus_degree = 4096;
 
         parms.set_poly_modulus_degree(poly_modulus_degree);
         parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 20));
