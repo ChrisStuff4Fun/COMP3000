@@ -74,7 +74,7 @@ jobs:
 
       - name: Copy native DLL into publish folder
         run: |
-          copy cpp_build\Release\seal_wrapper.dll ${{ env.PUBLISH_DIR }}\seal_wrapper.dll
+          copy cpp_build\Release\*.dll ${{ env.PUBLISH_DIR }}
 
 
       - name: Upload artifact for deployment
