@@ -34,9 +34,9 @@ bool initSeal()
         relin_keys = std::make_unique<RelinKeys>();
         keygen.create_relin_keys(*relin_keys);
 
-        encryptor = std::make_unique<Encryptor>(*context, public_key);
+        encryptor = std::make_unique<Encryptor>(*context, *public_key);
         evaluator  = std::make_unique<Evaluator>(*context);
-        decryptor  = std::make_unique<Decryptor>(*context, secret_key);
+        decryptor  = std::make_unique<Decryptor>(*context, *secret_key);
         encoder    = std::make_unique<BatchEncoder>(*context);
 
         return true;
