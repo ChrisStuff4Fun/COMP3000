@@ -48,25 +48,13 @@ bool initSeal()
 }
 
 extern "C" __declspec(dllexport)
-SEALContext* getContext()
-{
-    return context.get();
-}
+SEALContext* getContext() { return context.get(); }
 
 extern "C" __declspec(dllexport)
-PublicKey* getPublicKey()
-{
-    return &public_key;
-}
+PublicKey* getPublicKey() { return public_key.get(); }
 
 extern "C" __declspec(dllexport)
-SecretKey* getSecretKey()
-{
-    return &secret_key;
-}
+SecretKey* getSecretKey() { return secret_key.get(); }
 
 extern "C" __declspec(dllexport)
-RelinKeys* getRelinKeys()
-{
-    return &relin_keys;
-}
+RelinKeys* getRelinKeys() { return relin_keys.get(); }
