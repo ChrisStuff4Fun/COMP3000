@@ -18,6 +18,13 @@ public class SealKeyService
 
     public async Task initialiseAsync()
     {
+
+        if (!SealNative.initSeal())
+        {
+            throw new Exception("SEAL init failed");
+        }
+
+
         SealNative.initSeal();
 
         bool exists = await keyExists("bfv-public");
