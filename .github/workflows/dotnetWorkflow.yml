@@ -81,8 +81,7 @@ jobs:
 
       - name: Dump full DLL info
         run: |
-          dumpbin /headers cpp_build\Release\seal_wrapper.dll
-          dumpbin /exports cpp_build\Release\seal_wrapper.dll
+          dumpbin /dependents cpp_build\Release\seal_wrapper.dll
         shell: cmd
 
 
