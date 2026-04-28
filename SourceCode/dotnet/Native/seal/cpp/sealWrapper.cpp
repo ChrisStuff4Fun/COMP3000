@@ -2,7 +2,7 @@
 using namespace seal;
 
 // Globals
-static SEALContext *context = nullptr;
+static std::unique_ptr<SEALContext> context;
 static CKKSEncoder *encoder = nullptr;
 static Encryptor *encryptor = nullptr;
 static Evaluator *evaluator = nullptr;
@@ -28,10 +28,10 @@ void initSeal()
     parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 20));
     parms.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
 
-    context = SEALContext::Create(parms);
+    context = std::make_unique<SEALContext>(parms);
 
-    BatchEncoder encoder(context);
-    KeyGenerator keygen(context);
+    BatchEncoder encoder(*context);
+    KeyGenerator keygen(*context);
 
     // Generate keys
     secret_key = keygen.secret_key();
