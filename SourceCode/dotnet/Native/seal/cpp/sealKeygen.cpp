@@ -39,7 +39,8 @@ const char* generateKeys()
     SEALContext* ctx = getContext();
     if (!ctx)
     {
-        return "{}"; // not initialised
+        result = "{\"public\":null,\"secret\":null,\"relin\":null,\"error\":\"context is null\"}";
+        return result.c_str(); // not initialised
     }
 
     KeyGenerator keygen(*ctx);

@@ -33,8 +33,13 @@ public class SealKeyService
 
             var ptr = SealNative.generateKeys();
             var json = Marshal.PtrToStringAnsi(ptr);
-
             var keys = JsonSerializer.Deserialize<SealKeys>(json);
+
+            Console.WriteLine($"RAW JSON: {json}");
+            if (keys?.Public == null)
+                throw new Exception($"Null keys returned. JSON was: {json}");
+
+            
 
             // save to Key Vault
             await _client.SetSecretAsync("bfv-public", keys.Public);
