@@ -1,21 +1,16 @@
 #include "seal/seal.h"
 using namespace seal;
 
-// Globals
 static std::unique_ptr<SEALContext> context;
 static std::unique_ptr<Encryptor> encryptor;
 static std::unique_ptr<Evaluator> evaluator;
 static std::unique_ptr<Decryptor> decryptor;
 static std::unique_ptr<BatchEncoder> encoder;
 
-// Encrypt
 static PublicKey public_key;
-// Decrypt
 static SecretKey secret_key;
-// Multiplication
 static RelinKeys relin_keys;
 
-// Initialise function
 extern "C" __declspec(dllexport)
 bool initSeal()
 {
@@ -48,4 +43,28 @@ bool initSeal()
     {
         return false;
     }
+}
+
+extern "C" __declspec(dllexport)
+SEALContext* getContext()
+{
+    return context.get();
+}
+
+extern "C" __declspec(dllexport)
+PublicKey* getPublicKey()
+{
+    return &public_key;
+}
+
+extern "C" __declspec(dllexport)
+SecretKey* getSecretKey()
+{
+    return &secret_key;
+}
+
+extern "C" __declspec(dllexport)
+RelinKeys* getRelinKeys()
+{
+    return &relin_keys;
 }

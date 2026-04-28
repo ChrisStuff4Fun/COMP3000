@@ -3,14 +3,21 @@
 
 using namespace seal;
 
-extern std::unique_ptr<SEALContext> context;
+// import functions from wrapper
+extern "C" SEALContext* getContext();
 
 extern "C" __declspec(dllexport)
 const char* generateKeys()
 {
     static std::string result;
 
-    KeyGenerator keygen(*context);
+    SEALContext* ctx = getContext();
+    if (!ctx)
+    {
+        return "{}"; // not initialised
+    }
+
+    KeyGenerator keygen(*ctx);
 
     PublicKey pk;
     SecretKey sk = keygen.secret_key();
