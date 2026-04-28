@@ -7,9 +7,9 @@ static std::unique_ptr<Evaluator> evaluator;
 static std::unique_ptr<Decryptor> decryptor;
 static std::unique_ptr<BatchEncoder> encoder;
 
-static PublicKey public_key;
-static SecretKey secret_key;
-static RelinKeys relin_keys;
+static std::unique_ptr<PublicKey> public_key;
+static std::unique_ptr<SecretKey> secret_key;
+static std::unique_ptr<RelinKeys> relin_keys;
 
 extern "C" __declspec(dllexport)
 bool initSeal()
@@ -28,9 +28,11 @@ bool initSeal()
 
         KeyGenerator keygen(*context);
 
-        secret_key = keygen.secret_key();
-        keygen.create_public_key(public_key);
-        keygen.create_relin_keys(relin_keys);
+        secret_key = std::make_unique<SecretKey>(keygen.secret_key());
+        public_key = std::make_unique<PublicKey>();
+        keygen.create_public_key(*public_key);
+        relin_keys = std::make_unique<RelinKeys>();
+        keygen.create_relin_keys(*relin_keys);
 
         encryptor = std::make_unique<Encryptor>(*context, public_key);
         evaluator  = std::make_unique<Evaluator>(*context);

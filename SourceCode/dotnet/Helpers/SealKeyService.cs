@@ -25,8 +25,6 @@ public class SealKeyService
         }
 
 
-        SealNative.initSeal();
-
         bool exists = await keyExists("bfv-public");
 
         if (!exists)
