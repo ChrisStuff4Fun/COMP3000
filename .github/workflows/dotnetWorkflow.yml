@@ -55,7 +55,9 @@ jobs:
         run: |
           mkdir cpp_build
           cd cpp_build
-          cmake ../SourceCode/dotnet/Native/seal -A xWin32 -DCMAKE_BUILD_TYPE=Release
+          cmake ../SourceCode/dotnet/Native/seal ^
+            -G "Visual Studio 17 2022" ^
+            -A Win32
           cmake --build . --config Release
 
       - name: Setup .NET
