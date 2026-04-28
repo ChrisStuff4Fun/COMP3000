@@ -2,7 +2,7 @@
 using namespace seal;
 
 // Globals
-static std::unique_ptr<SEALContext> context;
+std::unique_ptr<SEALContext> context;
 static CKKSEncoder *encoder = nullptr;
 static Encryptor *encryptor = nullptr;
 static Evaluator *evaluator = nullptr;

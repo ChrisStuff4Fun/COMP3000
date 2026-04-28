@@ -3,7 +3,7 @@
 
 using namespace seal;
 
-extern SEALContext *context;
+extern std::unique_ptr<SEALContext> context;
 
 extern "C" __declspec(dllexport)
 const char* generateKeys()
