@@ -76,6 +76,8 @@ jobs:
         run: |
           copy cpp_build\Release\*.dll ${{ env.PUBLISH_DIR }}
 
+      - name: Setup MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Dump full DLL info
         run: |
