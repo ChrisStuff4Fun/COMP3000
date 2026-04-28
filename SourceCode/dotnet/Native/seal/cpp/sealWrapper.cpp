@@ -17,20 +17,21 @@ static RelinKeys relin_keys;
 
 // Initialise function
 extern "C" __declspec(dllexport)
-void init_seal()
+void initSeal()
 {
-    EncryptionParameters parms(scheme_type::ckks);
+    EncryptionParameters parms(scheme_type::bfv);
 
     // Set precision
     // Higher the polynomial > more secure and more room for + and x ops, but slow down each op
     size_t poly_modulus_degree = 8192;
     parms.set_poly_modulus_degree(poly_modulus_degree);
-    parms.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, { 60, 40, 40, 60 }));
+    parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 20));
+    parms.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
 
-    context = new SEALContext(parms);
+    context = SEALContext::Create(parms);
 
-    encoder = new CKKSEncoder(*context);
-    KeyGenerator keygen(*context);
+    BatchEncoder encoder(context);
+    KeyGenerator keygen(context);
 
     // Generate keys
     secret_key = keygen.secret_key();

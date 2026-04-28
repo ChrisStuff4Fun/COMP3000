@@ -14,6 +14,7 @@ public static class KeyEndpoints
 
         // Map endpoints
         keys.MapGet("/public", servePublicKey);
+        keys.MapGet("/bfv", serveBFV);
         keys.MapPost("/register", registerDeviceKeys);
 
     }
@@ -41,6 +42,28 @@ public static class KeyEndpoints
             };
 
             return Results.Ok(publicKey);
+        }
+        catch(Exception e)
+        {
+            return Results.Problem(detail: e.ToString(), statusCode: 500);
+        }
+
+    }
+
+
+
+    private static async Task<IResult> serveBFV([FromServices] AppDbContext db, [FromServices] IHttpContextAccessor httpAccessor)
+    {
+
+        Console.WriteLine("BFV key requested");
+        
+        try {
+            var sealService = new SealKeyService();
+            await sealService.initialiseAsync();
+
+            var keys = sealService.getKeys();
+
+            return Results.Ok(new { publicBFV = keys.Public });
         }
         catch(Exception e)
         {

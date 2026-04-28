@@ -50,13 +50,21 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Azure.Core": {
+              "target": "Package",
+              "version": "[1.54.0, )"
+            },
             "Azure.Identity": {
               "target": "Package",
-              "version": "[1.17.1, )"
+              "version": "[1.21.0, )"
             },
             "Azure.Security.KeyVault.Keys": {
               "target": "Package",
               "version": "[4.8.0, )"
+            },
+            "Azure.Security.KeyVault.Secrets": {
+              "target": "Package",
+              "version": "[4.10.0, )"
             },
             "Google.Apis.Auth": {
               "target": "Package",

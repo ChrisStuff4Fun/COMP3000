@@ -11,8 +11,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_subdirectory(external/SEAL)
 
 add_library(seal_wrapper SHARED
-    cpp/seal_wrapper.cpp
-    cpp/homomorphic_processing.cpp
+    cpp/sealWrapper.cpp
+    cpp/homomorphicProcessing.cpp
+    cpp/sealKeygen.cpp
 )
 
 target_include_directories(seal_wrapper PRIVATE
