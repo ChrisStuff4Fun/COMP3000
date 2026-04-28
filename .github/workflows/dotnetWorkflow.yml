@@ -77,6 +77,13 @@ jobs:
           copy cpp_build\Release\*.dll ${{ env.PUBLISH_DIR }}
 
 
+      - name: Dump full DLL info
+        run: |
+          dumpbin /headers cpp_build\Release\seal_wrapper.dll
+          dumpbin /exports cpp_build\Release\seal_wrapper.dll
+        shell: cmd
+
+
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
