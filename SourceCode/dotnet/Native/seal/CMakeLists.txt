@@ -4,7 +4,7 @@ project(seal_wrapper LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 # ─────────────────────────────
 # OPTION A: bundled SEAL
