@@ -58,9 +58,9 @@ const char* generateKeys()
     rk.save(rk_stream);
 
     result =
-        std::string("{\"public\":\"") + pk_stream.str() +
-        "\",\"secret\":\"" + sk_stream.str() +
-        "\",\"relin\":\"" + rk_stream.str() +
+        std::string("{\"public\":\"") + base64Encode(pk_stream.str()) +
+        "\",\"secret\":\"" + base64Encode(sk_stream.str()) +
+        "\",\"relin\":\"" + base64Encode(rk_stream.str()) +
         "\"}";
 
     return result.c_str();
