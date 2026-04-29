@@ -87,6 +87,60 @@ public class apiManager {
     }
 
 
+
+
+    public interface bfvKeyCallback {
+        void onSuccess(String key);
+        void onError(Exception e);
+    }
+
+    public void fetchServerBfvKey(bfvKeyCallback callback) {
+
+        new Thread(() -> {
+            try {
+                URL url = new URL(baseURL + "/keys/bfv");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+                conn.setRequestMethod("GET");
+                conn.setConnectTimeout(5000);
+                conn.setReadTimeout(5000);
+
+                int status = conn.getResponseCode();
+
+                if (status != HttpURLConnection.HTTP_OK) {
+                    throw new RuntimeException("HTTP error: " + status);
+                }
+
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(conn.getInputStream())
+                );
+
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                reader.close();
+                conn.disconnect();
+
+                JSONObject json = new JSONObject(response.toString());
+
+
+                String key = json.getString("publicBFV");
+
+
+                callback.onSuccess(key);
+
+            } catch (Exception e) {
+                callback.onError(e);
+            }
+        }).start();
+    }
+
+
+
     public interface RegisterCallback {
         void onSuccess(String deviceId);
         void onFailure(int statusCode, String errorMessage);

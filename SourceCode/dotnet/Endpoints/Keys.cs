@@ -83,7 +83,7 @@ public static class KeyEndpoints
         DeviceJoinCode? dbJoinCode = await db.DeviceJoinCodes.FirstOrDefaultAsync(j => j.Code == inboundMessage.Code);
 
         // Error cases 
-        if (dbJoinCode == null) return Results.NotFound();
+        if (dbJoinCode == null) return Results.NotFound("Code was not found in database");
         if (dbJoinCode.IsUsed) return Results.BadRequest("Join code already used.");
         if (dbJoinCode.ExpiryDate < DateTime.UtcNow) return Results.BadRequest("Join code has expired.");
 

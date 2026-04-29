@@ -4,61 +4,67 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.IBinder;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.example.comp3000androidapp.Crypto;
+import com.example.comp3000androidapp.apiManager;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
-import com.example.comp3000androidapp.encryptionManager;
-import com.example.comp3000androidapp.apiManager;
 
 public class trackingService extends Service {
 
     private LocationCallback callback;
     private locationManager locationManager;
+    private String cachedBfvKey = null;
+    private final Crypto crypto = new Crypto();
+    private final apiManager api = new apiManager();
 
-
-
-    // onCreate
-    // Service initialiser, sets the callback process and starts location updates
     public void onCreate() {
         super.onCreate();
 
-        callback = new LocationCallback() { // Define callback for when location is given
+        // fetch BFV key once on service start, cache it
+        api.fetchServerBfvKey(new apiManager.bfvKeyCallback() {
+            @Override
+            public void onSuccess(String key) {
+                cachedBfvKey = key;
+            }
+            @Override
+            public void onError(Exception e) {
+                e.printStackTrace();
+                // service will skip sending until key is available
+            }
+        });
+
+        callback = new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult result) {
-
                 Location location = result.getLastLocation();
-
-                // Stop here if location failed (possible but unlikely)
                 if (location == null) return;
+                if (cachedBfvKey == null) return; // key not ready yet, skip
 
-                // instantiate managers
-                encryptionManager crypto = encryptionManager.getInstance();
-                apiManager api = new apiManager();
-
-                encryptionManager.EncryptedLocation enc = crypto.encryptLocation(location.getLatitude(), location.getLongitude());
-
-                Context context = getApplicationContext();
-
-                SharedPreferences prefs =
-                        context.getSharedPreferences("cybertrackClient", Context.MODE_PRIVATE);
-
+                SharedPreferences prefs = getApplicationContext()
+                        .getSharedPreferences("cybertrackClient", Context.MODE_PRIVATE);
                 String deviceId = prefs.getString("device_id", null);
 
-
-                api.sendLocation(deviceId, enc.lat, enc.lon);
+                // encrypt with SEAL on background thread (crypto is heavy)
+                new Thread(() -> {
+                    String[] encrypted = crypto.encryptLocation(
+                            cachedBfvKey,
+                            location.getLatitude(),
+                            location.getLongitude()
+                    );
+                    api.sendLocation(deviceId, encrypted[0], encrypted[1]);
+                }).start();
             }
         };
 
-        // Initialise a locationManager class and begin updates
         locationManager = new locationManager(this, callback);
         locationManager.startLocationUpdates();
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Tell Android to restart the service if it gets killed
         return START_STICKY;
     }
 
@@ -67,5 +73,4 @@ public class trackingService extends Service {
     public IBinder onBind(Intent intent) {
         return null;
     }
-
 }
