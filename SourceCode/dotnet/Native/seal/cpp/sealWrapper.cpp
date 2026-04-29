@@ -1,4 +1,5 @@
 #include "seal/seal.h"
+#include "base64.h"
 using namespace seal;
 
 static std::unique_ptr<SEALContext> context;
@@ -139,7 +140,8 @@ long long addAndDecrypt(const char* base64Cipher1, const char* base64Cipher2)
         // decrypt result
         Plaintext plain;
         decryptor->decrypt(sum, plain);
-
+        
+        // encode back into b64 from binary for storage
         BatchEncoder encoder(*context);
         std::vector<int64_t> decoded;
         encoder.decode(plain, decoded);
