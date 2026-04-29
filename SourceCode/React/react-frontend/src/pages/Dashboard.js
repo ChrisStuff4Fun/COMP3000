@@ -634,16 +634,18 @@ function Map() {
 
 
     useEffect(() => {
-        const fetchDeviceData = async () => {
+      const fetchDevices = async () => {
         try {
-            const devicesRes = await fetch("/device/devices", { credentials: "include" });
-            const devicesData = await devicesRes.json();
-            setDevices(devicesData);
-
+          const res = await fetch("/device/devices", { credentials: "include" });
+          console.log("devices status:", res.status);
+          if (res.status === 404) { setDevices([]); return; }
+          if (!res.ok) throw new Error("Failed to fetch devices");
+          const data = await res.json();
+          setDevices(data);
         } catch (err) {
-            console.error("Failed to device map data", err);
+          console.error("Failed to fetch devices", err);
         }
-        };
+      };
 
         fetchDeviceData();
     }, []);
