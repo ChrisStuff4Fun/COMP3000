@@ -10,7 +10,7 @@ public class SealKeyService
     private readonly BlobContainerClient _container;
     private SealKeys _cachedKeys;
 
-    public SealKeyService(IConfiguration config)
+    public SealKeyService()
     {
         var connStr = Environment.GetEnvironmentVariable("BLOB_CONNECTION_STRING");
         var client = new BlobServiceClient(connStr);
