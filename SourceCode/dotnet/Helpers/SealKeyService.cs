@@ -36,7 +36,7 @@ public class SealKeyService
             if (keys?.Public == null || keys?.Secret == null || keys?.Relin == null)
                 throw new Exception($"Null keys returned. JSON: {json}");
 
-            await uploadBlob("", keys.Public);
+            await uploadBlob("bfvPublic", keys.Public);
             await uploadBlob("bfvSecret", keys.Secret);
             await uploadBlob("bfvRelin", keys.Relin);
             _cachedKeys = keys;
