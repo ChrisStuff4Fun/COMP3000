@@ -38,21 +38,12 @@ public static class DeviceEndpoints
 
      private static async Task<IResult> getInfo(int deviceId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
-        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
-        // Reject if user isnt authed by google
-        if (!currentUser.validateToken()) return Results.Unauthorized();
-        // Get current user from DB
-        await currentUser.getUserFromDBAsync();
-
 
         // Get device 
         Device? device = await db.Devices.FindAsync(deviceId);
 
         // Check if device exisits
         if (device == null) return Results.BadRequest("Device does not exist.");
-
-        // Prevent checks of other orgs devices
-        if (device.OrgID != currentUser.OrgID) return Results.Forbid();
 
         // Get org 
         Organisation? org = await db.Organisations.FindAsync(device.OrgID);

@@ -18,8 +18,8 @@ import androidx.fragment.app.Fragment;
 
 public class TrackingFragment extends Fragment {
 
-    TextView orgText = getView().findViewById(R.id.pairedToOrg);
-    TextView deviceText = getView().findViewById(R.id.pairedAsName);
+    TextView orgText;
+    TextView deviceText;
 
     public TrackingFragment() {
         super(R.layout.tracking_fragment);
@@ -27,6 +27,9 @@ public class TrackingFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        orgText  = getView().findViewById(R.id.pairedToOrg);
+        deviceText = getView().findViewById(R.id.pairedAsName);
 
         apiManager api = new apiManager();
 
