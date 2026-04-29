@@ -32,7 +32,7 @@ public static class DeviceEndpoints
         if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
 
         List<Device> devices = await db.Devices.Where(d => d.OrgID == currentUser.OrgID).ToListAsync();
-        return devices.Any() ? Results.Ok(devices) : Results.NotFound();
+        return devices.Any() ? Results.Ok(devices) : Results.Ok();
         
     }
 
