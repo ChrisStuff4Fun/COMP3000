@@ -65,6 +65,8 @@ function Devices({ accessLevel }) {
   const fetchDevices = async () => {
     try {
       const res = await fetch("/device/devices", { credentials: "include" });
+      console.log("devices status:", res.status);
+      if (res.status === 404) { setDevices([]); return; }
       if (!res.ok) throw new Error("Failed to fetch devices");
       const data = await res.json();
       setDevices(data);
@@ -634,18 +636,16 @@ function Map() {
 
 
     useEffect(() => {
-      const fetchDevices = async () => {
+        const fetchDeviceData = async () => {
         try {
-          const res = await fetch("/device/devices", { credentials: "include" });
-          console.log("devices status:", res.status);
-          if (res.status === 404) { setDevices([]); return; }
-          if (!res.ok) throw new Error("Failed to fetch devices");
-          const data = await res.json();
-          setDevices(data);
+            const devicesRes = await fetch("/device/devices", { credentials: "include" });
+            const devicesData = await devicesRes.json();
+            setDevices(devicesData);
+
         } catch (err) {
-          console.error("Failed to fetch devices", err);
+            console.error("Failed to device map data", err);
         }
-      };
+        };
 
         fetchDeviceData();
     }, []);
