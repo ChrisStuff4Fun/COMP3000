@@ -1245,7 +1245,7 @@ export default function Dashboard({ authState, refreshAuth }) {
 
       <TopBar accessLevel={authState.accessLevel} activeTab={activeTab} setActiveTab={setActiveTab} refreshAuth={refreshAuth} />
       <div className="dashboard-panel">
-        {activeTab === "devices" && <Devices />}
+        {activeTab === "devices" && <Devices accessLevel={authState.accessLevel}/>}
         {activeTab === "geofences" && <Geofences accessLevel={authState.accessLevel}/>}
         {activeTab === "groups" && <DeviceGroups />}
         {activeTab === "map" && <Map />}
