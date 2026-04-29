@@ -29,7 +29,7 @@ public static class FenceEndpoints
         if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(1)) return Results.Forbid();
 
         List<Geofence> fences = await db.Geofences.Where(g => g.OrgID == currentUser.OrgID).ToListAsync();
-        return fences.Any() ? Results.Ok(fences) : Results.NotFound();
+        return Results.Ok(fences);
         
     }
 
