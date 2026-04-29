@@ -722,6 +722,8 @@ function GroupOverview({ accessLevel }) {
     await fetchGroupDevices(groupId);
   };
 
+  console.log("accessLevel:", accessLevel);
+
   return (
     <div>
       <h2>Device Groups</h2>
@@ -1514,10 +1516,10 @@ export default function Dashboard({ authState, refreshAuth }) {
       <div className="dashboard-panel">
         {activeTab === "devices" && <Devices accessLevel={authState.accessLevel}/>}
         {activeTab === "geofences" && <Geofences accessLevel={authState.accessLevel}/>}
-        {activeTab === "groups" && <DeviceGroups />}
-        {activeTab === "map" && <Map />}
+        {activeTab === "groups" && <DeviceGroups accessLevel={authState.accessLevel}/>}
+        {activeTab === "map" && <Map accessLevel={authState.accessLevel}/>}
         {activeTab === "users" && <Users accessLevel={authState.accessLevel}/>}
-        {activeTab === "policies" && <Policies />}
+        {activeTab === "policies" && <Policies accessLevel={authState.accessLevel}/>}
         {activeTab === "organisation" && <Organisation accessLevel={authState.accessLevel} refreshAuth={refreshAuth}/>}
         {activeTab === "root" && <RootMenu accessLevel={authState.accessLevel} refreshAuth={refreshAuth}/>}
       </div>
