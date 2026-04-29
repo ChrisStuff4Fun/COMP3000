@@ -66,6 +66,10 @@
               "target": "Package",
               "version": "[4.10.0, )"
             },
+            "Azure.Storage.Blobs": {
+              "target": "Package",
+              "version": "[12.27.0, )"
+            },
             "Google.Apis.Auth": {
               "target": "Package",
               "version": "[1.73.0, )"
