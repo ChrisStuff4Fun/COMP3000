@@ -133,6 +133,8 @@ public class apiManager {
 
                 callback.onSuccess(key);
 
+                Log.d("BFV", "fetchServerBfvKey: fetched");
+
             } catch (Exception e) {
                 callback.onError(e);
             }
@@ -237,6 +239,8 @@ public class apiManager {
 
                 conn.getResponseCode();
                 conn.disconnect();
+
+                Log.d("API", "sendLocation: success");
 
             } catch (Exception e) {
                 e.printStackTrace();

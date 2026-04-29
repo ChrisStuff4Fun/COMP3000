@@ -27,6 +27,8 @@ target_include_directories(seal_jni PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/gsl
 )
 
+target_link_options(seal_jni PRIVATE "-Wl,-z,max-page-size=16384")
+
 target_link_libraries(seal_jni
         seal
         zlib

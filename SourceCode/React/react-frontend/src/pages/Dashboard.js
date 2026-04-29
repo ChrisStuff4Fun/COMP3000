@@ -479,16 +479,23 @@ function CreateFenceSection ({accessLevel}) {
 
       const approxShape = {
         type: "FeatureCollection",
-        features: approxCircles.map(c => ({
+        features: [
+        {
           type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [c.lon, c.lat]
-          },
-          properties: {
-            radius: c.radius
-          }
+          geometry: geo.geometry, // original polygon
+          properties: { type: "polygon" }
+        },
+          approxCircles.map(c => ({
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [c.lon, c.lat]
+            },
+            properties: {
+              radius: c.radius
+            }
         }))
+        ]
       };
 
       setShape(approxShape);

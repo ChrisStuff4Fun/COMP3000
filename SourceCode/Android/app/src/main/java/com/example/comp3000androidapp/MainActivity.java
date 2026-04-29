@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private void startApp(Bundle savedInstanceState) {
 
         if (savedInstanceState == null) {
-            boolean registered = getSharedPreferences("app", MODE_PRIVATE)
+            boolean registered = getSharedPreferences("cybertrackClient", MODE_PRIVATE)
                     .getBoolean("registered", false);
 
             if (registered) {
@@ -96,6 +96,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadTracking() {
+        android.util.Log.d("MainActivity", "loadTracking called");
+
+        Intent serviceIntent = new Intent(this, trackingService.class);
+        android.util.Log.d("MainActivity", "Starting service...");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        } else {
+            startService(serviceIntent);
+        }
+
+        android.util.Log.d("MainActivity", "Service start called");
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, new TrackingFragment())

@@ -7,4 +7,11 @@ public static class SealNative
 
     [DllImport("seal_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr generateKeys();
+
+    [DllImport("seal_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern IntPtr computeSquaredDiff(string base64Cipher, double plaintextCentre);
+
+    [DllImport("seal_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern long addAndDecrypt(string base64Cipher1, string base64Cipher2);
+
 }

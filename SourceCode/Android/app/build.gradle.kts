@@ -20,6 +20,13 @@ android {
         }
 
         ndkVersion = "25.2.9519653"
+
+        externalNativeBuild {
+            cmake {
+                arguments("-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
+            }
+        }
+
     }
 
     // CPP marker

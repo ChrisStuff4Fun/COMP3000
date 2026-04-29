@@ -58,3 +58,96 @@ SecretKey* getSecretKey() { return secret_key.get(); }
 
 extern "C" __declspec(dllexport)
 RelinKeys* getRelinKeys() { return relin_keys.get(); }
+
+
+ 
+// HOMOMORPHIC ENCRYPTION // // HOMOMORPHIC ENCRYPTION // // HOMOMORPHIC ENCRYPTION // // HOMOMORPHIC ENCRYPTION // // HOMOMORPHIC ENCRYPTION // // HOMOMORPHIC ENCRYPTION // // HOMOMORPHIC ENCRYPTION // 
+
+// Computes encrypted result of (ciphertext - plaintext_centre)^2
+extern "C" __declspec(dllexport)
+const char* computeSquaredDiff(const char* base64Cipher, double plaintextCentre)
+{
+    static std::string result;
+    try
+    {
+        if (!context) return "ERROR:not_initialised";
+
+        // decode ciphertext from b64 back into binary
+        std::string cipherBytes = base64Decode(base64Cipher);
+        std::istringstream cipherStream(cipherBytes);
+        Ciphertext cipher;
+        cipher.load(*context, cipherStream);
+
+        // encode centre as plaintext
+        // scale must match what Android used (1e6 currently, but i may increase to 10 in the future)
+        BatchEncoder encoder(*context);
+        int64_t scaledCentre = static_cast<int64_t>(plaintextCentre * 1e6);
+        std::vector<int64_t> centreVec(context->key_context_data()->parms().poly_modulus_degree(), scaledCentre);
+        Plaintext centrePlain;
+        encoder.encode(centreVec, centrePlain);
+
+        // compute (cipher - centre)
+        Evaluator evaluator(*context);
+        Ciphertext diff;
+        evaluator.sub_plain(cipher, centrePlain, diff);
+
+        // compute (cipher - centre)^2
+        Ciphertext squared;
+        evaluator.multiply(diff, diff, squared);
+        evaluator.relinearize_inplace(squared, *relin_keys);
+
+        // serialise and base64 encode result
+        std::ostringstream outStream;
+        squared.save(outStream);
+
+        result = base64Encode(outStream.str());
+        return result.c_str();
+    }
+    catch (const std::exception& e)
+    {
+        // catch any errors :(
+        result = std::string("ERROR:") + e.what();
+        return result.c_str();
+    }
+}
+
+// adds two ciphertexts and decrypts the first slot
+extern "C" __declspec(dllexport)
+long long addAndDecrypt(const char* base64Cipher1, const char* base64Cipher2)
+{
+    try
+    {
+        if (!context) return -1;
+
+        //  decode back to binary
+        std::string bytes1 = base64Decode(base64Cipher1);
+        std::istringstream stream1(bytes1);
+        Ciphertext c1;
+        c1.load(*context, stream1);
+
+        //  decode back to binary
+        std::string bytes2 = base64Decode(base64Cipher2);
+        std::istringstream stream2(bytes2);
+        Ciphertext c2;
+        c2.load(*context, stream2);
+        
+        // add input 1 and 2
+        Evaluator evaluator(*context);
+        Ciphertext sum;
+        evaluator.add(c1, c2, sum);
+
+        // decrypt result
+        Plaintext plain;
+        decryptor->decrypt(sum, plain);
+
+        BatchEncoder encoder(*context);
+        std::vector<int64_t> decoded;
+        encoder.decode(plain, decoded);
+
+        return decoded[0]; // squared distance in slot 0
+    }
+    catch (...)
+    {
+        return -1;
+    }
+}
