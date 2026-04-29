@@ -649,22 +649,49 @@ function GroupSidebar({ active, setActive, accessLevel }) {
     </div>
   );
 }
+
+
 function GroupOverview({ accessLevel }) {
   const [groups, setGroups] = useState([]);
-  const [devices, setDevices] = useState([]);
+  const [allDevices, setAllDevices] = useState([]);
+  const [groupDevices, setGroupDevices] = useState({});
   const [expanded, setExpanded] = useState(null);
 
-  const fetchData = async () => {
+  const fetchAll = async () => {
     const g = await fetch("/group/groups", { credentials: "include" });
     const d = await fetch("/device/devices", { credentials: "include" });
 
     setGroups(g.ok ? await g.json() : []);
-    setDevices(d.ok ? await d.json() : []);
+    setAllDevices(d.ok ? await d.json() : []);
+  };
+
+  const fetchGroupDevices = async (groupId) => {
+    const res = await fetch(`/group/${groupId}/devices`, {
+      credentials: "include",
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      setGroupDevices(prev => ({ ...prev, [groupId]: data }));
+    }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchAll();
   }, []);
+
+  const toggleExpand = async (groupId) => {
+    if (expanded === groupId) {
+      setExpanded(null);
+      return;
+    }
+
+    setExpanded(groupId);
+
+    if (!groupDevices[groupId]) {
+      await fetchGroupDevices(groupId);
+    }
+  };
 
   const deleteGroup = async (id) => {
     if (!window.confirm("Delete this group?")) return;
@@ -674,7 +701,7 @@ function GroupOverview({ accessLevel }) {
       credentials: "include",
     });
 
-    fetchData();
+    fetchAll();
   };
 
   const addDevice = async (groupId, deviceId) => {
@@ -683,7 +710,7 @@ function GroupOverview({ accessLevel }) {
       credentials: "include",
     });
 
-    fetchData();
+    await fetchGroupDevices(groupId);
   };
 
   const removeDevice = async (groupId, deviceId) => {
@@ -692,59 +719,92 @@ function GroupOverview({ accessLevel }) {
       credentials: "include",
     });
 
-    fetchData();
+    await fetchGroupDevices(groupId);
   };
 
   return (
     <div>
       <h2>Device Groups</h2>
 
-      {groups.map((group) => (
-        <div key={group.deviceGroupID} className="group-card">
-          <div className="group-header">
-            <strong>{group.groupName}</strong>
+      {groups.map(group => {
+        const devicesInGroup = groupDevices[group.deviceGroupID] || [];
 
-            <div>
-              {accessLevel >= ACCESS.ELEVATED && (
-                <button onClick={() => setExpanded(expanded === group.deviceGroupID ? null : group.deviceGroupID)}>
-                  {expanded === group.deviceGroupID ? "Hide" : "View Devices"}
-                </button>
-              )}
+        const deviceIdsInGroup = new Set(
+          devicesInGroup.map(d => d.deviceID)
+        );
 
-              {accessLevel >= ACCESS.ADMIN && (
-                <button
-                  className="danger-btn"
-                  onClick={() => deleteGroup(group.deviceGroupID)}
-                >
-                  Delete
-                </button>
-              )}
+        const devicesNotInGroup = allDevices.filter(
+          d => !deviceIdsInGroup.has(d.deviceID)
+        );
+
+        return (
+          <div key={group.deviceGroupID} className="group-card">
+
+            <div className="group-header">
+              <strong>{group.groupName}</strong>
+
+              <div>
+                {accessLevel >= ACCESS.ELEVATED && (
+                  <button onClick={() => toggleExpand(group.deviceGroupID)}>
+                    {expanded === group.deviceGroupID ? "Hide" : "Manage"}
+                  </button>
+                )}
+
+                {accessLevel >= ACCESS.ADMIN && (
+                  <button
+                    className="danger-btn"
+                    onClick={() => deleteGroup(group.deviceGroupID)}
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* DEVICE LIST */}
-          {expanded === group.deviceGroupID && (
-            <div className="group-devices">
-              {devices.map((device) => (
-                <div key={device.deviceID} className="device-row">
-                  {device.deviceName}
+            {expanded === group.deviceGroupID && (
+              <div className="group-devices">
 
-                  {accessLevel >= ACCESS.ADMIN && (
-                    <>
-                      <button onClick={() => addDevice(group.deviceGroupID, device.deviceID)}>
-                        Add
-                      </button>
-                      <button onClick={() => removeDevice(group.deviceGroupID, device.deviceID)}>
-                        Remove
-                      </button>
-                    </>
-                  )}
+                {/* IN GROUP */}
+                <div>
+                  <h4>In Group</h4>
+                  {devicesInGroup.map(device => (
+                    <div key={device.deviceID}>
+                      {device.deviceName}
+
+                      {accessLevel >= ACCESS.ADMIN && (
+                        <button onClick={() =>
+                          removeDevice(group.deviceGroupID, device.deviceID)
+                        }>
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+
+                {/* NOT IN GROUP */}
+                {accessLevel >= ACCESS.ADMIN && (
+                  <div>
+                    <h4>Add Devices</h4>
+                    {devicesNotInGroup.map(device => (
+                      <div key={device.deviceID}>
+                        {device.deviceName}
+
+                        <button onClick={() =>
+                          addDevice(group.deviceGroupID, device.deviceID)
+                        }>
+                          Add
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
