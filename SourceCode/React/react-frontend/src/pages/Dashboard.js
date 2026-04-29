@@ -66,8 +66,6 @@ function Devices({ accessLevel }) {
     try {
       const res = await fetch("/device/devices", { credentials: "include" });
       console.log("devices status:", res.status);
-      const text = await res.text();
-      console.log("body:", text);
       if (res.status === 404) { setDevices([]); return; }
       if (!res.ok) throw new Error("Failed to fetch devices");
       const data = await res.json();
