@@ -1,9 +1,7 @@
-
 public class KeyExchange
 {
-    public string Code = string.Empty;
-    public string DeviceName = string.Empty;
-    public string X = string.Empty;
-    public string Y = string.Empty;
-
+    public string Code { get; set; } = string.Empty;
+    public string DeviceName { get; set; } = string.Empty;
+    public string X { get; set; } = string.Empty;
+    public string Y { get; set; } = string.Empty;
 }
