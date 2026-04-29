@@ -58,10 +58,100 @@ function TopBar({ accessLevel, setActiveTab, refreshAuth }) {
 
 
 // ----------------------------------------------------------------------------------------------
-function Devices() {
-    return(
-        <p> devices </p>
-    )
+
+function Devices({ accessLevel }) {
+  const [devices, setDevices] = useState([]);
+
+  const fetchDevices = async () => {
+    try {
+      const res = await fetch("/device/devices", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch devices");
+      const data = await res.json();
+      setDevices(data);
+    } catch (err) {
+      console.error("Failed to fetch devices", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDevices();
+  }, []);
+
+  const releaseDevice = async (deviceId) => {
+    if (!window.confirm("Are you sure you want to release this device?")) return;
+    try {
+      const res = await fetch(`/device/release/${deviceId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to release device");
+      await fetchDevices();
+    } catch (err) {
+      console.error("Failed to release device", err);
+    }
+  };
+
+  const updateDeviceName = async (deviceId, newName) => {
+    try {
+      const res = await fetch(`/device/update/${deviceId}/${encodeURIComponent(newName)}`, {
+        method: "PUT",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to update device name");
+      await fetchDevices();
+    } catch (err) {
+      console.error("Failed to update device name", err);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Devices</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Device Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {devices.map((device) => (
+            <tr key={device.deviceID}>
+              <td>
+                {accessLevel >= ACCESS.ADMIN ? (
+                  <input
+                    type="text"
+                    value={device.deviceName}
+                    onChange={(e) =>
+                      setDevices((prev) =>
+                        prev.map((d) =>
+                          d.deviceID === device.deviceID
+                            ? { ...d, deviceName: e.target.value }
+                            : d
+                        )
+                      )
+                    }
+                    onBlur={(e) => updateDeviceName(device.deviceID, e.target.value)}
+                  />
+                ) : (
+                  device.deviceName
+                )}
+              </td>
+              <td>
+                <button
+                  className="danger-btn"
+                  disabled={accessLevel < ACCESS.ADMIN}
+                  onClick={() => releaseDevice(device.deviceID)}
+                >
+                  Release
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 // ----------------------------------------------------------------------------------------------

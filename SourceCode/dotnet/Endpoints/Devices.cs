@@ -12,7 +12,7 @@ public static class DeviceEndpoints
 
         // Map endpoints
         devices.MapGet("/devices", getDevicesByOrg);
-        devices.MapGet("/release/{deviceId}", deleteDevice);
+        devices.MapDelete("/release/{deviceId}", deleteDevice);
         devices.MapGet("/getinfo/{deviceId}", getInfo);
         devices.MapPut("/update/{deviceId}/{newName}", updateDevice);
     }
@@ -93,7 +93,7 @@ public static class DeviceEndpoints
         if (device == null) return Results.Conflict("Device does not exist");
 
         // Reject if current user is in different org or is not an admin
-        if (device.OrgID != currentUser.OrgID || currentUser.AccessLevel >= 3) return Results.Forbid();
+        if (device.OrgID != currentUser.OrgID || currentUser.AccessLevel < 3) return Results.Forbid();
 
         // Edit device name
         device.DeviceName = newName;
