@@ -9,7 +9,7 @@ public static class GroupEndpoints
 
         // Map endpoints
         groups.MapGet("/groups", getGroupsByOrg);
-        groups.MapGet("/delete/{groupId}", deleteGroup);
+        groups.MapDelete("/delete/{groupId}", deleteGroup);
         groups.MapPut("/create", createGroup);
         groups.MapPut("/update/{groupId}", updateGroup);
         groups.MapPut("/{groupId}/adddevice/{deviceID}", addDeviceToGroup);
@@ -96,7 +96,7 @@ public static class GroupEndpoints
         if (group == null) return Results.Conflict("Group does not exists");
 
         // Reject if current user is in different org or is not an admin
-        if (group.OrgID != currentUser.OrgID || currentUser.AccessLevel >= 3) return Results.Forbid();
+        if (group.OrgID != currentUser.OrgID || currentUser.hasAccessLevel(3)) return Results.Forbid();
 
         // Edit current group
         group.GroupName    = newGroup.GroupName;
@@ -121,7 +121,7 @@ public static class GroupEndpoints
         if (device == null) return Results.Conflict("Device does not exist");
 
         // Reject if current user is in different org or is not an admin
-        if (group.OrgID != currentUser.OrgID || currentUser.AccessLevel >= 3 || device.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (group.OrgID != currentUser.OrgID || currentUser.hasAccessLevel(3)|| device.OrgID != currentUser.OrgID) return Results.Forbid();
 
         // Check if device is already in the group
         DeviceDeviceGroupLink? link = await db.Device_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);
@@ -153,7 +153,7 @@ public static class GroupEndpoints
         if (device == null) return Results.Conflict("Device does not exist");
 
         // Reject if current user is in different org or is not an admin
-        if (group.OrgID != currentUser.OrgID || currentUser.AccessLevel >= 3 || device.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (group.OrgID != currentUser.OrgID || currentUser.hasAccessLevel(3) || device.OrgID != currentUser.OrgID) return Results.Forbid();
 
         // Find link 
         DeviceDeviceGroupLink? link = await db.Device_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);

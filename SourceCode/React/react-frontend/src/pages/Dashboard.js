@@ -624,11 +624,198 @@ function Geofences({ accessLevel }) {
 
 // ----------------------------------------------------------------------------------------------
 
-function DeviceGroups() {
-    return(
-        <p> DeviceGroups </p>
-    )
+const GROUP_PANELS = {
+  OVERVIEW: "overview",
+  CREATE: "create",
+};
+
+function GroupSidebar({ active, setActive, accessLevel }) {
+  return (
+    <div className="org-sidebar">
+      <button
+        className={active === GROUP_PANELS.OVERVIEW ? "active" : ""}
+        onClick={() => setActive(GROUP_PANELS.OVERVIEW)}
+      >
+        Groups
+      </button>
+
+      <button
+        className={active === GROUP_PANELS.CREATE ? "active" : ""}
+        onClick={() => setActive(GROUP_PANELS.CREATE)}
+        disabled={accessLevel < ACCESS.ADMIN}
+      >
+        Create
+      </button>
+    </div>
+  );
 }
+function GroupOverview({ accessLevel }) {
+  const [groups, setGroups] = useState([]);
+  const [devices, setDevices] = useState([]);
+  const [expanded, setExpanded] = useState(null);
+
+  const fetchData = async () => {
+    const g = await fetch("/group/groups", { credentials: "include" });
+    const d = await fetch("/device/devices", { credentials: "include" });
+
+    setGroups(g.ok ? await g.json() : []);
+    setDevices(d.ok ? await d.json() : []);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const deleteGroup = async (id) => {
+    if (!window.confirm("Delete this group?")) return;
+
+    await fetch(`/group/delete/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    fetchData();
+  };
+
+  const addDevice = async (groupId, deviceId) => {
+    await fetch(`/group/${groupId}/adddevice/${deviceId}`, {
+      method: "PUT",
+      credentials: "include",
+    });
+
+    fetchData();
+  };
+
+  const removeDevice = async (groupId, deviceId) => {
+    await fetch(`/group/${groupId}/removedevice/${deviceId}`, {
+      method: "PUT",
+      credentials: "include",
+    });
+
+    fetchData();
+  };
+
+  return (
+    <div>
+      <h2>Device Groups</h2>
+
+      {groups.map((group) => (
+        <div key={group.deviceGroupID} className="group-card">
+          <div className="group-header">
+            <strong>{group.groupName}</strong>
+
+            <div>
+              {accessLevel >= ACCESS.ELEVATED && (
+                <button onClick={() => setExpanded(expanded === group.deviceGroupID ? null : group.deviceGroupID)}>
+                  {expanded === group.deviceGroupID ? "Hide" : "View Devices"}
+                </button>
+              )}
+
+              {accessLevel >= ACCESS.ADMIN && (
+                <button
+                  className="danger-btn"
+                  onClick={() => deleteGroup(group.deviceGroupID)}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* DEVICE LIST */}
+          {expanded === group.deviceGroupID && (
+            <div className="group-devices">
+              {devices.map((device) => (
+                <div key={device.deviceID} className="device-row">
+                  {device.deviceName}
+
+                  {accessLevel >= ACCESS.ADMIN && (
+                    <>
+                      <button onClick={() => addDevice(group.deviceGroupID, device.deviceID)}>
+                        Add
+                      </button>
+                      <button onClick={() => removeDevice(group.deviceGroupID, device.deviceID)}>
+                        Remove
+                      </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+function CreateGroup({ accessLevel }) {
+  const [name, setName] = useState("");
+
+  const createGroup = async () => {
+    if (!name) return alert("Enter a name");
+
+    await fetch("/group/create", {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        groupName: name,
+        gpsAccuracy: 10
+      }),
+    });
+
+    setName("");
+    alert("Group created");
+  };
+
+  return (
+    <div>
+      <h2>Create Group</h2>
+
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Group name"
+      />
+
+      <button
+        onClick={createGroup}
+        disabled={accessLevel < ACCESS.ADMIN}
+      >
+        Create
+      </button>
+    </div>
+  );
+}
+
+
+function DeviceGroups({ accessLevel }) {
+  const [active, setActive] = useState(GROUP_PANELS.OVERVIEW);
+
+  return (
+    <div className="org-layout">
+      <GroupSidebar
+        active={active}
+        setActive={setActive}
+        accessLevel={accessLevel}
+      />
+
+      <div className="org-content">
+        {active === GROUP_PANELS.OVERVIEW && (
+          <GroupOverview accessLevel={accessLevel} />
+        )}
+
+        {active === GROUP_PANELS.CREATE && (
+          <CreateGroup accessLevel={accessLevel} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 
 // ----------------------------------------------------------------------------------------------
 
