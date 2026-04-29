@@ -13,7 +13,6 @@ add_subdirectory(external/SEAL)
 
 add_library(seal_wrapper SHARED
     cpp/sealWrapper.cpp
-    cpp/homomorphicProcessing.cpp
     cpp/sealKeygen.cpp
 )
 
