@@ -14,10 +14,40 @@ public static class GroupEndpoints
         groups.MapPut("/update/{groupId}", updateGroup);
         groups.MapPut("/{groupId}/adddevice/{deviceID}", addDeviceToGroup);
         groups.MapPut("/{groupId}/removedevice/{deviceID}", removeDeviceFromGroup);
+        groups.MapGet("/{groupId}/devices", getDevicesInGroup);
     }
 
 
     // Methods for endpoints
+    private static async Task<IResult> getDevicesInGroup(int groupId, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
+    {
+        CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
+        // Reject if user isnt authed by google
+        if (!currentUser.validateToken()) return Results.Unauthorized();
+        // Get current user from db
+        await currentUser.getUserFromDBAsync();
+
+        // Reject if the user is not registered to the app or the org, or if they are not level 2 or higher
+        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
+
+        DeviceGroup? group = await db.DeviceGroups.FindAsync(groupId);
+        if (group == null) return Results.NotFound();
+
+        if (group.OrgID != currentUser.OrgID)
+            return Results.Forbid();
+
+        var devices = await db.Device_DeviceGroup_Link
+            .Where(l => l.DeviceGroupID == groupId)
+            .Join(db.Devices,
+                link => link.DeviceID,
+                device => device.DeviceID,
+                (link, device) => device)
+            .ToListAsync();
+
+        return Results.Ok(devices);
+    }
+
+
     private static async Task<IResult> getGroupsByOrg( AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
@@ -121,7 +151,7 @@ public static class GroupEndpoints
         if (device == null) return Results.Conflict("Device does not exist");
 
         // Reject if current user is in different org or is not an admin
-        if (group.OrgID != currentUser.OrgID || currentUser.hasAccessLevel(3)|| device.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3)|| device.OrgID != currentUser.OrgID) return Results.Forbid();
 
         // Check if device is already in the group
         DeviceDeviceGroupLink? link = await db.Device_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);
@@ -153,7 +183,7 @@ public static class GroupEndpoints
         if (device == null) return Results.Conflict("Device does not exist");
 
         // Reject if current user is in different org or is not an admin
-        if (group.OrgID != currentUser.OrgID || currentUser.hasAccessLevel(3) || device.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3) || device.OrgID != currentUser.OrgID) return Results.Forbid();
 
         // Find link 
         DeviceDeviceGroupLink? link = await db.Device_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);
