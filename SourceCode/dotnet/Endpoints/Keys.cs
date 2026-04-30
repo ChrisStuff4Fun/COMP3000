@@ -53,16 +53,15 @@ public static class KeyEndpoints
 
 
 
-    private static async Task<IResult> serveBFV([FromServices] AppDbContext db, [FromServices] IHttpContextAccessor httpAccessor, [FromServices] SealKeyService sealService)
+    private static async Task<IResult> serveBFV([FromServices] AppDbContext db, [FromServices] IHttpContextAccessor httpAccessor, [FromServices] SealKeyService bfvService)
     {
 
         Console.WriteLine("BFV key requested");
         
         try {
-            var sealService = new SealKeyService();
-            await sealService.initialiseAsync();
+            await bfvService.initialiseAsync();
 
-            var keys = sealService.getKeys();
+            var keys = bfvService.getKeys();
 
             return Results.Ok(new { publicBFV = keys.Public });
         }
