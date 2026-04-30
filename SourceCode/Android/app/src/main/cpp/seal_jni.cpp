@@ -44,9 +44,20 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         EncryptionParameters parms(scheme_type::bfv);
         size_t poly_modulus_degree = 4096;
         parms.set_poly_modulus_degree(poly_modulus_degree);
-        parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 20));
-        parms.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
+        parms.set_plain_modulus(65537);
+        parms.set_coeff_modulus(CoeffModulus::Create(4096,{ 60, 40, 40, 60 }));
         SEALContext context(parms);
+
+        std::cout << parms.coeff_modulus().size() << std::endl;
+        auto id = parms.parms_id();
+
+        std::cout << std::hex;
+        for (size_t i = 0; i < id.size(); i++)
+        {
+            std::cout << id[i];
+            if (i + 1 < id.size()) std::cout << "-";
+        }
+        std::cout << std::dec << std::endl;
 
         // decode base64 public key from server
         const char* b64chars = env->GetStringUTFChars(base64PublicKey, nullptr);

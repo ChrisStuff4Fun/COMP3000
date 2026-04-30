@@ -22,10 +22,22 @@ bool initSeal()
         size_t poly_modulus_degree = 4096;
 
         parms.set_poly_modulus_degree(poly_modulus_degree);
-        parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 20));
-        parms.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
+        parms.set_plain_modulus(65537);
+        parms.set_coeff_modulus(CoeffModulus::Create(4096,{ 60, 40, 40, 60 }));
 
         context = std::make_unique<SEALContext>(parms);
+
+
+        std::cout << parms.coeff_modulus().size() << std::endl;
+        auto id = parms.parms_id();
+
+        std::cout << std::hex;
+        for (size_t i = 0; i < id.size(); i++)
+        {
+            std::cout << id[i];
+            if (i + 1 < id.size()) std::cout << "-";
+        }
+        std::cout << std::dec << std::endl;
 
         KeyGenerator keygen(*context);
 
@@ -46,29 +58,6 @@ bool initSeal()
     catch (...)
     {
         return false;
-    }
-}
-
-
-// used to send to android to stop the "incompatible version" error
-extern "C" __declspec(dllexport)
-const char* getSerialisedContext()
-{
-    static std::string encoded;
-
-    try
-    {
-        if (!context) return nullptr;
-
-        std::ostringstream stream;
-        context->save(stream);
-
-        encoded = base64Encode(stream.str());
-        return encoded.c_str();
-    }
-    catch (...)
-    {
-        return nullptr;
     }
 }
 

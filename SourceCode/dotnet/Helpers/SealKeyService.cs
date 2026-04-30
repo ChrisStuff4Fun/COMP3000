@@ -29,9 +29,6 @@ public class SealKeyService
             var ptr = SealNative.generateKeys();
             var json = Marshal.PtrToStringAnsi(ptr);
 
-            var contextPtr = SealNative.getSerialisedContext();
-            var context = Marshal.PtrToStringAnsi(contextPtr);
-
             var keys = JsonSerializer.Deserialize<SealKeys>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -43,7 +40,6 @@ public class SealKeyService
             await uploadBlob("bfvPublic", keys.Public);
             await uploadBlob("bfvSecret", keys.Secret);
             await uploadBlob("bfvRelin", keys.Relin);
-            await uploadBlob("bfvContext", context);
             _cachedKeys = keys;
         }
         else
@@ -53,8 +49,7 @@ public class SealKeyService
             {
                 Public  = await downloadBlob("bfvPublic"),
                 Secret  = await downloadBlob("bfvSecret"),
-                Relin   = await downloadBlob("bfvRelin"),
-                Context = await downloadBlob("bfvContext")
+                Relin   = await downloadBlob("bfvRelin")
             };
         }
     }
