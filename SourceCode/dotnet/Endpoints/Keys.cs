@@ -1,4 +1,5 @@
 
+using System.Text.Json;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
@@ -62,6 +63,11 @@ public static class KeyEndpoints
             await sealService.initialiseAsync();
 
             var keys = sealService.getKeys();
+
+            Console.WriteLine($"Public null: {keys?.Public == null}");
+            Console.WriteLine($"Secret null: {keys?.Secret == null}");
+            Console.WriteLine($"Relin null: {keys?.Relin == null}");
+
 
             return Results.Ok(new { publicBFV = keys.Public });
         }
