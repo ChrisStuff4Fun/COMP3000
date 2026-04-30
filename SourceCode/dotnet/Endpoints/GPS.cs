@@ -29,7 +29,7 @@ public static class GPSEndpoints
                 return Results.Problem("SEAL init failed", statusCode: 500);
 
             // get device groups for this device
-            List<DeviceDeviceGroupLink> groupLinks = await db.Device_DeviceGroup_Link
+            List<DeviceDeviceGroupLink> groupLinks = await db.Devices_DeviceGroup_Link
                 .Where(l => l.DeviceID == deviceId)
                 .ToListAsync();
 
