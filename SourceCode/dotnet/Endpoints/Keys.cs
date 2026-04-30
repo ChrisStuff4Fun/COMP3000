@@ -64,11 +64,6 @@ public static class KeyEndpoints
 
             var keys = sealService.getKeys();
 
-            Console.WriteLine($"Public null: {keys?.Public == null}");
-            Console.WriteLine($"Secret null: {keys?.Secret == null}");
-            Console.WriteLine($"Relin null: {keys?.Relin == null}");
-
-
             return Results.Ok(new { publicBFV = keys.Public });
         }
         catch(Exception e)

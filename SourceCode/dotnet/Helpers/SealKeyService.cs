@@ -28,6 +28,7 @@ public class SealKeyService
             Console.WriteLine("Generating new SEAL keys...");
             var ptr = SealNative.generateKeys();
             var json = Marshal.PtrToStringAnsi(ptr);
+            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug.txt", json ?? "null");
 
             var keys = JsonSerializer.Deserialize<SealKeys>(json, new JsonSerializerOptions
             {
