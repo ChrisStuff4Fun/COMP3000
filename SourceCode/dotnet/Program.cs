@@ -54,6 +54,8 @@ builder.Services.AddSingleton<IDataProtector>(provider =>
             .CreateProtector("AuthCookieProtector"));
 
 
+builder.Services.AddSingleton<SealKeyService>();
+
 // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER // BUILDER 
 
 

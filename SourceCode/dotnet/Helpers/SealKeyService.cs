@@ -39,9 +39,12 @@ public class SealKeyService
             if (keys?.Public == null || keys?.Secret == null || keys?.Relin == null || keys?.Context == null)
                 throw new Exception($"Null keys returned. JSON: {json}");
 
-            await uploadBlob("bfvPublic", keys.Public);
-            await uploadBlob("bfvSecret", keys.Secret);
-            await uploadBlob("bfvRelin", keys.Relin);
+            await uploadBlob("bfv-public", keys.Public);
+            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded public");
+            await uploadBlob("bfv-secret", keys.Secret);
+            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded secret");
+            await uploadBlob("bfv-relin", keys.Relin);
+            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded relin");
             _cachedKeys = keys;
         }
         else

@@ -53,7 +53,7 @@ public static class KeyEndpoints
 
 
 
-    private static async Task<IResult> serveBFV([FromServices] AppDbContext db, [FromServices] IHttpContextAccessor httpAccessor)
+    private static async Task<IResult> serveBFV([FromServices] AppDbContext db, [FromServices] IHttpContextAccessor httpAccessor, [FromServices] SealKeyService sealService)
     {
 
         Console.WriteLine("BFV key requested");
