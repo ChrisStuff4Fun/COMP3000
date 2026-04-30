@@ -21,4 +21,8 @@ public class Crypto {
                 encryptValue(base64PublicKey, lon)
         };
     }
+
+    public native String getSealDebugInfo();
+
+
 }

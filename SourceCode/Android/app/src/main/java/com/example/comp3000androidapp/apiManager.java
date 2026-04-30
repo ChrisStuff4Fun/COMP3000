@@ -24,7 +24,7 @@ import java.security.spec.ECGenParameterSpec;
 import java.security.KeyStore;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECPoint;
-
+import com.example.comp3000androidapp.Crypto;
 public class apiManager {
 
     private final String baseURL = "https://cybertrack.azurewebsites.net";
@@ -134,6 +134,9 @@ public class apiManager {
                 callback.onSuccess(key);
 
                 Log.d("BFV", "fetchServerBfvKey: fetched " + key);
+
+                Crypto c = new Crypto();
+                Log.d("test", "seal" + c.getSealDebugInfo());
 
             } catch (Exception e) {
                 callback.onError(e);

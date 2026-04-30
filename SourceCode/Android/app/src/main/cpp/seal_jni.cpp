@@ -48,6 +48,7 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         parms.set_coeff_modulus(CoeffModulus::Create(4096,{ 60, 40, 40, 60 }));
         SEALContext context(parms);
 
+
         std::cout << parms.coeff_modulus().size() << std::endl;
         auto id = parms.parms_id();
 
@@ -64,11 +65,24 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         std::string b64str(b64chars);
         env->ReleaseStringUTFChars(base64PublicKey, b64chars);
 
+
         std::string keyBytes = base64Decode(b64str);
         std::istringstream keyStream(keyBytes);
 
+
+
         PublicKey pk;
         pk.load(context, keyStream);
+
+        return env->NewStringUTF("test");
+
+    }
+    catch (const std::exception& e)
+    {
+        // catch error and send back to java
+        return env->NewStringUTF((std::string("ERROR: ") + e.what()).c_str());
+    }
+    /*
 
         // scale double to integer (multiply by 1e6 for 6 decimal places)
         BatchEncoder encoder(context);
@@ -78,12 +92,14 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         Plaintext plain;
         encoder.encode(vec, plain);
 
+
+
         // encrypt
         Encryptor encryptor(context, pk);
         Ciphertext cipher;
         encryptor.encrypt(plain, cipher);
 
-        // serialize and base64 encode
+        // serialise and base64 encode
         std::ostringstream cipherStream;
         cipher.save(cipherStream);
 
@@ -105,10 +121,23 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         while (encoded.size() % 4) encoded.push_back('=');
 
         return env->NewStringUTF(encoded.c_str());
-    }
-    catch (const std::exception& e)
-    {
-        // catch error and send back to java
-        return env->NewStringUTF((std::string("ERROR: ") + e.what()).c_str());
-    }
+    */
+
+}
+
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_example_comp3000androidapp_Crypto_getSealDebugInfo(JNIEnv *env, jobject thiz)
+{
+    static std::string info;
+
+    info =
+            std::string("SEAL: ") +
+            std::to_string(SEAL_VERSION_MAJOR) + "." +
+            std::to_string(SEAL_VERSION_MINOR) + "." +
+            std::to_string(SEAL_VERSION_PATCH) +
+            " | COMPILED: " + __DATE__ + " " + __TIME__;
+
+    return env->NewStringUTF(info.c_str());
 }

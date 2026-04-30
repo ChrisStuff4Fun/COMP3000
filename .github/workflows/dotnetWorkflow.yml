@@ -45,8 +45,11 @@ jobs:
           $global:LASTEXITCODE = 0
         shell: powershell
 
-      - name: Clone SEAL
-        run: git clone https://github.com/microsoft/SEAL.git SourceCode/dotnet/Native/seal/external/SEAL
+      - name: Clone SEAL (pinned)
+        run: |
+          git clone https://github.com/microsoft/SEAL.git SourceCode/dotnet/Native/seal/external/SEAL
+          cd SourceCode/dotnet/Native/seal/external/SEAL
+          git checkout 7a931d55ba84a40b85938f6ca3ac206f18654093
 
       - name: Install CMake
         run: choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
