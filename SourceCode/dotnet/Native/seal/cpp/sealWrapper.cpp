@@ -18,12 +18,10 @@ bool initSeal()
     try
     {
         EncryptionParameters parms(scheme_type::bfv);
-
         size_t poly_modulus_degree = 4096;
-
         parms.set_poly_modulus_degree(poly_modulus_degree);
-        parms.set_plain_modulus(65537);
-        parms.set_coeff_modulus(CoeffModulus::Create(4096,{ 60, 40, 40, 60 }));
+        parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 20));
+        parms.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
 
         context = std::make_unique<SEALContext>(parms);
 
