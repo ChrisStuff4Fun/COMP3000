@@ -28,12 +28,13 @@ public class SealKeyService
             Console.WriteLine("Generating new SEAL keys...");
             var ptr = SealNative.generateKeys();
             var json = Marshal.PtrToStringAnsi(ptr);
-            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug.txt", json ?? "null");
 
             var keys = JsonSerializer.Deserialize<SealKeys>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
+
+            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug2.txt",  $"Public null: {keys?.Public == null}\nSecret null: {keys?.Secret == null}\nRelin null: {keys?.Relin == null}\nPublic length: {keys?.Public?.Length}\nSecret length: {keys?.Secret?.Length}\nRelin length: {keys?.Relin?.Length}");
 
             if (keys?.Public == null || keys?.Secret == null || keys?.Relin == null || keys?.Context == null)
                 throw new Exception($"Null keys returned. JSON: {json}");
