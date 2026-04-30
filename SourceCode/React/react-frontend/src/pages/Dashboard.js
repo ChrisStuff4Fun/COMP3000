@@ -893,6 +893,7 @@ function Map() {
             const geofencesRes = await fetch("/geofence/geofences", { credentials: "include" });
             const geofencesData = await geofencesRes.json();
             setGeofences(geofencesData);
+            console.log("Geofences: ", geofencesData)
 
         } catch (err) {
             console.error("Failed to fence map data", err);
@@ -909,6 +910,7 @@ function Map() {
             const devicesRes = await fetch("/gps/devices", { credentials: "include" });
             const devicesData = await devicesRes.json();
             setDevices(devicesData);
+            console.log("Devices: ", devicesData)
 
         } catch (err) {
             console.error("Failed to device map data", err);
