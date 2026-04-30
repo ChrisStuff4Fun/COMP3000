@@ -485,7 +485,7 @@ function CreateFenceSection ({accessLevel}) {
           geometry: geo.geometry, // original polygon
           properties: { type: "polygon" }
         },
-          approxCircles.map(c => ({
+          ...approxCircles.map(c => ({
             type: "Feature",
             geometry: {
               type: "Point",
