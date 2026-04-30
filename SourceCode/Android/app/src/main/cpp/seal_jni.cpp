@@ -39,6 +39,7 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
 {
     try
     {
+
         // set up same SEAL params as server
         EncryptionParameters parms(scheme_type::bfv);
         size_t poly_modulus_degree = 4096;

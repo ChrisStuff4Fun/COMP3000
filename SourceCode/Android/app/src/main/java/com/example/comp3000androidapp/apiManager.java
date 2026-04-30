@@ -133,7 +133,7 @@ public class apiManager {
 
                 callback.onSuccess(key);
 
-                Log.d("BFV", "fetchServerBfvKey: fetched");
+                Log.d("BFV", "fetchServerBfvKey: fetched " + key);
 
             } catch (Exception e) {
                 callback.onError(e);
@@ -232,6 +232,9 @@ public class apiManager {
                 JSONObject json = new JSONObject();
                 json.put("lat", lat);
                 json.put("lon", lon);
+
+                Log.d("API", "lat: " + lat);
+                Log.d("API", "lon: " + lon);
 
                 OutputStream os = conn.getOutputStream();
                 os.write(json.toString().getBytes());

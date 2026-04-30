@@ -10,4 +10,7 @@ public class SealKeys
 
     [JsonPropertyName("relin")]
     public string? Relin { get; set; }
+
+    [JsonPropertyName("context")]
+    public string? Context { get; set; }
 }

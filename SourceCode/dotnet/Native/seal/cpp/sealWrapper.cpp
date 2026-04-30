@@ -41,12 +41,37 @@ bool initSeal()
         encoder    = std::make_unique<BatchEncoder>(*context);
 
         return true;
+
     }
     catch (...)
     {
         return false;
     }
 }
+
+
+// used to send to android to stop the "incompatible version" error
+extern "C" __declspec(dllexport)
+const char* getSerialisedContext()
+{
+    static std::string encoded;
+
+    try
+    {
+        if (!context) return nullptr;
+
+        std::ostringstream stream;
+        context->save(stream);
+
+        encoded = base64Encode(stream.str());
+        return encoded.c_str();
+    }
+    catch (...)
+    {
+        return nullptr;
+    }
+}
+
 
 extern "C" __declspec(dllexport)
 SEALContext* getContext() { return context.get(); }

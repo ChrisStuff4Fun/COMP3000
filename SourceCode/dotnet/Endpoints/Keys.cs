@@ -63,7 +63,7 @@ public static class KeyEndpoints
 
             var keys = sealService.getKeys();
 
-            return Results.Ok(new { publicBFV = keys.Public });
+            return Results.Ok(new { publicBFV = keys.Public, context = keys.Context});
         }
         catch(Exception e)
         {

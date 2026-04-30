@@ -28,17 +28,22 @@ public class SealKeyService
             Console.WriteLine("Generating new SEAL keys...");
             var ptr = SealNative.generateKeys();
             var json = Marshal.PtrToStringAnsi(ptr);
+
+            var contextPtr = SealNative.getSerialisedContext();
+            var context = Marshal.PtrToStringAnsi(contextPtr);
+
             var keys = JsonSerializer.Deserialize<SealKeys>(json, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             });
 
-            if (keys?.Public == null || keys?.Secret == null || keys?.Relin == null)
+            if (keys?.Public == null || keys?.Secret == null || keys?.Relin == null || keys?.Context == null)
                 throw new Exception($"Null keys returned. JSON: {json}");
 
             await uploadBlob("bfvPublic", keys.Public);
             await uploadBlob("bfvSecret", keys.Secret);
             await uploadBlob("bfvRelin", keys.Relin);
+            await uploadBlob("bfvContext", context);
             _cachedKeys = keys;
         }
         else
@@ -46,9 +51,10 @@ public class SealKeyService
             Console.WriteLine("Loading SEAL keys from Blob Storage...");
             _cachedKeys = new SealKeys
             {
-                Public = await downloadBlob("bfvPublic"),
-                Secret = await downloadBlob("bfvSecret"),
-                Relin  = await downloadBlob("bfvRelin")
+                Public  = await downloadBlob("bfvPublic"),
+                Secret  = await downloadBlob("bfvSecret"),
+                Relin   = await downloadBlob("bfvRelin"),
+                Context = await downloadBlob("bfvContext")
             };
         }
     }
