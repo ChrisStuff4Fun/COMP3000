@@ -935,7 +935,7 @@ function Map() {
           {devices.map((device) => (
             <Marker
               key={device.deviceID}
-              position={[device.lastLoggedLat, device.lastLoggedLong]}
+              position={[device.lat, device.lon]}
             >
               <Popup>{device.deviceName}</Popup>
             </Marker>
