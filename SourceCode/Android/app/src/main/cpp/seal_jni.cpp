@@ -66,7 +66,9 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
 
 
         std::string keyBytes = base64Decode(b64str);
-        std::istringstream keyStream(keyBytes);
+        std::stringstream keyStream(std::ios::in | std::ios::out | std::ios::binary);
+        keyStream.write(keyBytes.data(), keyBytes.size());
+        keyStream.seekg(0);
 
         __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "b64str length: %zu", b64str.length());
         __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "keyBytes length: %zu", keyBytes.length());
