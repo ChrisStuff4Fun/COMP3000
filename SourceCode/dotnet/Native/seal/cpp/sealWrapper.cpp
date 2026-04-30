@@ -153,3 +153,32 @@ long long addAndDecrypt(const char* base64Cipher1, const char* base64Cipher2)
         return -1;
     }
 }
+
+
+
+extern "C" __declspec(dllexport)
+long long decryptValue(const char* base64Cipher)
+{
+    try
+    {
+        if (!context || !decryptor) return -1;
+
+        std::string cipherBytes = base64Decode(base64Cipher);
+        std::istringstream cipherStream(cipherBytes);
+        Ciphertext cipher;
+        cipher.load(*context, cipherStream);
+
+        Plaintext plain;
+        decryptor->decrypt(cipher, plain);
+
+        BatchEncoder encoder(*context);
+        std::vector<int64_t> decoded;
+        encoder.decode(plain, decoded);
+
+        return decoded[0];
+    }
+    catch (...)
+    {
+        return -1;
+    }
+}

@@ -905,7 +905,7 @@ function Map() {
     useEffect(() => {
         const fetchDeviceData = async () => {
         try {
-            const devicesRes = await fetch("/device/devices", { credentials: "include" });
+            const devicesRes = await fetch("/gps/devices", { credentials: "include" });
             const devicesData = await devicesRes.json();
             setDevices(devicesData);
 
