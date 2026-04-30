@@ -203,7 +203,7 @@ public static class GPSEndpoints
             CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
             if (!currentUser.validateToken()) return Results.Unauthorized();
             await currentUser.getUserFromDBAsync();
-            if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
+            if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Problem("Forbidden", statusCode: 403);
 
             // get all devices for this org
             List<Device> devices = await db.Devices.Where(d => d.OrgID == currentUser.OrgID).ToListAsync();

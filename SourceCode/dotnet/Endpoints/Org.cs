@@ -30,7 +30,7 @@ public static class OrgEndpoints
         if (!currentUser.isRegistered()) return Results.BadRequest("Current API user not signed up");
 
         // Reject if the current user is not in the same org
-        if (currentUser.OrgID != orgId) return Results.Forbid();
+        if (currentUser.OrgID != orgId) return Results.Problem("Forbidden", statusCode: 403);
 
         Organisation? organisation = await db.Organisations.FindAsync(orgId);
         
@@ -51,7 +51,7 @@ public static class OrgEndpoints
         await currentUser.getUserFromDBAsync();
 
         // If current user is in an org, reject
-        if (currentUser.OrgID != 0) return Results.Forbid();
+        if (currentUser.OrgID != 0) return Results.Problem("Forbidden", statusCode: 403);
 
 
         User? user = await db.UserAccessLevels.FindAsync(currentUser.UserID);
@@ -85,10 +85,10 @@ public static class OrgEndpoints
         await currentUser.getUserFromDBAsync(); 
 
         // Cannot delete the unnasigned org group
-        if (currentUser.isRegToOrg(0)) return Results.Forbid();
+        if (currentUser.isRegToOrg(0)) return Results.Problem("Forbidden", statusCode: 403);
 
         // If current user is not root, reject
-        if (!currentUser.hasAccessLevel(4)) return Results.Forbid();
+        if (!currentUser.hasAccessLevel(4)) return Results.Problem("Forbidden", statusCode: 403);
 
         Organisation? org = await db.Organisations.FindAsync(currentUser.OrgID);
         if (org == null) return Results.NotFound("Organisation not found");

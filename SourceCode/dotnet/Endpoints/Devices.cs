@@ -29,7 +29,7 @@ public static class DeviceEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Reject if the user is not registered to the app or the org, or if they are not level 2 or higher
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
+        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Problem("Forbidden", statusCode: 403);
 
         List<Device> devices = await db.Devices.Where(d => d.OrgID == currentUser.OrgID).ToListAsync();
         return Results.Ok(devices);
@@ -64,7 +64,7 @@ public static class DeviceEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Only admin and root can delete policies
-        if (currentUser.AccessLevel < 3) return Results.Forbid();
+        if (currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
 
         // Get device to delete
         Device? device = await db.Devices.FindAsync(deviceId);
@@ -73,7 +73,7 @@ public static class DeviceEndpoints
         if (device == null) return Results.BadRequest("Device does not exist.");
 
         // Prevent deletion of other orgs devices
-        if (device.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (device.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
 
         // Remove device and save
         db.Devices.Remove(device);
@@ -87,13 +87,15 @@ public static class DeviceEndpoints
         CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
+        // Get current user from DB
+        await currentUser.getUserFromDBAsync();
 
         // Get device to update
         Device? device = await db.Devices.FindAsync(deviceId);
         if (device == null) return Results.Conflict("Device does not exist");
 
         // Reject if current user is in different org or is not an admin
-        if (device.OrgID != currentUser.OrgID || currentUser.AccessLevel < 3) return Results.Forbid();
+        if (device.OrgID != currentUser.OrgID || currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
 
         // Edit device name
         device.DeviceName = newName;

@@ -26,7 +26,7 @@ public static class FenceEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Reject if the user is not registered to the app or the org, or if they are not level 1 or higher
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(1)) return Results.Forbid();
+        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(1)) return Results.Problem("Forbidden", statusCode: 403);
 
         List<Geofence> fences = await db.Geofences.Where(g => g.OrgID == currentUser.OrgID).ToListAsync();
         return Results.Ok(fences);
@@ -43,7 +43,7 @@ public static class FenceEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Only admin and root can delete fences
-        if (currentUser.AccessLevel < 3) return Results.Forbid();
+        if (currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
 
         // Get fence to delete
         Geofence? fence = await db.Geofences.FindAsync(fenceId);
@@ -52,7 +52,7 @@ public static class FenceEndpoints
         if (fence == null) return Results.BadRequest("Geofence does not exist.");
 
         // Prevent deletion of other orgs geofences
-        if (fence.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (fence.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
 
         // Remove fence and save
         db.Geofences.Remove(fence);
@@ -71,7 +71,7 @@ public static class FenceEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Only admin and root can create fences
-        if (currentUser.AccessLevel < 3) return Results.Forbid();
+        if (currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
 
 
         Geofence fence = new Geofence();
@@ -97,7 +97,7 @@ public static class FenceEndpoints
         if (fence == null) return Results.Conflict("Fence does not exists");
 
         // Reject if current user is in different org or is not an admin
-        if (fence.OrgID != currentUser.OrgID || currentUser.AccessLevel >= 3) return Results.Forbid();
+        if (fence.OrgID != currentUser.OrgID || currentUser.AccessLevel >= 3) return Results.Problem("Forbidden", statusCode: 403);
 
         // Edit current fence name
         fence.GeofenceName = newName;

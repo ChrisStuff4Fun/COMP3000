@@ -29,7 +29,7 @@ public static class PolicyEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Reject if the user is not registered to the app or the org, or if they are not level 2 or higher
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
+        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Problem("Forbidden", statusCode: 403);
 
         List<Policy> policies = await db.Policies.Where(p => p.OrgID == currentUser.OrgID).ToListAsync();
         return policies.Any() ? Results.Ok(policies) : Results.NotFound();
@@ -46,7 +46,7 @@ public static class PolicyEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Only admin and root can delete policies
-        if (currentUser.AccessLevel < 3) return Results.Forbid();
+        if (currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
 
         // Get policy to delete
         Policy? policy = await db.Policies.FindAsync(policyId);
@@ -55,7 +55,7 @@ public static class PolicyEndpoints
         if (policy == null) return Results.BadRequest("Policy does not exist.");
 
         // Prevent deletion of other orgs policies
-        if (policy.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (policy.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
 
         // Remove user and save
         db.Policies.Remove(policy);
@@ -74,7 +74,7 @@ public static class PolicyEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Only admin and root can create policies
-        if (currentUser.AccessLevel < 3) return Results.Forbid();
+        if (currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
 
         // Set policy Id to impossible value so that db server autofills it
         newPolicyIn.PolicyID = 0;
@@ -87,7 +87,7 @@ public static class PolicyEndpoints
         return Results.Created();
     }
 
-    private static async Task<IResult> updatePolicy(int policyId, [FromBody] Policy newPolicy, AppDbContext db, IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
+    private static async Task<IResult> updatePolicy(int policyId, [FromBody] Policy newPolicy, AppDbContext db, IHttpContextAccessor httpAccessor, [FromServices] IDataProtector dataProtector)
     {
         CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
@@ -98,7 +98,7 @@ public static class PolicyEndpoints
         if (policy == null) return Results.Conflict("Policy does not exists");
 
         // Reject if current user is in different org or is not an admin
-        if (policy.OrgID != currentUser.OrgID || currentUser.AccessLevel >= 3) return Results.Forbid();
+        if (policy.OrgID != currentUser.OrgID || currentUser.AccessLevel >= 3) return Results.Problem("Forbidden", statusCode: 403);
 
         // Edit current policy
         policy.PolicyName            = newPolicy.PolicyName;

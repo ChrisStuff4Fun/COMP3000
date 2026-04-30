@@ -28,7 +28,7 @@ public static class JoinCodeEndpoints
         await currentUser.getUserFromDBAsync();
 
         // If current user is not admin or root, reject
-        if (!currentUser.hasAccessLevel(3)) return Results.Forbid();
+        if (!currentUser.hasAccessLevel(3)) return Results.Problem("Forbidden", statusCode: 403);
 
 
         // Create new join code obj
@@ -56,7 +56,7 @@ public static class JoinCodeEndpoints
         await currentUser.getUserFromDBAsync(); 
 
         // If current user is not admin or root, reject
-        if (!currentUser.hasAccessLevel(3)) return Results.Forbid();
+        if (!currentUser.hasAccessLevel(3)) return Results.Problem("Forbidden", statusCode: 403);
 
 
         // Create new join code obj
@@ -82,7 +82,7 @@ public static class JoinCodeEndpoints
         await currentUser.getUserFromDBAsync();
 
         // If current user is not admin or root, reject
-        if (!currentUser.hasAccessLevel(2)) return Results.Forbid();
+        if (!currentUser.hasAccessLevel(2)) return Results.Problem("Forbidden", statusCode: 403);
 
         // Get list of codes to delete
         List<DeviceJoinCode> codesToDelete = await db.DeviceJoinCodes.Where(j => j.OrgID == currentUser.OrgID && (j.IsUsed || j.ExpiryDate < DateTime.UtcNow)).ToListAsync();
@@ -106,7 +106,7 @@ public static class JoinCodeEndpoints
         await currentUser.getUserFromDBAsync();
 
         // If current user is not admin or root, reject
-        if (!currentUser.hasAccessLevel(2)) return Results.Forbid();
+        if (!currentUser.hasAccessLevel(2)) return Results.Problem("Forbidden", statusCode: 403);
 
         // Get list of codes to delete
         List<OrgJoinCode> codesToDelete = await db.OrgJoinCodes.Where(j => j.OrgID == currentUser.OrgID && (j.IsUsed || j.ExpiryDate < DateTime.UtcNow)).ToListAsync();
@@ -130,7 +130,7 @@ public static class JoinCodeEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Reject if the user is not registered to the app or the org, or if they are not level 2 or higher
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
+        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Problem("Forbidden", statusCode: 403);
 
         List<OrgJoinCode> codes = await db.OrgJoinCodes.Where(c => c.OrgID == currentUser.OrgID).ToListAsync();
         return codes.Any() ? Results.Ok(codes) : Results.NotFound();
@@ -146,7 +146,7 @@ public static class JoinCodeEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Reject if the user is not registered to the app or the org, or if they are not level 2 or higher
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
+        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Problem("Forbidden", statusCode: 403);
 
         List<DeviceJoinCode> codes = await db.DeviceJoinCodes.Where(c => c.OrgID == currentUser.OrgID).ToListAsync();
         return codes.Any() ? Results.Ok(codes) : Results.NotFound();

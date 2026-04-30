@@ -28,13 +28,13 @@ public static class GroupEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Reject if the user is not registered to the app or the org, or if they are not level 2 or higher
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
+        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Problem("Forbidden", statusCode: 403);
 
         DeviceGroup? group = await db.DeviceGroups.FindAsync(groupId);
         if (group == null) return Results.NotFound();
 
         if (group.OrgID != currentUser.OrgID)
-            return Results.Forbid();
+            return Results.Problem("Forbidden", statusCode: 403);
 
         List<Device> devices = await db.Devices_DeviceGroup_Link
             .Where(l => l.DeviceGroupID == groupId)
@@ -57,7 +57,7 @@ public static class GroupEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Reject if the user is not registered to the app or the org, or if they are not level 1 or higher
-        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(1)) return Results.Forbid();
+        if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(1)) return Results.Problem("Forbidden", statusCode: 403);
 
         List<DeviceGroup> groups = await db.DeviceGroups.Where(g => g.OrgID == currentUser.OrgID).ToListAsync();
         return groups.Any() ? Results.Ok(groups) : Results.NotFound();
@@ -74,7 +74,7 @@ public static class GroupEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Only admin and root can delete policies
-        if (currentUser.AccessLevel < 3) return Results.Forbid();
+        if (currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
 
         // Get group to delete
         DeviceGroup? group = await db.DeviceGroups.FindAsync(groupId);
@@ -83,7 +83,7 @@ public static class GroupEndpoints
         if (group == null) return Results.BadRequest("Group does not exist.");
 
         // Prevent deletion of other orgs devices
-        if (group.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (group.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
 
         // Remove device and save
         db.DeviceGroups.Remove(group);
@@ -102,7 +102,7 @@ public static class GroupEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Only admin and root can create groups
-        if (currentUser.AccessLevel < 3) return Results.Forbid();
+        if (currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
 
         // Set group Id to impossible value so that db server autofills it
         newGroup.DeviceGroupID = 0;
@@ -126,7 +126,7 @@ public static class GroupEndpoints
         if (group == null) return Results.Conflict("Group does not exists");
 
         // Reject if current user is in different org or is not an admin
-        if (group.OrgID != currentUser.OrgID || currentUser.hasAccessLevel(3)) return Results.Forbid();
+        if (group.OrgID != currentUser.OrgID || currentUser.hasAccessLevel(3)) return Results.Problem("Forbidden", statusCode: 403);
 
         // Edit current group
         group.GroupName    = newGroup.GroupName;
@@ -151,7 +151,7 @@ public static class GroupEndpoints
         if (device == null) return Results.Conflict("Device does not exist");
 
         // Reject if current user is in different org or is not an admin
-        if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3)|| device.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3)|| device.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
 
         // Check if device is already in the group
         DeviceDeviceGroupLink? link = await db.Devices_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);
@@ -183,7 +183,7 @@ public static class GroupEndpoints
         if (device == null) return Results.Conflict("Device does not exist");
 
         // Reject if current user is in different org or is not an admin
-        if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3) || device.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3) || device.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
 
         // Find link 
         DeviceDeviceGroupLink? link = await db.Devices_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);

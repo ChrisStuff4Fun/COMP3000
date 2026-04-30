@@ -36,7 +36,7 @@ public static class UserEndpoints
         if (!currentUser.isRegistered()) return Results.BadRequest("Current API user not signed up");
 
         // Reject if the current user is not the requested user
-        if (currentUser.UserID != userId) return Results.Forbid();
+        if (currentUser.UserID != userId) return Results.Problem("Forbidden", statusCode: 403);
 
         User? user = await db.UserAccessLevels.FindAsync(userId);
         
@@ -56,7 +56,7 @@ public static class UserEndpoints
 
         await currentUser.getUserFromDBAsync();
 
-        if (!currentUser.isRegistered() || currentUser.isRegToOrg(0)) return Results.Forbid();
+        if (!currentUser.isRegistered() || currentUser.isRegToOrg(0)) return Results.Problem("Forbidden", statusCode: 403);
 
         var users = await db.UserAccessLevels.Where(u => u.OrgID == currentUser.OrgID).ToListAsync();
 
@@ -74,7 +74,7 @@ public static class UserEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Reject if the user is not registered to the app
-        if (!currentUser.isRegistered()) return Results.Forbid();
+        if (!currentUser.isRegistered()) return Results.Problem("Forbidden", statusCode: 403);
         // Reject if the user is already bound to an org
         if (currentUser.OrgID != 0) return Results.BadRequest("User already assigned to an organisation.");
     
@@ -110,22 +110,22 @@ public static class UserEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Reject if the user is not registered to the app
-        if (!currentUser.isRegistered()) return Results.Forbid();
+        if (!currentUser.isRegistered()) return Results.Problem("Forbidden", statusCode: 403);
 
         // Reject if user is not releasing themself, and does not have admin perms
-        if ( (currentUser.UserID != userId) && !currentUser.hasAccessLevel(3) ) return Results.Forbid();
+        if ( (currentUser.UserID != userId) && !currentUser.hasAccessLevel(3) ) return Results.Problem("Forbidden", statusCode: 403);
 
         // Reject if user is root, root users cannot leave, only delete organisations
-        if (currentUser.hasAccessLevel(4)) return Results.Forbid();
+        if (currentUser.hasAccessLevel(4)) return Results.Problem("Forbidden", statusCode: 403);
 
         User? user = await db.UserAccessLevels.FirstOrDefaultAsync(u => u.UserID == userId);
 
         if (user == null) return Results.BadRequest("User does not exist.");
         // Reject if user does not belong to same org as out current user
-        if (user.OrgID != currentUser.OrgID) return Results.Forbid();
+        if (user.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
         
         // Reject if target is root or admin, and they are not releasing themselves
-        if ( (user.AccessLevel >= 3) && (currentUser.UserID != userId) )return Results.Forbid();
+        if ( (user.AccessLevel >= 3) && (currentUser.UserID != userId) )return Results.Problem("Forbidden", statusCode: 403);
 
         // Set OrgId to unnasigned value and reset access.
         user.OrgID = 0;
@@ -228,10 +228,10 @@ public static class UserEndpoints
             if (user == null) return Results.Conflict("User does not exists");
 
             // Reject if current user is in different org or is lower level of access or attempting to change their own access level, or is not an admin
-            if (user.OrgID != currentUser.OrgID || user.AccessLevel >= currentUser.AccessLevel || currentUser.UserID == user.UserID || currentUser.AccessLevel < 3) return Results.Forbid();
+            if (user.OrgID != currentUser.OrgID || user.AccessLevel >= currentUser.AccessLevel || currentUser.UserID == user.UserID || currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
 
             // Cannot edit root user's access level
-            if (user.AccessLevel == 4) return Results.Forbid();
+            if (user.AccessLevel == 4) return Results.Problem("Forbidden", statusCode: 403);
 
             // If the new access level is legitimate and does not exceed the current users level, set and save
             if (newAL >= 1 && newAL <= currentUser.AccessLevel )
@@ -241,7 +241,7 @@ public static class UserEndpoints
                 return Results.Ok();
             }
                     
-            return Results.Forbid();
+            return Results.Problem("Forbidden", statusCode: 403);
         } catch (Exception e)
         {
             return Results.Problem(e.InnerException.Message);
