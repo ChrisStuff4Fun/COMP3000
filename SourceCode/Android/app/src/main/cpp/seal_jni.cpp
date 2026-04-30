@@ -49,18 +49,15 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
 
 
         SEALContext context(parms);
-
-
-        std::cout << parms.coeff_modulus().size() << std::endl;
-        auto id = parms.parms_id();
-
-        std::cout << std::hex;
-        for (size_t i = 0; i < id.size(); i++)
-        {
-            std::cout << id[i];
-            if (i + 1 < id.size()) std::cout << "-";
+        auto id = context.key_context_data()->parms_id();
+        std::string idStr;
+        for (size_t i = 0; i < id.size(); i++) {
+            char buf[32];
+            snprintf(buf, sizeof(buf), "%016llx", (unsigned long long)id[i]);
+            idStr += buf;
+            if (i + 1 < id.size()) idStr += "-";
         }
-        std::cout << std::dec << std::endl;
+        __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "parms_id: %s", idStr.c_str());
 
         // decode base64 public key from server
         const char* b64chars = env->GetStringUTFChars(base64PublicKey, nullptr);
@@ -71,25 +68,19 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         std::string keyBytes = base64Decode(b64str);
         std::istringstream keyStream(keyBytes);
 
-
+        __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "b64str length: %zu", b64str.length());
+        __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "keyBytes length: %zu", keyBytes.length());
+        __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "first 4 bytes: %02x %02x %02x %02x",
+                            (unsigned char)keyBytes[0], (unsigned char)keyBytes[1],
+                            (unsigned char)keyBytes[2], (unsigned char)keyBytes[3]);
 
         PublicKey pk;
         pk.load(context, keyStream);
 
-        return env->NewStringUTF("test");
-
-    }
-    catch (const std::exception& e)
-    {
-        // catch error and send back to java
-        return env->NewStringUTF((std::string("ERROR: ") + e.what()).c_str());
-    }
-    /*
-
         // scale double to integer (multiply by 1e6 for 6 decimal places)
         BatchEncoder encoder(context);
         int64_t scaled = static_cast<int64_t>(value * 1e6);
-        std::vector<int64_t> vec(poly_modulus_degree / 2, 0);
+        std::vector<int64_t> vec(poly_modulus_degree, 0);
         vec[0] = scaled;
         Plaintext plain;
         encoder.encode(vec, plain);
@@ -123,7 +114,14 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         while (encoded.size() % 4) encoded.push_back('=');
 
         return env->NewStringUTF(encoded.c_str());
-    */
+
+    }
+    catch (const std::exception& e)
+    {
+        // catch error and send back to java
+        __android_log_print(ANDROID_LOG_ERROR, "SEAL_JNI", "encryptValue failed: %s", e.what());
+        return env->NewStringUTF((std::string("ERROR: ") + e.what()).c_str());
+    }
 
 }
 

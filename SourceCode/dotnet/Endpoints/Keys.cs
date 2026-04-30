@@ -63,7 +63,9 @@ public static class KeyEndpoints
 
             var keys = bfvService.getKeys();
 
-            return Results.Ok(new { publicBFV = keys.Public });
+            return Results.Ok(new { publicBFV = SealNative.getParms() });
+
+            //return Results.Ok(new { publicBFV = keys.Public });
         }
         catch(Exception e)
         {

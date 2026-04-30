@@ -195,3 +195,17 @@ long long decryptValue(const char* base64Cipher)
         return LLONG_MIN;
     }
 }
+
+extern "C" __declspec(dllexport)
+string getParms() {
+    auto id = context->key_context_data()->parms_id();
+    std::string idStr;
+    for (size_t i = 0; i < id.size(); i++) {
+        char buf[32];
+        snprintf(buf, sizeof(buf), "%016llx", (unsigned long long)id[i]);
+        idStr += buf;
+        if (i + 1 < id.size()) idStr += "-";
+    }
+
+    return idStr;
+}
