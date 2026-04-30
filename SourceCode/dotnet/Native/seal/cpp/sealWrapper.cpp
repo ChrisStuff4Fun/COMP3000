@@ -197,9 +197,14 @@ long long decryptValue(const char* base64Cipher)
 }
 
 extern "C" __declspec(dllexport)
-string getParms() {
+const char* getParms()
+{
+    static std::string idStr;
+
     auto id = context->key_context_data()->parms_id();
-    std::string idStr;
+
+    idStr.clear();
+
     for (size_t i = 0; i < id.size(); i++) {
         char buf[32];
         snprintf(buf, sizeof(buf), "%016llx", (unsigned long long)id[i]);
@@ -207,5 +212,5 @@ string getParms() {
         if (i + 1 < id.size()) idStr += "-";
     }
 
-    return idStr;
+    return idStr.c_str();
 }
