@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ public static class GPSEndpoints
 
         // Map endpoints
         fences.MapPost("/update/{deviceId}", updateGPS);
+        fences.MapGet("/devices", getTrackableDevices);
     
     }
 
@@ -189,4 +191,116 @@ public static class GPSEndpoints
 
         return squaredDistScaled <= radiusSquaredScaled;
     }
+
+
+
+    // get function for maps
+    private static async Task<IResult> getTrackableDevices(AppDbContext db,IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
+    {
+        try
+        {
+            // auth check
+            CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
+            if (!currentUser.validateToken()) return Results.Unauthorized();
+            await currentUser.getUserFromDBAsync();
+            if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Forbid();
+
+            // get all devices for this org
+            List<Device> devices = await db.Devices.Where(d => d.OrgID == currentUser.OrgID).ToListAsync();
+
+            if (!devices.Any()) return Results.Ok(new List<object>());
+
+            // initialise SEAL for decryption
+            if (!SealNative.initSeal()) return Results.Problem("SEAL init failed", statusCode: 500);
+
+            var result = new List<object>();
+
+            foreach (Device device in devices)
+            {
+                // skip devices with no location yet
+                if (string.IsNullOrEmpty(device.LastLoggedLat) || string.IsNullOrEmpty(device.LastLoggedLong)) continue;
+
+                // get all policy statuses for this device
+                List<DevicePolicyStatus> statuses = await db.DevicePolicyStatus.Where(s => s.DeviceID == device.DeviceID).ToListAsync();
+
+                // if no policies apply, always show the device
+                if (!statuses.Any())
+                {
+                    var decryptedNoPolicy = decryptLocation(device.LastLoggedLat, device.LastLoggedLong);
+                    if (decryptedNoPolicy == null) continue;
+                    result.Add(new
+                    {
+                        deviceId = device.DeviceID,
+                        deviceName = device.DeviceName,
+                        lat = decryptedNoPolicy.Value.lat,
+                        lon = decryptedNoPolicy.Value.lon
+                    });
+                    continue;
+                }
+
+                // check if any policy allows tracking at current position
+                bool shouldShow = false;
+                foreach (DevicePolicyStatus status in statuses)
+                {
+                    Policy? policy = await db.Policies.FindAsync(status.PolicyID);
+                    if (policy == null) continue;
+
+                    bool trackable = (status.IsInsideFence && policy.TrackInsideFenceRule) || (!status.IsInsideFence && policy.TrackOutsideFenceRule);
+
+                    if (trackable)
+                    {
+                        shouldShow = true;
+                        break;
+                    }
+                }
+
+                if (!shouldShow) continue;
+
+                // decrypt location for map display
+                var decrypted = decryptLocation(device.LastLoggedLat, device.LastLoggedLong);
+                if (decrypted == null) continue;
+
+                result.Add(new
+                {
+                    deviceId = device.DeviceID,
+                    deviceName = device.DeviceName,
+                    lat = decrypted.Value.lat,
+                    lon = decrypted.Value.lon
+                });
+            }
+
+            return Results.Ok(result);
+        }
+        catch (Exception e)
+        {
+            return Results.Problem(detail: e.ToString(), statusCode: 500);
+        }
+    }
+
+
+    // SEAL helper function
+    private static (double lat, double lon)? decryptLocation(string encLat, string encLon)
+    {
+        try
+        {
+            long scaledLat = SealNative.decryptValue(encLat);
+            long scaledLon = SealNative.decryptValue(encLon);
+
+            if (scaledLat == long.MinValue || scaledLon == long.MinValue) return null;
+
+            double lat = scaledLat / 1e6;
+            double lon = scaledLon / 1e6;
+
+            return (lat, lon);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+
 }
+
+
+
