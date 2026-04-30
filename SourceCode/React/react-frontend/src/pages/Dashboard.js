@@ -966,55 +966,54 @@ function Map() {
 
             // case 1: approx circles
             if (geo.type === "FeatureCollection") {
-              if (viewMode !== "approx") return [];
+              return geo.features.flatMap((feature, i) => {
 
-              return geo.features.map((feature, i) => (
-                <Circle
-                  key={`${fence.geofenceID}-approx-${i}`}
-                  center={[
-                    feature.geometry.coordinates[1],
-                    feature.geometry.coordinates[0],
-                  ]}
-                  radius={feature.properties.radius}
-                  pathOptions={{
-                    color: "blue",
-                    fillOpacity: 0.15,
-                    weight: 1,
-                  }}
-                >
-                  {i === 0 && <Popup>{fence.geofenceName} (approx)</Popup>}
-                </Circle>
-              ));
+                // approximated mode, only render circles
+                if (viewMode === "approx" && feature.geometry?.type === "Point") {
+                  return (
+                    <Circle
+                      key={`${fence.geofenceID}-approx-${i}`}
+                      center={[
+                        feature.geometry.coordinates[1],
+                        feature.geometry.coordinates[0],
+                      ]}
+                      radius={feature.properties.radius}
+                      pathOptions={{
+                        color: "blue",
+                        fillOpacity: 0.15,
+                        weight: 1,
+                      }}
+                    >
+                      {i === 0 && <Popup>{fence.geofenceName} (approx)</Popup>}
+                    </Circle>
+                  );
+                }
+
+                // polygon mode, only render polygon
+                if (viewMode === "polygon" && feature.geometry?.type === "Polygon") {
+                  const coords = feature.geometry.coordinates[0].map(([lon, lat]) => [
+                    lat,
+                    lon,
+                  ]);
+
+                  return (
+                    <Polygon
+                      key={`${fence.geofenceID}-poly`}
+                      positions={coords}
+                      pathOptions={{
+                        color: "red",
+                        fillOpacity: 0.2,
+                        weight: 2,
+                      }}
+                    >
+                      <Popup>{fence.geofenceName} (polygon)</Popup>
+                    </Polygon>
+                  );
+                }
+
+                return [];
+              });
             }
-
-            // case 2: polygon
-            if (geo.type === "Feature" && geo.geometry?.type === "Polygon") {
-              if (viewMode !== "polygon") return [];
-
-              const coords = geo.geometry.coordinates[0].map(([lon, lat]) => [
-                lat,
-                lon,
-              ]);
-
-              return [
-                <Circle
-                  key={fence.geofenceID + "-poly"}
-                  center={coords[0]}
-                  radius={0} // dummy (we use polygon instead)
-                >
-                  <Polygon
-                    positions={coords}
-                    pathOptions={{
-                      color: "red",
-                      fillOpacity: 0.2,
-                      weight: 2,
-                    }}
-                  />
-                  <Popup>{fence.geofenceName} (polygon)</Popup>
-                </Circle>,
-              ];
-            }
-
             // case 3: single circle
             if (geo.geometry?.type === "Point" && geo.properties?.radius) {
               if (viewMode !== "approx") return [];
