@@ -2,6 +2,8 @@ package com.example.comp3000androidapp;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,7 +53,26 @@ public class TrackingFragment extends Fragment {
 
             @Override
             public void onError(Exception e) {
-                e.printStackTrace();
+                // device or org no longer exists, clear registration and go back
+                if (e.getMessage() != null && e.getMessage().contains("400")) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        // clear stored registration
+                        requireActivity().getSharedPreferences("cybertrackClient", Context.MODE_PRIVATE)
+                                .edit()
+                                .remove("registered")
+                                .remove("device_id")
+                                .apply();
+
+                        // stop tracking service
+                        requireActivity().stopService(
+                                new Intent(requireActivity(), trackingService.class));
+
+                        // go back to register
+                        ((MainActivity) requireActivity()).loadRegister();
+                    });
+                } else {
+                    e.printStackTrace();
+                }
             }
         });
 

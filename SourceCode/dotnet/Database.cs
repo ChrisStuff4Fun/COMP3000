@@ -7,7 +7,7 @@ public class AppDbContext : DbContext
 
 
     // Map CS entities to tables in DB
-    public DbSet<DeviceDeviceGroupLink> Device_DeviceGroup_Link {get; set;}
+    public DbSet<DeviceDeviceGroupLink> Devices_DeviceGroup_Link {get; set;}
     public DbSet<Device>                Devices {get; set;}
     public DbSet<DeviceGroup>           DeviceGroups {get; set;}
     public DbSet<DeviceJoinCode>        DeviceJoinCodes {get; set;}

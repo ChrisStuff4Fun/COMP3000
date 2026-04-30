@@ -36,7 +36,7 @@ public static class GroupEndpoints
         if (group.OrgID != currentUser.OrgID)
             return Results.Forbid();
 
-        var devices = await db.Device_DeviceGroup_Link
+        List<Device> devices = await db.Devices_DeviceGroup_Link
             .Where(l => l.DeviceGroupID == groupId)
             .Join(db.Devices,
                 link => link.DeviceID,
@@ -154,14 +154,14 @@ public static class GroupEndpoints
         if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3)|| device.OrgID != currentUser.OrgID) return Results.Forbid();
 
         // Check if device is already in the group
-        DeviceDeviceGroupLink? link = await db.Device_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);
+        DeviceDeviceGroupLink? link = await db.Devices_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);
         if (link != null) return Results.BadRequest("Link already exists");
 
         DeviceDeviceGroupLink newLink = new DeviceDeviceGroupLink();
         newLink.DeviceGroupID = groupId;
         newLink.DeviceID      = deviceId;
 
-        db.Device_DeviceGroup_Link.Add(newLink);
+        db.Devices_DeviceGroup_Link.Add(newLink);
         
         await db.SaveChangesAsync();
         return Results.Created();
@@ -186,11 +186,11 @@ public static class GroupEndpoints
         if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3) || device.OrgID != currentUser.OrgID) return Results.Forbid();
 
         // Find link 
-        DeviceDeviceGroupLink? link = await db.Device_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);
+        DeviceDeviceGroupLink? link = await db.Devices_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);
         // Check if it exists
         if (link == null) return Results.NotFound("Link not found");
 
-        db.Device_DeviceGroup_Link.Remove(link);
+        db.Devices_DeviceGroup_Link.Remove(link);
         
         await db.SaveChangesAsync();
         return Results.Created();
