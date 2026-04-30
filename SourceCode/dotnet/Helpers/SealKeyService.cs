@@ -36,7 +36,7 @@ public class SealKeyService
 
             await File.WriteAllTextAsync("C:\\home\\sealkeys_debug2.txt",  $"Public null: {keys?.Public == null}\nSecret null: {keys?.Secret == null}\nRelin null: {keys?.Relin == null}\nPublic length: {keys?.Public?.Length}\nSecret length: {keys?.Secret?.Length}\nRelin length: {keys?.Relin?.Length}");
 
-            if (keys?.Public == null || keys?.Secret == null || keys?.Relin == null || keys?.Context == null)
+            if (keys?.Public == null || keys?.Secret == null || keys?.Relin == null)
                 throw new Exception($"Null keys returned. JSON: {json}");
 
             await uploadBlob("bfv-public", keys.Public);
