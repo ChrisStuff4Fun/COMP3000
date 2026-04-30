@@ -13,9 +13,9 @@ extern "C" __declspec(dllexport)
 const char* generateKeys()
 {
 
-    try {
+     static std::string result;
 
-        static std::string result;
+    try {
 
         SEALContext* ctx = getContext();
         if (!ctx)
@@ -46,7 +46,7 @@ const char* generateKeys()
             "\"}";
 
         return result.c_str();
-        
+
     }
     catch (const std::exception& e)
     {
