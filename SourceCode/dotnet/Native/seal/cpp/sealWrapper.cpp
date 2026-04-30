@@ -179,6 +179,7 @@ long long decryptValue(const char* base64Cipher)
     }
     catch (...)
     {
-        return -1;
+        std::cerr << "Decrypt failed: " << e.what() << std::endl;
+        return LLONG_MIN;
     }
 }

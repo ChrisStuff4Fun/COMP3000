@@ -61,7 +61,7 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         // scale double to integer (multiply by 1e6 for 6 decimal places)
         BatchEncoder encoder(context);
         int64_t scaled = static_cast<int64_t>(value * 1e6);
-        std::vector<int64_t> vec(poly_modulus_degree, 0);
+        std::vector<int64_t> vec(poly_modulus_degree / 2, 0);
         vec[0] = scaled;
         Plaintext plain;
         encoder.encode(vec, plain);
