@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { FeatureGroup, MapContainer, TileLayer, Marker, Popup, Circle} from "react-leaflet";
+import { FeatureGroup, MapContainer, TileLayer, Marker, Popup, Circle, Polygon} from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import 'leaflet-draw/dist/leaflet.draw.css';
@@ -883,6 +883,7 @@ function DeviceGroups({ accessLevel }) {
 
 function Map() {
 
+    const [viewMode, setViewMode] = useState("approx"); 
     const [devices, setDevices] = useState([]);
     const [geofences, setGeofences] = useState([]);
 
@@ -922,6 +923,14 @@ function Map() {
 
     return(
       <div className="map-wrapper">
+        <button onClick={() => setViewMode("polygon")}>
+          Polygon view
+        </button>
+        <button onClick={() => setViewMode("approx")}>
+          Approx circles
+        </button>
+
+
         <MapContainer
           center={[50.375, -4.139]} 
           zoom={13}
@@ -943,44 +952,88 @@ function Map() {
 
 
           {geofences.flatMap((fence) => {
-          if (!fence.geoJSON) return [];
+            if (!fence.geoJSON) return [];
 
-          let geo;
-          try {
-            geo = JSON.parse(fence.geoJSON);
-          } catch (e) {
+            let geo;
+            try {
+              geo = JSON.parse(fence.geoJSON);
+            } catch {
+              return [];
+            }
+
+
+            // case 1: approx circles
+            if (geo.type === "FeatureCollection") {
+              if (viewMode !== "approx") return [];
+
+              return geo.features.map((feature, i) => (
+                <Circle
+                  key={`${fence.geofenceID}-approx-${i}`}
+                  center={[
+                    feature.geometry.coordinates[1],
+                    feature.geometry.coordinates[0],
+                  ]}
+                  radius={feature.properties.radius}
+                  pathOptions={{
+                    color: "blue",
+                    fillOpacity: 0.15,
+                    weight: 1,
+                  }}
+                >
+                  {i === 0 && <Popup>{fence.geofenceName} (approx)</Popup>}
+                </Circle>
+              ));
+            }
+
+            // case 2: polygon
+            if (geo.type === "Feature" && geo.geometry?.type === "Polygon") {
+              if (viewMode !== "polygon") return [];
+
+              const coords = geo.geometry.coordinates[0].map(([lon, lat]) => [
+                lat,
+                lon,
+              ]);
+
+              return [
+                <Circle
+                  key={fence.geofenceID + "-poly"}
+                  center={coords[0]}
+                  radius={0} // dummy (we use polygon instead)
+                >
+                  <Polygon
+                    positions={coords}
+                    pathOptions={{
+                      color: "red",
+                      fillOpacity: 0.2,
+                      weight: 2,
+                    }}
+                  />
+                  <Popup>{fence.geofenceName} (polygon)</Popup>
+                </Circle>,
+              ];
+            }
+
+            // case 3: single circle
+            if (geo.geometry?.type === "Point" && geo.properties?.radius) {
+              if (viewMode !== "approx") return [];
+
+              return [
+                <Circle
+                  key={fence.geofenceID}
+                  center={[
+                    geo.geometry.coordinates[1],
+                    geo.geometry.coordinates[0],
+                  ]}
+                  radius={geo.properties.radius}
+                  pathOptions={{ color: "red", fillOpacity: 0.3 }}
+                >
+                  <Popup>{fence.geofenceName}</Popup>
+                </Circle>,
+              ];
+            }
+
             return [];
-          }
-
-          // FeatureCollection = approximated polygon fence
-          if (geo.type === "FeatureCollection") {
-            return geo.features.map((feature, i) => (
-              <Circle
-                key={`${fence.geofenceID}-${i}`}
-                center={[feature.geometry.coordinates[1], feature.geometry.coordinates[0]]}
-                radius={feature.properties.radius}
-                pathOptions={{ color: "blue", fillOpacity: 0.15, weight: 1 }}
-              >
-                {i === 0 && <Popup>{fence.geofenceName}</Popup>}
-              </Circle>
-            ));
-          }
-
-          // Single circle
-          if (geo.geometry?.type === "Point" && geo.properties?.radius) {
-            return [(
-              <Circle
-                key={fence.geofenceID}
-                center={[geo.geometry.coordinates[1], geo.geometry.coordinates[0]]}
-                radius={geo.properties.radius}
-                pathOptions={{ color: "red", fillOpacity: 0.3 }}
-              >
-                <Popup>{fence.geofenceName}</Popup>
-              </Circle>
-            )];
-          }
-
-          return [];
+          
         })}
 
 
