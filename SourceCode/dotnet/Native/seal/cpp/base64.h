@@ -32,7 +32,7 @@ static std::string base64Decode(const std::string& input)
     for (int i = 0; i < 64; i++) T[chars[i]] = i;
     int val = 0, valb = -8;
     for (unsigned char c : input) {
-        if (T[c] == -1) break;
+        if (T[c] == -1) continue;
         val = (val << 6) + T[c];
         valb += 6;
         if (valb >= 0) {

@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -90,6 +91,10 @@ public class trackingService extends Service {
                             String deviceId = getApplicationContext()
                                     .getSharedPreferences("cybertrackClient", Context.MODE_PRIVATE)
                                     .getString("device_id", null);
+
+                            Log.d("Location", "lat" + location.getLatitude());
+                            Log.d("Location", "lat" + location.getLongitude());
+
                             new Thread(() -> {
                                 String[] encrypted = crypto.encryptLocation(cachedBfvKey,
                                         location.getLatitude(), location.getLongitude());

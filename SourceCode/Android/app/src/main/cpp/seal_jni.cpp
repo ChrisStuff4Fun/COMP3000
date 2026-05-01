@@ -95,8 +95,8 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         encryptor.encrypt(plain, cipher);
 
         // serialise and base64 encode
-        std::ostringstream cipherStream;
-        cipher.save(cipherStream);
+        std::ostringstream cipherStream(std::ios::binary);
+        cipher.save(cipherStream, compr_mode_type::none);
 
         // base64 encode output
         const std::string& bytes = cipherStream.str();
