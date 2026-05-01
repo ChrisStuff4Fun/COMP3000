@@ -42,9 +42,9 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
 
         // set up same SEAL params as server
         EncryptionParameters parms(scheme_type::bfv);
-        size_t poly_modulus_degree = 4096;
+        size_t poly_modulus_degree = 8192;
         parms.set_poly_modulus_degree(poly_modulus_degree);
-        parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 20));
+        parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 42));
         parms.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
 
 
@@ -79,9 +79,9 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         PublicKey pk;
         pk.load(context, keyStream);
 
-        // scale double to integer (multiply by 1e6 for 10 decimal places)
+        // scale double to integer (multiply by 1e6 for 6 decimal places)
         BatchEncoder encoder(context);
-        int64_t scaled = static_cast<int64_t>(value * 1e10);
+        int64_t scaled = static_cast<int64_t>(value * 1e6);
         std::vector<int64_t> vec(poly_modulus_degree, 0);
         vec[0] = scaled;
         Plaintext plain;

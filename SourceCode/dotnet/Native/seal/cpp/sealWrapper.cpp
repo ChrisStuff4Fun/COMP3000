@@ -18,9 +18,9 @@ bool initSeal()
     try
     {
         EncryptionParameters parms(scheme_type::bfv);
-        size_t poly_modulus_degree = 4096;
+        size_t poly_modulus_degree = 8192;
         parms.set_poly_modulus_degree(poly_modulus_degree);
-        parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 20));
+        parms.set_plain_modulus(PlainModulus::Batching(poly_modulus_degree, 42));
         parms.set_coeff_modulus(CoeffModulus::BFVDefault(poly_modulus_degree));
 
         context = std::make_unique<SEALContext>(parms);
@@ -94,7 +94,7 @@ const char* computeSquaredDiff(const char* base64Cipher, double plaintextCentre)
         // encode centre as plaintext
         // scale must match what Android used 
         BatchEncoder encoder(*context);
-        int64_t scaledCentre = static_cast<int64_t>(plaintextCentre * 1e10);
+        int64_t scaledCentre = static_cast<int64_t>(plaintextCentre * 1e6);
         std::vector<int64_t> centreVec(context->key_context_data()->parms().poly_modulus_degree(), scaledCentre);
         Plaintext centrePlain;
         encoder.encode(centreVec, centrePlain);
