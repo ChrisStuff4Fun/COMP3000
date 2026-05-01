@@ -40,9 +40,9 @@ public class locationManager {
         }
 
         LocationRequest request = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY) // Prioritise accuracy, uses all forms of location gathering
-                .setIntervalMillis(30000) // Calls an update every 30s
-                .setMinUpdateIntervalMillis(15000) // Will wait max 15s for an update (to save power)
-                .setMaxUpdateDelayMillis(60000) // Will wait 60s at the very most (low power mode etc)
+                .setIntervalMillis(5000) // Calls an update every 30s
+                .setMinUpdateIntervalMillis(5000) // Will wait max 15s for an update (to save power)
+                .setMaxUpdateDelayMillis(10000) // Will wait 60s at the very most (low power mode etc)
                 .build();
 
         //fusedClient.requestLocationUpdates(request, callback, Looper.getMainLooper());
