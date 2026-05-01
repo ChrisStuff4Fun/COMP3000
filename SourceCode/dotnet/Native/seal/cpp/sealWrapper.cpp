@@ -92,9 +92,9 @@ const char* computeSquaredDiff(const char* base64Cipher, double plaintextCentre)
         cipher.load(*context, cipherStream);
 
         // encode centre as plaintext
-        // scale must match what Android used (1e6 currently, but i may increase to 10 in the future)
+        // scale must match what Android used 
         BatchEncoder encoder(*context);
-        int64_t scaledCentre = static_cast<int64_t>(plaintextCentre * 1e6);
+        int64_t scaledCentre = static_cast<int64_t>(plaintextCentre * 1e10);
         std::vector<int64_t> centreVec(context->key_context_data()->parms().poly_modulus_degree(), scaledCentre);
         Plaintext centrePlain;
         encoder.encode(centreVec, centrePlain);
@@ -176,7 +176,7 @@ long long decryptValue(const char* base64Cipher)
         if (!context || !decryptor) return -1;
 
         std::string cipherBytes = base64Decode(base64Cipher);
-        std::istringstream cipherStream(cipherBytes);
+        std::istringstream cipherStream(cipherBytes, std::ios::binary);
         Ciphertext cipher;
         cipher.load(*context, cipherStream);
 
