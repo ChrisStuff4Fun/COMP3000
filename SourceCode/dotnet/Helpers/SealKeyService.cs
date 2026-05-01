@@ -46,6 +46,10 @@ public class SealKeyService
             await uploadBlob("bfv-relin", keys.Relin);
             await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded relin");
             _cachedKeys = keys;
+
+            if (!SealNative.loadSecretKey(_cachedKeys.Secret))
+                throw new Exception("Failed to load secret key into SEAL");
+                
         }
         else
         {
@@ -56,6 +60,9 @@ public class SealKeyService
                 Secret  = await downloadBlob("bfvSecret"),
                 Relin   = await downloadBlob("bfvRelin")
             };
+            if (!SealNative.loadSecretKey(_cachedKeys.Secret))
+                throw new Exception("Failed to load secret key into SEAL");
+
         }
     }
 

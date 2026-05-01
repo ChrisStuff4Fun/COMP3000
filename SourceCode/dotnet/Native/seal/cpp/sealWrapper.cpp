@@ -214,3 +214,21 @@ const char* getParms()
 
     return idStr.c_str();
 }
+
+extern "C" __declspec(dllexport)
+bool loadSecretKey(const char* base64SecretKey)
+{
+    try
+    {
+        std::string keyBytes = base64Decode(base64SecretKey);
+        std::istringstream keyStream(keyBytes);
+        secret_key = std::make_unique<SecretKey>();
+        secret_key->load(*context, keyStream);
+        decryptor = std::make_unique<Decryptor>(*context, *secret_key);
+        return true;
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
