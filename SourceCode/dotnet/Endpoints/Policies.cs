@@ -92,6 +92,8 @@ public static class PolicyEndpoints
         CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
+        // Get current user from DB
+        await currentUser.getUserFromDBAsync();
 
         // Get policy to update
         Policy? policy = await db.Policies.FindAsync(policyId);
