@@ -98,7 +98,7 @@ public static class PolicyEndpoints
         if (policy == null) return Results.Conflict("Policy does not exists");
 
         // Reject if current user is in different org or is not an admin
-        if (policy.OrgID != currentUser.OrgID || currentUser.hasAccessLevel(3)) return Results.Problem("Forbidden", statusCode: 403);
+        if (policy.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3)) return Results.Problem("Forbidden", statusCode: 403);
 
         // Edit current policy
         policy.PolicyName            = newPolicy.PolicyName;
