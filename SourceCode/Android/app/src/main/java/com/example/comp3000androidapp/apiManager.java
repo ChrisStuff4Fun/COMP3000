@@ -236,9 +236,6 @@ public class apiManager {
                 json.put("lat", lat);
                 json.put("lon", lon);
 
-                Log.d("API", "lat: " + lat);
-                Log.d("API", "lon: " + lon);
-
                 OutputStream os = conn.getOutputStream();
                 os.write(json.toString().getBytes());
                 os.close();

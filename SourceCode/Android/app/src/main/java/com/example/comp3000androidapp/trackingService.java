@@ -25,6 +25,7 @@ import com.example.comp3000androidapp.apiManager;
 import com.example.comp3000androidapp.locationManager;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.Priority;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -92,22 +93,25 @@ public class trackingService extends Service {
                 if (ActivityCompat.checkSelfPermission(trackingService.this,
                         Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return;
 
-                fusedClient.getLastLocation().addOnSuccessListener(location -> {
+                fusedClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null).addOnSuccessListener(location -> {
                     if (location == null) {
                         android.util.Log.w("TrackingService", "Last location null");
                         return;
                     }
-                    android.util.Log.d("TrackingService", "Timer location: " + location.getLatitude());
+
                     String deviceId = getApplicationContext()
                             .getSharedPreferences("cybertrackClient", Context.MODE_PRIVATE)
                             .getString("device_id", null);
 
-                    Log.d("Location", "lat: " + location.getLatitude());
-                    Log.d("Location", "lon: " + location.getLongitude());
+                    var lat = location.getLatitude();
+                    var lon = location.getLongitude();
+
+                    Log.d("Location", "lat: " + lat);
+                    Log.d("Location", "lon: " + lon);
 
                     new Thread(() -> {
                         String[] encrypted = crypto.encryptLocation(cachedBfvKey,
-                                100, 100);
+                                lat, lon);
                         api.sendLocation(deviceId, encrypted[0], encrypted[1]);
                     }).start();
                 });

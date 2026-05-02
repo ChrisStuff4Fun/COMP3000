@@ -57,10 +57,6 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
             idStr += buf;
             if (i + 1 < id.size()) idStr += "-";
         }
-        __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "parms_id: %s", idStr.c_str());
-
-        uint64_t plainMod = parms.plain_modulus().value();
-        __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "plain_modulus: %llu", plainMod);
 
         // decode base64 public key from server
         const char* b64chars = env->GetStringUTFChars(base64PublicKey, nullptr);
@@ -73,18 +69,12 @@ Java_com_example_comp3000androidapp_Crypto_encryptValue(JNIEnv* env, jobject thi
         keyStream.write(keyBytes.data(), keyBytes.size());
         keyStream.seekg(0);
 
-        __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "b64str length: %zu", b64str.length());
-        __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "keyBytes length: %zu", keyBytes.length());
-        __android_log_print(ANDROID_LOG_DEBUG, "SEAL_JNI", "first 4 bytes: %02x %02x %02x %02x",
-                            (unsigned char)keyBytes[0], (unsigned char)keyBytes[1],
-                            (unsigned char)keyBytes[2], (unsigned char)keyBytes[3]);
-
         PublicKey pk;
         pk.load(context, keyStream);
 
         // scale double to integer (multiply by 1e6 for 6 decimal places)
         BatchEncoder encoder(context);
-        int64_t scaled = static_cast<int64_t>(100 * 1e6);
+        int64_t scaled = static_cast<int64_t>(value * 1e6);
         std::vector<int64_t> vec(poly_modulus_degree, 0);
         vec[0] = scaled;
         Plaintext plain;

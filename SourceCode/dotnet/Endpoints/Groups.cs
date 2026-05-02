@@ -143,6 +143,8 @@ public static class GroupEndpoints
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
 
+        await currentUser.getUserFromDBAsync();
+
         // Get group and device
         DeviceGroup? group = await db.DeviceGroups.FindAsync(groupId);
         if (group == null) return Results.Conflict("Group does not exist");
@@ -151,7 +153,7 @@ public static class GroupEndpoints
         if (device == null) return Results.Conflict("Device does not exist");
 
         // Reject if current user is in different org or is not an admin
-        if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3)|| device.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
+        if (group.OrgID != currentUser.OrgID || !currentUser.hasAccessLevel(3) || device.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
 
         // Check if device is already in the group
         DeviceDeviceGroupLink? link = await db.Devices_DeviceGroup_Link.SingleOrDefaultAsync(l => l.DeviceGroupID == groupId && l.DeviceID == deviceId);
@@ -174,6 +176,9 @@ public static class GroupEndpoints
         CurrentUser currentUser = new CurrentUser(db, httpAccessor, dataProtector);
         // Reject if user isnt authed by google
         if (!currentUser.validateToken()) return Results.Unauthorized();
+
+        await currentUser.getUserFromDBAsync();
+
 
         // Get group and device
         DeviceGroup? group = await db.DeviceGroups.FindAsync(groupId);

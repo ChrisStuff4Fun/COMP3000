@@ -883,7 +883,7 @@ function DeviceGroups({ accessLevel }) {
 
 function Map() {
 
-    const [viewMode, setViewMode] = useState("approx"); 
+    const [viewMode, setViewMode] = useState("polygon"); 
     const [devices, setDevices] = useState([]);
     const [geofences, setGeofences] = useState([]);
 
@@ -929,7 +929,7 @@ function Map() {
           Polygon view
         </button>
         <button onClick={() => setViewMode("approx")}>
-          Approx circles
+          Accurate view
         </button>
 
 
