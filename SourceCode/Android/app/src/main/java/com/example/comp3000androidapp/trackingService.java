@@ -116,7 +116,7 @@ public class trackingService extends Service {
                     }).start();
                 });
             }
-        }, 0, 10000);
+        }, 0, 30000);
     }
 
     private String loadBfvKeyFromAssets() {

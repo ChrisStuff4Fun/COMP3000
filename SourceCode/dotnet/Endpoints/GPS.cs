@@ -214,19 +214,24 @@ public static class GPSEndpoints
         IntPtr lonDiffPtr = SealNative.computeSquaredDiff(encLon, centreLon);
         string lonDiffB64 = Marshal.PtrToStringAnsi(lonDiffPtr)!;
 
-        // add and decrypt, result is squared distance in scaled integer space
-        long squaredDistScaled = SealNative.addAndDecrypt(latDiffB64, lonDiffB64);
+        // early check for efficiency
+        long latSquared = SealNative.decryptValue(latDiffB64);
+        long lonSquared = SealNative.decryptValue(lonDiffB64);
 
-        if (squaredDistScaled < 0) return false; // SEAL error, would rather have false negatives than false positives
+        if (latSquared < 0 || lonSquared < 0) return false;
 
-        // convert radius to scaled integer space
-        // lat/lon scaled by 1e6, 1 degree lat ≈ 111320m
-        // so radius in degrees = radiusMeters / 111320
-        // scaled: radiusScaled = (radiusMeters / 111320) * 1e6
-        double radiusScaled = (radiusMeters / 111320.0) * 1e6;
-        double radiusSquaredScaled = radiusScaled * radiusScaled;
+        // convert to meters squared
+        // 1 degree lat = 111320m, scaled by 1e6
+        // so 1 unit of latSquared = (1/1e6 degree)^2 = (111320/1e6 m)^2
+        double latMetersSquared = latSquared * Math.Pow(111320.0 / 1e6, 2);
 
-        return squaredDistScaled <= radiusSquaredScaled;
+        // longitude correction for latitude
+        double lonMetersPerDegree = 111320.0 * Math.Cos(centreLat * Math.PI / 180.0);
+        double lonMetersSquared = lonSquared * Math.Pow(lonMetersPerDegree / 1e6, 2);
+
+        double distanceMetersSquared = latMetersSquared + lonMetersSquared;
+
+        return distanceMetersSquared <= radiusMeters * radiusMeters;
     }
 
 
