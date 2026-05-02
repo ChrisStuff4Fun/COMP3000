@@ -45,11 +45,11 @@ public static class GPSEndpoints
     });
     }
 
-    private static async Task<IResult> testFunc(AppDbContext db)
+    private static async Task<IResult> testFunc(AppDbContext db, [FromServices] SealKeyService sealService)
     {
         
-        if (!SealNative.initSeal())
-            return Results.Problem("SEAL init failed", statusCode: 500);
+        await sealService.initialiseAsync();
+
         // encrypt 12345678 (represents 12.345678 * 1e6)
         var ptr = SealNative.debugEncryptAndDecrypt(12345678);
         long result = ptr;
@@ -57,7 +57,7 @@ public static class GPSEndpoints
     }
 
 
-    private static async Task<IResult> updateGPS(int deviceId, GPSUpdate update, AppDbContext db)
+    private static async Task<IResult> updateGPS(int deviceId, GPSUpdate update, AppDbContext db, [FromServices] SealKeyService sealService)
     {
         try
         {
@@ -65,9 +65,7 @@ public static class GPSEndpoints
             Device? device = await db.Devices.FindAsync(deviceId);
             if (device == null) return Results.NotFound("Device not found");
 
-            // initialise SEAL
-            if (!SealNative.initSeal())
-                return Results.Problem("SEAL init failed", statusCode: 500);
+            await sealService.initialiseAsync();
 
             // get device groups for this device
             List<DeviceDeviceGroupLink> groupLinks = await db.Devices_DeviceGroup_Link
@@ -234,7 +232,7 @@ public static class GPSEndpoints
 
 
     // get function for maps
-    private static async Task<IResult> getTrackableDevices(AppDbContext db,IHttpContextAccessor httpAccessor, IDataProtector dataProtector)
+    private static async Task<IResult> getTrackableDevices(AppDbContext db,IHttpContextAccessor httpAccessor, IDataProtector dataProtector, [FromServices] SealKeyService sealService)
     {
         try
         {
@@ -249,8 +247,7 @@ public static class GPSEndpoints
 
             if (!devices.Any()) return Results.Ok(new List<object>());
 
-            // initialise SEAL for decryption
-            if (!SealNative.initSeal()) return Results.Problem("SEAL init failed", statusCode: 500);
+            await sealService.initialiseAsync();
 
             var result = new List<object>();
 
