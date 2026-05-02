@@ -232,3 +232,31 @@ bool loadSecretKey(const char* base64SecretKey)
         return false;
     }
 }
+
+
+extern "C" __declspec(dllexport)
+long long debugEncryptAndDecrypt(long long value)
+{
+    try
+    {
+        BatchEncoder encoder(*context);
+        std::vector<int64_t> vec(context->first_context_data()->parms().poly_modulus_degree(), 0);
+        vec[0] = value;
+        Plaintext plain;
+        encoder.encode(vec, plain);
+
+        Ciphertext cipher;
+        encryptor->encrypt(plain, cipher);
+
+        Plaintext decPlain;
+        decryptor->decrypt(cipher, decPlain);
+
+        std::vector<int64_t> decoded;
+        encoder.decode(decPlain, decoded);
+        return decoded[0];
+    }
+    catch (...)
+    {
+        return -1;
+    }
+}

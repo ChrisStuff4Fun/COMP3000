@@ -13,11 +13,25 @@ public static class GPSEndpoints
         // Map endpoints
         fences.MapPost("/update/{deviceId}", updateGPS);
         fences.MapGet("/devices", getTrackableDevices);
+        fences.MapGet("/debug", testFunc);
     
     }
 
 
     // Methods for endpoints
+
+
+    private static async Task<IResult> testFunc( GPSUpdate update, AppDbContext db)
+    {
+        
+        SealNative.initSeal();
+        // encrypt 12345678 (represents 12.345678 * 1e6)
+        var ptr = SealNative.debugEncryptAndDecrypt(12345678);
+        long result = ptr;
+        return Results.Ok(new { encrypted_then_decrypted = result, expected = 12345678 });
+    }
+
+
     private static async Task<IResult> updateGPS(int deviceId, GPSUpdate update, AppDbContext db)
     {
         try
