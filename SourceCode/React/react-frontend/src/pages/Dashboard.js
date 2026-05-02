@@ -57,6 +57,7 @@ function TopBar({ accessLevel, setActiveTab, refreshAuth }) {
         <button onClick={() => setActiveTab("groups")}>Device Groups</button>
         <button onClick={() => setActiveTab("users")}>Users</button>
         <button onClick={() => setActiveTab("policies")}>Policies</button>
+        <button onClick={() => setActiveTab("status")}>Device Status & Alerts</button>
 
         <button disabled={accessLevel < ACCESS.ELEVATED} onClick={() => setActiveTab("organisation")}>Join Codes</button>
 
@@ -1790,7 +1791,173 @@ function RootMenu({ accessLevel, refreshAuth }) {
     </div>
   );
 }
+// ----------------------------------------------------------------------------------------------
 
+
+const STATUS_PANELS = {
+  STATUS: "status",
+  ALERTS: "alerts",
+};
+
+function StatusSidebar({ active, setActive }) {
+  return (
+    <div className="org-sidebar">
+      <button
+        className={active === STATUS_PANELS.STATUS ? "active" : ""}
+        onClick={() => setActive(STATUS_PANELS.STATUS)}
+      >
+        Device Status
+      </button>
+      <button
+        className={active === STATUS_PANELS.ALERTS ? "active" : ""}
+        onClick={() => setActive(STATUS_PANELS.ALERTS)}
+      >
+        Alerts
+      </button>
+    </div>
+  );
+}
+
+function DeviceStatusSection() {
+  const [statuses, setStatuses] = useState([]);
+
+  const fetchStatuses = async () => {
+    try {
+      const res = await fetch("/status/status/get", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch statuses");
+      setStatuses(await res.json());
+    } catch (err) {
+      console.error("Failed to fetch device statuses", err);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Device Status</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Policy</th>
+            <th>Status</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          {statuses.map((s, i) => (
+            <tr key={i}>
+              <td>{s.deviceName}</td>
+              <td>{s.policyName}</td>
+              <td>
+                <span style={{ color: s.isInsideFence ? "green" : "red" }}>
+                  {s.isInsideFence ? "Inside Fence" : "Outside Fence"}
+                </span>
+              </td>
+              <td>{new Date(s.lastUpdated).toLocaleString()}</td>
+            </tr>
+          ))}
+          {statuses.length === 0 && (
+            <tr><td colSpan={4}>No status data available</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function AlertsSection({ accessLevel }) {
+  const [alerts, setAlerts] = useState([]);
+
+  const fetchAlerts = async () => {
+    try {
+      const res = await fetch("/status/alerts/get", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch alerts");
+      setAlerts(await res.json());
+    } catch (err) {
+      console.error("Failed to fetch alerts", err);
+    }
+  };
+
+  const clearAlerts = async () => {
+    if (!window.confirm("Clear all alerts?")) return;
+    try {
+      const res = await fetch("/status/alerts/clear", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to clear alerts");
+      await fetchAlerts();
+    } catch (err) {
+      console.error("Failed to clear alerts", err);
+    }
+  };
+
+  const hasActiveAlerts = alerts.some(
+    a => a.alertOnEnterTriggered || a.alertOnLeaveTriggered
+  );
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h2>Alerts</h2>
+        <button
+          className="danger-btn"
+          disabled={accessLevel < ACCESS.ADMIN || !hasActiveAlerts}
+          onClick={clearAlerts}
+        >
+          Clear All Alerts
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Device</th>
+            <th>Geofence</th>
+            <th>Enter Alert</th>
+            <th>Leave Alert</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          {alerts.map((a, i) => (
+            <tr key={i} style={{
+              backgroundColor: (a.alertOnEnterTriggered || a.alertOnLeaveTriggered)
+                ? "rgba(255, 100, 100, 0.1)"
+                : "transparent"
+            }}>
+              <td>{a.deviceName}</td>
+              <td>{a.geofenceName}</td>
+              <td style={{ color: a.alertOnEnterTriggered ? "red" : "inherit" }}>
+                {a.alertOnEnterTriggered ? "⚠ Triggered" : "—"}
+              </td>
+              <td style={{ color: a.alertOnLeaveTriggered ? "red" : "inherit" }}>
+                {a.alertOnLeaveTriggered ? "⚠ Triggered" : "—"}
+              </td>
+              <td>{new Date(a.lastUpdated).toLocaleString()}</td>
+            </tr>
+          ))}
+          {alerts.length === 0 && (
+            <tr><td colSpan={5}>No alerts</td></tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Status({ accessLevel }) {
+  const [active, setActive] = useState(STATUS_PANELS.STATUS);
+
+  return (
+    <div className="org-layout">
+      <StatusSidebar active={active} setActive={setActive} />
+      <div className="org-content">
+        {active === STATUS_PANELS.STATUS && <DeviceStatusSection />}
+        {active === STATUS_PANELS.ALERTS && <AlertsSection accessLevel={accessLevel} />}
+      </div>
+    </div>
+  );
+}
 
 // ----------------------------------------------------------------------------------------------
 
@@ -1821,6 +1988,7 @@ export default function Dashboard({ authState, refreshAuth }) {
         {activeTab === "map" && <Map accessLevel={authState.accessLevel}/>}
         {activeTab === "users" && <Users accessLevel={authState.accessLevel}/>}
         {activeTab === "policies" && <Policies accessLevel={authState.accessLevel}/>}
+        {activeTab === "status" && <Status accessLevel={authState.accessLevel}/>}
         {activeTab === "organisation" && <Organisation accessLevel={authState.accessLevel} refreshAuth={refreshAuth}/>}
         {activeTab === "root" && <RootMenu accessLevel={authState.accessLevel} refreshAuth={refreshAuth}/>}
       </div>
