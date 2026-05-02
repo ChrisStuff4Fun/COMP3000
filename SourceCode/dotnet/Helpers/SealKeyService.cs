@@ -99,7 +99,7 @@ public class SealKeyService
 
     public SealKeys getKeys() => _cachedKeys;
 
-    public async Task<T> SealLock<T>(Func<T> sealOperation)
+    public async Task<T>WithSealLock<T>(Func<T> sealOperation)
     {
         await _sealLock.WaitAsync();
         try
