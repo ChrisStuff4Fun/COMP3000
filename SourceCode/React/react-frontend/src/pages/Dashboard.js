@@ -1155,10 +1155,257 @@ function Users({accessLevel}) {
 
 // ----------------------------------------------------------------------------------------------
 
-function Policies() {
-    return(
-        <p> Policies </p>
-    )
+const POLICY_PANELS = {
+  OVERVIEW: "overview",
+  CREATE: "create",
+};
+
+function PolicySidebar({ active, setActive, accessLevel }) {
+  return (
+    <div className="org-sidebar">
+      <button
+        className={active === POLICY_PANELS.OVERVIEW ? "active" : ""}
+        onClick={() => setActive(POLICY_PANELS.OVERVIEW)}
+      >
+        Policies
+      </button>
+      <button
+        className={active === POLICY_PANELS.CREATE ? "active" : ""}
+        onClick={() => setActive(POLICY_PANELS.CREATE)}
+        disabled={accessLevel < ACCESS.ADMIN}
+      >
+        Create
+      </button>
+    </div>
+  );
+}
+
+function PolicyOverview({ accessLevel }) {
+  const [policies, setPolicies] = useState([]);
+  const [geofences, setGeofences] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [editingId, setEditingId] = useState(null);
+  const [editForm, setEditForm] = useState({});
+
+  const fetchAll = async () => {
+    try {
+      const [pRes, gRes, grRes] = await Promise.all([
+        fetch("/policy/policies", { credentials: "include" }),
+        fetch("/geofence/geofences", { credentials: "include" }),
+        fetch("/group/groups", { credentials: "include" }),
+      ]);
+      setPolicies(pRes.ok ? await pRes.json() : []);
+      setGeofences(gRes.ok ? await gRes.json() : []);
+      setGroups(grRes.ok ? await grRes.json() : []);
+    } catch (err) {
+      console.error("Failed to fetch policy data", err);
+    }
+  };
+
+  useEffect(() => { fetchAll(); }, []);
+
+  const deletePolicy = async (id) => {
+    if (!window.confirm("Delete this policy?")) return;
+    await fetch(`/policy/delete/${id}`, { method: "GET", credentials: "include" });
+    await fetchAll();
+  };
+
+  const startEdit = (policy) => {
+    setEditingId(policy.policyID);
+    setEditForm({ ...policy });
+  };
+
+  const saveEdit = async () => {
+    await fetch(`/policy/update/${editingId}`, {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editForm),
+    });
+    setEditingId(null);
+    await fetchAll();
+  };
+
+  const geofenceName = (id) => geofences.find(g => g.geofenceID === id)?.geofenceName ?? id;
+  const groupName = (id) => groups.find(g => g.deviceGroupID === id)?.groupName ?? id;
+
+  return (
+    <div>
+      <h2>Policies</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Device Group</th>
+            <th>Geofence</th>
+            <th>Alert on Enter</th>
+            <th>Alert on Leave</th>
+            <th>Track Inside</th>
+            <th>Track Outside</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {policies.map(policy => (
+            <tr key={policy.policyID}>
+              {editingId === policy.policyID ? (
+                <>
+                  <td>
+                    <input
+                      value={editForm.policyName}
+                      onChange={e => setEditForm(f => ({ ...f, policyName: e.target.value }))}
+                    />
+                  </td>
+                  <td>
+                    <select
+                      value={editForm.deviceGroupID}
+                      onChange={e => setEditForm(f => ({ ...f, deviceGroupID: Number(e.target.value) }))}
+                    >
+                      {groups.map(g => (
+                        <option key={g.deviceGroupID} value={g.deviceGroupID}>{g.groupName}</option>
+                      ))}
+                    </select>
+                  </td>
+                  <td>
+                    <select
+                      value={editForm.geofenceID}
+                      onChange={e => setEditForm(f => ({ ...f, geofenceID: Number(e.target.value) }))}
+                    >
+                      {geofences.map(g => (
+                        <option key={g.geofenceID} value={g.geofenceID}>{g.geofenceName}</option>
+                      ))}
+                    </select>
+                  </td>
+                  <td><input type="checkbox" checked={editForm.alertOnEnterRule} onChange={e => setEditForm(f => ({ ...f, alertOnEnterRule: e.target.checked }))} /></td>
+                  <td><input type="checkbox" checked={editForm.alertOnLeaveRule} onChange={e => setEditForm(f => ({ ...f, alertOnLeaveRule: e.target.checked }))} /></td>
+                  <td><input type="checkbox" checked={editForm.trackInsideFenceRule} onChange={e => setEditForm(f => ({ ...f, trackInsideFenceRule: e.target.checked }))} /></td>
+                  <td><input type="checkbox" checked={editForm.trackOutsideFenceRule} onChange={e => setEditForm(f => ({ ...f, trackOutsideFenceRule: e.target.checked }))} /></td>
+                  <td>
+                    <button onClick={saveEdit}>Save</button>
+                    <button onClick={() => setEditingId(null)}>Cancel</button>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td>{policy.policyName}</td>
+                  <td>{groupName(policy.deviceGroupID)}</td>
+                  <td>{geofenceName(policy.geofenceID)}</td>
+                  <td>{policy.alertOnEnterRule ? "✓" : "✗"}</td>
+                  <td>{policy.alertOnLeaveRule ? "✓" : "✗"}</td>
+                  <td>{policy.trackInsideFenceRule ? "✓" : "✗"}</td>
+                  <td>{policy.trackOutsideFenceRule ? "✓" : "✗"}</td>
+                  <td>
+                    <button disabled={accessLevel < ACCESS.ADMIN} onClick={() => startEdit(policy)}>Edit</button>
+                    <button className="danger-btn" disabled={accessLevel < ACCESS.ADMIN} onClick={() => deletePolicy(policy.policyID)}>Delete</button>
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function CreatePolicy({ accessLevel }) {
+  const [geofences, setGeofences] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [form, setForm] = useState({
+    policyName: "",
+    deviceGroupID: "",
+    geofenceID: "",
+    alertOnEnterRule: false,
+    alertOnLeaveRule: false,
+    trackInsideFenceRule: false,
+    trackOutsideFenceRule: false,
+  });
+
+  useEffect(() => {
+    const fetchOptions = async () => {
+      const [gRes, grRes] = await Promise.all([
+        fetch("/geofence/geofences", { credentials: "include" }),
+        fetch("/group/groups", { credentials: "include" }),
+      ]);
+      const g = gRes.ok ? await gRes.json() : [];
+      const gr = grRes.ok ? await grRes.json() : [];
+      setGeofences(g);
+      setGroups(gr);
+      if (g.length) setForm(f => ({ ...f, geofenceID: g[0].geofenceID }));
+      if (gr.length) setForm(f => ({ ...f, deviceGroupID: gr[0].deviceGroupID }));
+    };
+    fetchOptions();
+  }, []);
+
+  const handleCreate = async () => {
+    if (!form.policyName) return alert("Enter a policy name");
+    if (!form.deviceGroupID) return alert("Select a device group");
+    if (!form.geofenceID) return alert("Select a geofence");
+
+    const res = await fetch("/policy/create", {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        deviceGroupID: Number(form.deviceGroupID),
+        geofenceID: Number(form.geofenceID),
+      }),
+    });
+
+    if (res.ok) {
+      alert("Policy created");
+      setForm({
+        policyName: "",
+        deviceGroupID: groups[0]?.deviceGroupID ?? "",
+        geofenceID: geofences[0]?.geofenceID ?? "",
+        alertOnEnterRule: false,
+        alertOnLeaveRule: false,
+        trackInsideFenceRule: false,
+        trackOutsideFenceRule: false,
+      });
+    } else {
+      alert("Failed to create policy");
+    }
+  };
+
+  return (
+    <div>
+      <h2>Create Policy</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "400px" }}>
+        <label>Name<input value={form.policyName} onChange={e => setForm(f => ({ ...f, policyName: e.target.value }))} /></label>
+        <label>Device Group
+          <select value={form.deviceGroupID} onChange={e => setForm(f => ({ ...f, deviceGroupID: e.target.value }))}>
+            {groups.map(g => <option key={g.deviceGroupID} value={g.deviceGroupID}>{g.groupName}</option>)}
+          </select>
+        </label>
+        <label>Geofence
+          <select value={form.geofenceID} onChange={e => setForm(f => ({ ...f, geofenceID: e.target.value }))}>
+            {geofences.map(g => <option key={g.geofenceID} value={g.geofenceID}>{g.geofenceName}</option>)}
+          </select>
+        </label>
+        <label><input type="checkbox" checked={form.alertOnEnterRule} onChange={e => setForm(f => ({ ...f, alertOnEnterRule: e.target.checked }))} /> Alert on Enter</label>
+        <label><input type="checkbox" checked={form.alertOnLeaveRule} onChange={e => setForm(f => ({ ...f, alertOnLeaveRule: e.target.checked }))} /> Alert on Leave</label>
+        <label><input type="checkbox" checked={form.trackInsideFenceRule} onChange={e => setForm(f => ({ ...f, trackInsideFenceRule: e.target.checked }))} /> Track Inside Fence</label>
+        <label><input type="checkbox" checked={form.trackOutsideFenceRule} onChange={e => setForm(f => ({ ...f, trackOutsideFenceRule: e.target.checked }))} /> Track Outside Fence</label>
+        <button disabled={accessLevel < ACCESS.ADMIN} onClick={handleCreate}>Create Policy</button>
+      </div>
+    </div>
+  );
+}
+
+function Policies({ accessLevel }) {
+  const [active, setActive] = useState(POLICY_PANELS.OVERVIEW);
+
+  return (
+    <div className="org-layout">
+      <PolicySidebar active={active} setActive={setActive} accessLevel={accessLevel} />
+      <div className="org-content">
+        {active === POLICY_PANELS.OVERVIEW && <PolicyOverview accessLevel={accessLevel} />}
+        {active === POLICY_PANELS.CREATE && <CreatePolicy accessLevel={accessLevel} />}
+      </div>
+    </div>
+  );
 }
 
 // ----------------------------------------------------------------------------------------------
