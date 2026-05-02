@@ -65,7 +65,8 @@ public static class KeyEndpoints
 
             //return Results.Ok(new { publicBFV = SealNative.getParms() });
 
-            return Results.Ok(new { publicBFV = keys.Public });
+            //return Results.Ok(new { publicBFV = keys.Public });
+            return Results.Ok();
         }
         catch(Exception e)
         {
