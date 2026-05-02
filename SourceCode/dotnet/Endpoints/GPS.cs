@@ -21,10 +21,11 @@ public static class GPSEndpoints
     // Methods for endpoints
 
 
-    private static async Task<IResult> testFunc( GPSUpdate update, AppDbContext db)
+    private static async Task<IResult> testFunc(AppDbContext db)
     {
         
-        SealNative.initSeal();
+        if (!SealNative.initSeal())
+            return Results.Problem("SEAL init failed", statusCode: 500);
         // encrypt 12345678 (represents 12.345678 * 1e6)
         var ptr = SealNative.debugEncryptAndDecrypt(12345678);
         long result = ptr;
