@@ -19,8 +19,16 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
+import com.example.comp3000androidapp.Crypto;
+import com.example.comp3000androidapp.R;
+import com.example.comp3000androidapp.apiManager;
+import com.example.comp3000androidapp.locationManager;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class trackingService extends Service {
 
@@ -65,51 +73,63 @@ public class trackingService extends Service {
             }
         };
 
-        // fetch BFV key first, THEN start location updates
-        api.fetchServerBfvKey(new apiManager.bfvKeyCallback() {
+        // load BFV key from assets, then start location updates
+        cachedBfvKey = loadBfvKeyFromAssets();
+        if (cachedBfvKey == null) {
+            android.util.Log.e("TrackingService", "Failed to load BFV key from assets");
+            return;
+        }
+        android.util.Log.d("TrackingService", "BFV key loaded, length: " + cachedBfvKey.length());
+
+        locationManager = new locationManager(this, callback);
+        locationManager.startLocationUpdates();
+
+        // fallback timer for emulator
+        java.util.Timer timer = new java.util.Timer();
+        timer.schedule(new java.util.TimerTask() {
             @Override
-            public void onSuccess(String key) {
-                cachedBfvKey = key;
-                android.util.Log.d("TrackingService", "BFV key fetched, starting location updates");
-                locationManager = new locationManager(trackingService.this, callback);
-                locationManager.startLocationUpdates();
+            public void run() {
+                if (ActivityCompat.checkSelfPermission(trackingService.this,
+                        Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return;
 
-                // Fallback for emulator: use last known location on a timer
-                java.util.Timer timer = new java.util.Timer();
-                timer.schedule(new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        if (ActivityCompat.checkSelfPermission(trackingService.this,
-                                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return;
-
-                        fusedClient.getLastLocation().addOnSuccessListener(location -> {
-                            if (location == null) {
-                                android.util.Log.w("TrackingService", "Last location null");
-                                return;
-                            }
-                            android.util.Log.d("TrackingService", "Timer location: " + location.getLatitude());
-                            String deviceId = getApplicationContext()
-                                    .getSharedPreferences("cybertrackClient", Context.MODE_PRIVATE)
-                                    .getString("device_id", null);
-
-                            Log.d("Location", "lat" + location.getLatitude());
-                            Log.d("Location", "lat" + location.getLongitude());
-
-                            new Thread(() -> {
-                                String[] encrypted = crypto.encryptLocation(cachedBfvKey,
-                                        location.getLatitude(), location.getLongitude());
-                                api.sendLocation(deviceId, encrypted[0], encrypted[1]);
-                            }).start();
-                        });
+                fusedClient.getLastLocation().addOnSuccessListener(location -> {
+                    if (location == null) {
+                        android.util.Log.w("TrackingService", "Last location null");
+                        return;
                     }
-                }, 0, 10000); // every 10 seconds
+                    android.util.Log.d("TrackingService", "Timer location: " + location.getLatitude());
+                    String deviceId = getApplicationContext()
+                            .getSharedPreferences("cybertrackClient", Context.MODE_PRIVATE)
+                            .getString("device_id", null);
 
+                    Log.d("Location", "lat: " + location.getLatitude());
+                    Log.d("Location", "lon: " + location.getLongitude());
+
+                    new Thread(() -> {
+                        String[] encrypted = crypto.encryptLocation(cachedBfvKey,
+                                location.getLatitude(), location.getLongitude());
+                        api.sendLocation(deviceId, encrypted[0], encrypted[1]);
+                    }).start();
+                });
             }
-            @Override
-            public void onError(Exception e) {
-                android.util.Log.e("TrackingService", "BFV key fetch FAILED: " + e.getMessage());
+        }, 0, 10000);
+    }
+
+    private String loadBfvKeyFromAssets() {
+        try {
+            InputStream is = getAssets().open("bfv-public.txt");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
             }
-        });
+            reader.close();
+            return sb.toString();
+        } catch (Exception e) {
+            android.util.Log.e("TrackingService", "Failed to load BFV key from assets: " + e.getMessage());
+            return null;
+        }
     }
 
     private void createNotificationChannel() {
@@ -123,6 +143,7 @@ public class trackingService extends Service {
             manager.createNotificationChannel(channel);
         }
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;

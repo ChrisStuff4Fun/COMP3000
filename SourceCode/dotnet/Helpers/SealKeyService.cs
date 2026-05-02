@@ -7,6 +7,8 @@ using Azure.Storage.Blobs;
 
 public class SealKeyService
 {
+
+    private bool _initialised = false;
     private readonly BlobContainerClient _container;
     private SealKeys _cachedKeys;
 
@@ -19,6 +21,9 @@ public class SealKeyService
 
     public async Task initialiseAsync()
     {
+
+         if (_initialised) return;
+
         if (!SealNative.initSeal())
             throw new Exception("SEAL init failed");
 
@@ -49,7 +54,7 @@ public class SealKeyService
 
             if (!SealNative.loadSecretKey(_cachedKeys.Secret))
                 throw new Exception("Failed to load secret key into SEAL");
-                
+
         }
         else
         {
@@ -64,6 +69,9 @@ public class SealKeyService
                 throw new Exception("Failed to load secret key into SEAL");
 
         }
+
+        _initialised = true;
+
     }
 
     private async Task uploadBlob(string name, string value)

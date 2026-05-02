@@ -1,0 +1,70 @@
+<mxfile host="Electron" scale="1" border="0">
+  <diagram name="Page-1" id="d7_L2PQS0lQoCS3hP5wn">
+    <mxGraphModel dx="2054" dy="1201" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="530" width="180" x="440" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="530" width="180" x="234" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="530" width="180" x="30" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="SEAL CPP Library (Pre-Compiled)" vertex="1">
+          <mxGeometry height="50" width="120" x="470" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="CPP JNI Wrapper" vertex="1">
+          <mxGeometry height="30" width="60" x="300" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Android app" vertex="1">
+          <mxGeometry height="30" width="60" x="90" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Register device &amp;amp; retrieve public key to store locally" vertex="1">
+          <mxGeometry height="40" width="110" x="65" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-19" edge="1" parent="1" source="aF1uLKwAb_SgKC_sUdDP-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="aF1uLKwAb_SgKC_sUdDP-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-10" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Get location data &amp;amp; send to JNI with public key" vertex="1">
+          <mxGeometry height="40" width="140" x="50" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-20" edge="1" parent="1" source="aF1uLKwAb_SgKC_sUdDP-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="aF1uLKwAb_SgKC_sUdDP-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Initialse BFV scheme&amp;nbsp;" vertex="1">
+          <mxGeometry height="20" width="140" x="254" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-21" edge="1" parent="1" source="aF1uLKwAb_SgKC_sUdDP-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="aF1uLKwAb_SgKC_sUdDP-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-12" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Encrypt data" vertex="1">
+          <mxGeometry height="20" width="140" x="460" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-22" edge="1" parent="1" source="aF1uLKwAb_SgKC_sUdDP-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="aF1uLKwAb_SgKC_sUdDP-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-13" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Return data" vertex="1">
+          <mxGeometry height="20" width="100" x="480" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-23" edge="1" parent="1" source="aF1uLKwAb_SgKC_sUdDP-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="aF1uLKwAb_SgKC_sUdDP-15">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-14" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Return data" vertex="1">
+          <mxGeometry height="20" width="74" x="287" y="575" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-15" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Send data back to server" vertex="1">
+          <mxGeometry height="30" width="140" x="50" y="630" as="geometry" />
+        </mxCell>
+        <mxCell id="aF1uLKwAb_SgKC_sUdDP-18" edge="1" parent="1" source="aF1uLKwAb_SgKC_sUdDP-8" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="aF1uLKwAb_SgKC_sUdDP-10" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="110" y="340" as="sourcePoint" />
+            <mxPoint x="160" y="290" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
