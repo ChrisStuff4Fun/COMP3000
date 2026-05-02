@@ -107,6 +107,7 @@ app.MapCodeEndpoints();
 app.MapKeyEndpoints();
 app.MapPolicyEndpoints();
 app.MapUserEndpoints();
+app.MapStatusEndpoints();
 
 
 // Configure the HTTP request pipeline.
