@@ -83,7 +83,7 @@ public class trackingService extends Service {
         android.util.Log.d("TrackingService", "BFV key loaded, length: " + cachedBfvKey.length());
 
         locationManager = new locationManager(this, callback);
-        locationManager.startLocationUpdates();
+        //locationManager.startLocationUpdates();
 
         // fallback timer for emulator
         java.util.Timer timer = new java.util.Timer();

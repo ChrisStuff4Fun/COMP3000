@@ -11,6 +11,8 @@ public class SealKeyService
     private bool _initialised = false;
     private readonly BlobContainerClient _container;
     private SealKeys _cachedKeys;
+    private static readonly SemaphoreSlim _sealLock = new SemaphoreSlim(1, 1);
+    public SemaphoreSlim SealLock => _sealLock;
 
     public SealKeyService()
     {
@@ -96,4 +98,19 @@ public class SealKeyService
     }
 
     public SealKeys getKeys() => _cachedKeys;
+
+    public async Task<T> SealLock<T>(Func<T> sealOperation)
+    {
+        await _sealLock.WaitAsync();
+        try
+        {
+            return sealOperation();
+        }
+        finally
+        {
+            _sealLock.Release();
+        }
+    }
+
 }
+

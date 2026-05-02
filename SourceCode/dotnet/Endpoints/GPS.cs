@@ -59,6 +59,7 @@ public static class GPSEndpoints
 
     private static async Task<IResult> updateGPS(int deviceId, GPSUpdate update, AppDbContext db, [FromServices] SealKeyService sealService)
     {
+        await sealService.SealLock.WaitAsync();
         try
         {
             // get device
@@ -107,7 +108,7 @@ public static class GPSEndpoints
                 }
 
                 // compute if device is inside geofence using FHE
-                bool isInside = await isInsideFenceAsync(update.Lat, update.Lon, geofence);
+                bool isInside = await isInsideFenceAsync(update.Lat, update.Lon, geofence, sealService);
 
                 bool wasInside = status.IsInsideFence;
                 status.IsInsideFence = isInside;
@@ -152,10 +153,14 @@ public static class GPSEndpoints
         {
             return Results.Problem(detail: e.ToString(), statusCode: 500);
         }
+        finally
+        {
+            sealService.SealLock.Release();
+        }
     }
 
 // isInsideFenceAsync - responsible for breaking down the geoJSON into usable numbers 
-    private static async Task<bool> isInsideFenceAsync(string encLat, string encLon, Geofence geofence)
+    private static async Task<bool> isInsideFenceAsync(string encLat, string encLon, Geofence geofence, [FromServices] SealKeyService sealService)
     {
         try
         {
@@ -179,7 +184,7 @@ public static class GPSEndpoints
                     double radius = feature.GetProperty("properties").GetProperty("radius").GetDouble();
 
                     // compute 
-                    if (isInsideCircleFHE(encLat, encLon, centreLat, centreLon, radius))
+                    if (await isInsideCircleFHE(encLat, encLon, centreLat, centreLon, radius, sealService))
                         return true;
                 }
                 return false;
@@ -192,7 +197,7 @@ public static class GPSEndpoints
                 double centreLon = coords[0].GetDouble();
                 double centreLat = coords[1].GetDouble();
                 double radius = geo.GetProperty("properties").GetProperty("radius").GetDouble();
-                return isInsideCircleFHE(encLat, encLon, centreLat, centreLon, radius);
+                return await isInsideCircleFHE(encLat, encLon, centreLat, centreLon, radius, sealService);
             }
 
             return false;
@@ -205,33 +210,41 @@ public static class GPSEndpoints
 
 
 // isInsideCircleFHE - uses SEAL to compute if a given BFV encrypted coordinate lies inside non-encrypted circle params
-    private static bool isInsideCircleFHE( string encLat, string encLon, double centreLat, double centreLon, double radiusMeters)
+    private static async Task<bool> isInsideCircleFHE( string encLat, string encLon, double centreLat, double centreLon, double radiusMeters, [FromServices] SealKeyService sealService)
     {
-        // compute (encLat - centreLat)^2 and (encLon - centreLon)^2 homomorphically
-        IntPtr latDiffPtr = SealNative.computeSquaredDiff(encLat, centreLat);
-        string latDiffB64 = Marshal.PtrToStringAnsi(latDiffPtr)!;
+        await sealService.SealLock.WaitAsync();
+        try
+        {
+            // compute (encLat - centreLat)^2 and (encLon - centreLon)^2 homomorphically
+            IntPtr latDiffPtr = SealNative.computeSquaredDiff(encLat, centreLat);
+            string latDiffB64 = Marshal.PtrToStringAnsi(latDiffPtr)!;
 
-        IntPtr lonDiffPtr = SealNative.computeSquaredDiff(encLon, centreLon);
-        string lonDiffB64 = Marshal.PtrToStringAnsi(lonDiffPtr)!;
+            IntPtr lonDiffPtr = SealNative.computeSquaredDiff(encLon, centreLon);
+            string lonDiffB64 = Marshal.PtrToStringAnsi(lonDiffPtr)!;
 
-        // early check for efficiency
-        long latSquared = SealNative.decryptValue(latDiffB64);
-        long lonSquared = SealNative.decryptValue(lonDiffB64);
+            // early check for efficiency
+            long latSquared = SealNative.decryptValue(latDiffB64);
+            long lonSquared = SealNative.decryptValue(lonDiffB64);
 
-        if (latSquared < 0 || lonSquared < 0) return false;
+            if (latSquared < 0 || lonSquared < 0) return false;
 
-        // convert to meters squared
-        // 1 degree lat = 111320m, scaled by 1e6
-        // so 1 unit of latSquared = (1/1e6 degree)^2 = (111320/1e6 m)^2
-        double latMetersSquared = latSquared * Math.Pow(111320.0 / 1e6, 2);
+            // convert to meters squared
+            // 1 degree lat = 111320m, scaled by 1e6
+            // so 1 unit of latSquared = (1/1e6 degree)^2 = (111320/1e6 m)^2
+            double latMetersSquared = latSquared * Math.Pow(111320.0 / 1e6, 2);
 
-        // longitude correction for latitude
-        double lonMetersPerDegree = 111320.0 * Math.Cos(centreLat * Math.PI / 180.0);
-        double lonMetersSquared = lonSquared * Math.Pow(lonMetersPerDegree / 1e6, 2);
+            // longitude correction for latitude
+            double lonMetersPerDegree = 111320.0 * Math.Cos(centreLat * Math.PI / 180.0);
+            double lonMetersSquared = lonSquared * Math.Pow(lonMetersPerDegree / 1e6, 2);
 
-        double distanceMetersSquared = latMetersSquared + lonMetersSquared;
+            double distanceMetersSquared = latMetersSquared + lonMetersSquared;
 
-        return distanceMetersSquared <= radiusMeters * radiusMeters;
+            return distanceMetersSquared <= radiusMeters * radiusMeters;
+        }
+        finally
+        {
+            sealService.SealLock.Release();
+        }
     }
 
 
@@ -239,6 +252,7 @@ public static class GPSEndpoints
     // get function for maps
     private static async Task<IResult> getTrackableDevices(AppDbContext db,IHttpContextAccessor httpAccessor, IDataProtector dataProtector, [FromServices] SealKeyService sealService)
     {
+        await sealService.SealLock.WaitAsync();
         try
         {
             // auth check
@@ -267,7 +281,7 @@ public static class GPSEndpoints
                 // if no policies apply, always show the device
                 if (!statuses.Any())
                 {
-                    var decryptedNoPolicy = decryptLocation(device.LastLoggedLat, device.LastLoggedLong);
+                    var decryptedNoPolicy = await decryptLocation(device.LastLoggedLat, device.LastLoggedLong, sealService);
                     if (decryptedNoPolicy == null) continue;
                     result.Add(new
                     {
@@ -298,7 +312,7 @@ public static class GPSEndpoints
                 if (!shouldShow) continue;
 
                 // decrypt location for map display
-                var decrypted = decryptLocation(device.LastLoggedLat, device.LastLoggedLong);
+                var decrypted = await decryptLocation(device.LastLoggedLat, device.LastLoggedLong, sealService);
                 if (decrypted == null) continue;
 
                 result.Add(new
@@ -316,12 +330,17 @@ public static class GPSEndpoints
         {
             return Results.Problem(detail: e.ToString(), statusCode: 500);
         }
+        finally
+        {
+            sealService.SealLock.Release();
+        }
     }
 
 
     // SEAL helper function
-    private static (double lat, double lon)? decryptLocation(string encLat, string encLon)
+    private static async Task<(double lat, double lon)?> decryptLocation(string encLat, string encLon, [FromServices] SealKeyService sealService)
     {
+        await sealService.SealLock.WaitAsync();
         try
         {
             long scaledLat = SealNative.decryptValue(encLat);
@@ -337,6 +356,10 @@ public static class GPSEndpoints
         catch
         {
             return null;
+        }
+        finally
+        {
+            sealService.SealLock.Release();
         }
     }
 

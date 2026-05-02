@@ -224,6 +224,7 @@ public class apiManager {
 
         new Thread(() -> {
             try {
+                Log.d("API", "sendLocation: started");
 
                 URL url = new URL(baseURL + "/gps/update/" + deviceId);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
