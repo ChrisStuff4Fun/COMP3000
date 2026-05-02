@@ -23,16 +23,26 @@ public static class GPSEndpoints
 
 
 
- private static async Task<IResult> testFunc2(AppDbContext db)
+    private static async Task<IResult> testFunc2(AppDbContext db, [FromServices] SealKeyService bfvService)
     {
         
-        if (!SealNative.initSeal())
-            return Results.Problem("SEAL init failed", statusCode: 500);
-        // encrypt 12345678 (represents 12.345678 * 1e6)
-        var ptr = SealNative.debugEncryptAndDecrypt(12345678);
-        long result = ptr;
-        return Results.Ok(new { encrypted_then_decrypted = result, expected = 12345678 });
+    await bfvService.initialiseAsync();
+    var keys = bfvService.getKeys();
+    
+    // encrypt using the stored public key
+    IntPtr encPtr = (nint)SealNative.encryptWithPublicKey(keys.Public, 99999999);
+    string encB64 = Marshal.PtrToStringAnsi(encPtr)!;
+    
+    // decrypt using the loaded secret key
+    long decrypted = SealNative.debugDecryptWithLoadedKey(encB64);
+    
+    return Results.Ok(new { 
+        expected = 99999999, 
+        decrypted = decrypted,
+        match = decrypted == 99999999
+    });
     }
+
     private static async Task<IResult> testFunc(AppDbContext db)
     {
         
