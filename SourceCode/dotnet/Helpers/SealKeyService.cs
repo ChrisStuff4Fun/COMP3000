@@ -27,7 +27,7 @@ public class SealKeyService
         if (!SealNative.initSeal())
             throw new Exception("SEAL init failed");
 
-        bool exists = await keyExists("bfvPublic");
+        bool exists = await keyExists("bfv-public");
         if (!exists)
         {
             Console.WriteLine("Generating new SEAL keys...");
@@ -61,9 +61,9 @@ public class SealKeyService
             Console.WriteLine("Loading SEAL keys from Blob Storage...");
             _cachedKeys = new SealKeys
             {
-                Public  = await downloadBlob("bfvPublic"),
-                Secret  = await downloadBlob("bfvSecret"),
-                Relin   = await downloadBlob("bfvRelin")
+                Public  = await downloadBlob("bfv-public"),
+                Secret  = await downloadBlob("bfv-secret"),
+                Relin   = await downloadBlob("bfv-relin")
             };
             if (!SealNative.loadSecretKey(_cachedKeys.Secret))
                 throw new Exception("Failed to load secret key into SEAL");
