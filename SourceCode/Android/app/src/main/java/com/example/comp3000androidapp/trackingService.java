@@ -107,7 +107,7 @@ public class trackingService extends Service {
 
                     new Thread(() -> {
                         String[] encrypted = crypto.encryptLocation(cachedBfvKey,
-                                location.getLatitude(), location.getLongitude());
+                                100, 100);
                         api.sendLocation(deviceId, encrypted[0], encrypted[1]);
                     }).start();
                 });

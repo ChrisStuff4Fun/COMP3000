@@ -31,7 +31,16 @@ public static class DeviceEndpoints
         // Reject if the user is not registered to the app or the org, or if they are not level 2 or higher
         if (!currentUser.isRegistered() || !currentUser.hasAccessLevel(2)) return Results.Problem("Forbidden", statusCode: 403);
 
-        List<Device> devices = await db.Devices.Where(d => d.OrgID == currentUser.OrgID).ToListAsync();
+        List<DeviceOutput> devices = await db.Devices.Where(d => d.OrgID == currentUser.OrgID).Select(d => new DeviceOutput
+        {
+            DeviceID = d.DeviceID,
+            DeviceName = d.DeviceName,
+            OrgID = d.OrgID,
+            PublicKeyX = d.PublicKeyX,
+            PublicKeyY = d.PublicKeyY
+
+        }).ToListAsync();
+
         return Results.Ok(devices);
         
     }

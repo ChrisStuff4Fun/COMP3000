@@ -30,7 +30,7 @@ public static class GPSEndpoints
     var keys = bfvService.getKeys();
     
     // encrypt using the stored public key
-    IntPtr encPtr = (nint)SealNative.encryptWithPublicKey(keys.Public, 99999999);
+    IntPtr encPtr = SealNative.encryptWithPublicKey(keys.Public, 99999999);
     string encB64 = Marshal.PtrToStringAnsi(encPtr)!;
     
     // decrypt using the loaded secret key
@@ -39,7 +39,9 @@ public static class GPSEndpoints
     return Results.Ok(new { 
         expected = 99999999, 
         decrypted = decrypted,
-        match = decrypted == 99999999
+        match = decrypted == 99999999,
+        publicKeyPrefix = keys.Public.Substring(0, 30),  // first 30 chars of server public key
+        publicKeyLength = keys.Public.Length
     });
     }
 
