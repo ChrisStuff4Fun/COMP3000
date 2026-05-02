@@ -260,3 +260,62 @@ long long debugEncryptAndDecrypt(long long value)
         return -1;
     }
 }
+
+extern "C" __declspec(dllexport)
+long long debugDecryptWithLoadedKey(const char* base64Cipher)
+{
+    try
+    {
+        if (!context || !decryptor) return -999;
+        
+        std::string cipherBytes = base64Decode(base64Cipher);
+        std::istringstream cipherStream(cipherBytes);
+        Ciphertext cipher;
+        cipher.load(*context, cipherStream);
+
+        Plaintext plain;
+        decryptor->decrypt(cipher, plain);
+
+        BatchEncoder encoder(*context);
+        std::vector<int64_t> decoded;
+        encoder.decode(plain, decoded);
+        return decoded[0];
+    }
+    catch (const std::exception& e)
+    {
+        return -998;
+    }
+}
+
+extern "C" __declspec(dllexport)
+const char* encryptWithPublicKey(const char* base64PublicKey, long long value)
+{
+    static std::string result;
+    try
+    {
+        std::string keyBytes = base64Decode(base64PublicKey);
+        std::istringstream keyStream(keyBytes);
+        PublicKey pk;
+        pk.load(*context, keyStream);
+
+        BatchEncoder encoder(*context);
+        std::vector<int64_t> vec(context->first_context_data()->parms().poly_modulus_degree(), 0);
+        vec[0] = value;
+        Plaintext plain;
+        encoder.encode(vec, plain);
+
+        Encryptor encryptor(*context, pk);
+        Ciphertext cipher;
+        encryptor.encrypt(plain, cipher);
+
+        std::ostringstream outStream;
+        cipher.save(outStream);
+        result = base64Encode(outStream.str());
+        return result.c_str();
+    }
+    catch (const std::exception& e)
+    {
+        result = std::string("ERROR:") + e.what();
+        return result.c_str();
+    }
+}

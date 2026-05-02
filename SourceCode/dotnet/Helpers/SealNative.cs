@@ -26,4 +26,11 @@ public static class SealNative
 
     [DllImport("seal_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern long debugEncryptAndDecrypt(long value);
+
+
+    [DllImport("seal_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern long debugDecryptWithLoadedKey(string base64Cipher);
+
+    [DllImport("seal_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern long encryptWithPublicKey(string base64PublicKey, long value);
 }
