@@ -1831,6 +1831,10 @@ function DeviceStatusSection() {
     }
   };
 
+  useEffect(() => {
+        fetchStatuses();
+    }, []);
+
   return (
     <div>
       <h2>Device Status</h2>
@@ -1895,6 +1899,10 @@ function AlertsSection({ accessLevel }) {
   const hasActiveAlerts = alerts.some(
     a => a.alertOnEnterTriggered || a.alertOnLeaveTriggered
   );
+
+  useEffect(() => {
+        fetchAlerts();
+    }, []);
 
   return (
     <div>
