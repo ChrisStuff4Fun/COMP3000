@@ -78,14 +78,15 @@ public static class DeviceEndpoints
         // Get device to delete
         Device? device = await db.Devices.FindAsync(deviceId);
 
-        // Get device link to delete
-        DeviceDeviceGroupLink? link = await db.Devices_DeviceGroup_Link.FindAsync(deviceId);
-
-        // Get device status to delete
-        DevicePolicyStatus? status = await db.DevicePolicyStatus.FindAsync(deviceId);
-
         // Check if device exists
         if (device == null) return Results.BadRequest("Device does not exist.");
+
+        // Get device links to delete
+        List<DeviceDeviceGroupLink> links = await db.Devices_DeviceGroup_Link.Where(l => l.DeviceID == device.DeviceID).ToListAsync();
+
+        // Get device statuses to delete
+        List<DevicePolicyStatus> statuses = await db.DevicePolicyStatus.Where(s => s.DeviceID == device.DeviceID).ToListAsync();
+
 
         // Prevent deletion of other orgs devices
         if (device.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
@@ -93,9 +94,9 @@ public static class DeviceEndpoints
         // Remove device and save
         db.Devices.Remove(device);
 
-        if (link != null) db.Devices_DeviceGroup_Link.Remove(link);
+        if (links != null) db.Devices_DeviceGroup_Link.RemoveRange(links);
 
-        if (status != null) db.DevicePolicyStatus.Remove(status);
+        if (statuses != null) db.DevicePolicyStatus.RemoveRange(statuses);
 
         await db.SaveChangesAsync();
 
