@@ -87,16 +87,17 @@ public static class DeviceEndpoints
         // Get device statuses to delete
         List<DevicePolicyStatus> statuses = await db.DevicePolicyStatus.Where(s => s.DeviceID == device.DeviceID).ToListAsync();
 
-
         // Prevent deletion of other orgs devices
         if (device.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
-
-        // Remove device and save
-        db.Devices.Remove(device);
 
         if (links != null) db.Devices_DeviceGroup_Link.RemoveRange(links);
 
         if (statuses != null) db.DevicePolicyStatus.RemoveRange(statuses);
+
+        await db.SaveChangesAsync();
+
+        // Remove device and save
+        db.Devices.Remove(device);
 
         await db.SaveChangesAsync();
 
