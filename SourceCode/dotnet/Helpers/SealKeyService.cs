@@ -24,55 +24,63 @@ public class SealKeyService
     public async Task initialiseAsync()
     {
 
-         if (_initialised) return;
+        await _sealLock.WaitAsync();
+        try {
 
-        if (!SealNative.initSeal())
-            throw new Exception("SEAL init failed");
+            if (_initialised) return;
 
-        bool exists = await keyExists("bfv-public");
-        if (!exists)
-        {
-            Console.WriteLine("Generating new SEAL keys...");
-            var ptr = SealNative.generateKeys();
-            var json = Marshal.PtrToStringAnsi(ptr);
+            if (!SealNative.initSeal())
+                throw new Exception("SEAL init failed");
 
-            var keys = JsonSerializer.Deserialize<SealKeys>(json, new JsonSerializerOptions
+            bool exists = await keyExists("bfv-public");
+            if (!exists)
             {
-                PropertyNameCaseInsensitive = true
-            });
+                Console.WriteLine("Generating new SEAL keys...");
+                var ptr = SealNative.generateKeys();
+                var json = Marshal.PtrToStringAnsi(ptr);
 
-            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug2.txt",  $"Public null: {keys?.Public == null}\nSecret null: {keys?.Secret == null}\nRelin null: {keys?.Relin == null}\nPublic length: {keys?.Public?.Length}\nSecret length: {keys?.Secret?.Length}\nRelin length: {keys?.Relin?.Length}");
+                var keys = JsonSerializer.Deserialize<SealKeys>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
-            if (keys?.Public == null || keys?.Secret == null || keys?.Relin == null)
-                throw new Exception($"Null keys returned. JSON: {json}");
+                await File.WriteAllTextAsync("C:\\home\\sealkeys_debug2.txt",  $"Public null: {keys?.Public == null}\nSecret null: {keys?.Secret == null}\nRelin null: {keys?.Relin == null}\nPublic length: {keys?.Public?.Length}\nSecret length: {keys?.Secret?.Length}\nRelin length: {keys?.Relin?.Length}");
 
-            await uploadBlob("bfv-public", keys.Public);
-            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded public");
-            await uploadBlob("bfv-secret", keys.Secret);
-            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded secret");
-            await uploadBlob("bfv-relin", keys.Relin);
-            await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded relin");
-            _cachedKeys = keys;
+                if (keys?.Public == null || keys?.Secret == null || keys?.Relin == null)
+                    throw new Exception($"Null keys returned. JSON: {json}");
 
-            if (!SealNative.loadSecretKey(_cachedKeys.Secret))
-                throw new Exception("Failed to load secret key into SEAL");
+                await uploadBlob("bfv-public", keys.Public);
+                await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded public");
+                await uploadBlob("bfv-secret", keys.Secret);
+                await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded secret");
+                await uploadBlob("bfv-relin", keys.Relin);
+                await File.WriteAllTextAsync("C:\\home\\sealkeys_debug3.txt", "uploaded relin");
+                _cachedKeys = keys;
 
-        }
-        else
-        {
-            Console.WriteLine("Loading SEAL keys from Blob Storage...");
-            _cachedKeys = new SealKeys
+                if (!SealNative.loadSecretKey(_cachedKeys.Secret))
+                    throw new Exception("Failed to load secret key into SEAL");
+
+            }
+            else
             {
-                Public  = await downloadBlob("bfv-public"),
-                Secret  = await downloadBlob("bfv-secret"),
-                Relin   = await downloadBlob("bfv-relin")
-            };
-            if (!SealNative.loadSecretKey(_cachedKeys.Secret))
-                throw new Exception("Failed to load secret key into SEAL");
+                Console.WriteLine("Loading SEAL keys from Blob Storage...");
+                _cachedKeys = new SealKeys
+                {
+                    Public  = await downloadBlob("bfv-public"),
+                    Secret  = await downloadBlob("bfv-secret"),
+                    Relin   = await downloadBlob("bfv-relin")
+                };
+                if (!SealNative.loadSecretKey(_cachedKeys.Secret))
+                    throw new Exception("Failed to load secret key into SEAL");
 
+            }
+
+            _initialised = true;
         }
-
-        _initialised = true;
+        finally
+        {
+            _sealLock.Release();
+        }
 
     }
 

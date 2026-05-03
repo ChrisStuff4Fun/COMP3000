@@ -37,7 +37,7 @@ const char* generateKeys()
 
         pk.save(pk_stream, compr_mode_type::none);
         sk.save(sk_stream, compr_mode_type::none);
-        rk.save(rk_stream), compr_mode_type::none;
+        rk.save(rk_stream, compr_mode_type::none);
 
         result =
             std::string("{\"public\":\"") + base64Encode(pk_stream.str()) +
