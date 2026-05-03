@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CyberTrackAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+30ab077579a2f124b68bbdd7be60d1dff122b183")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ee5cc69d54c674b6cb7dee2efc0aa872efbcd767")]
 [assembly: System.Reflection.AssemblyProductAttribute("CyberTrackAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CyberTrackAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

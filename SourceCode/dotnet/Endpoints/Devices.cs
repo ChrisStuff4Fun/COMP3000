@@ -78,7 +78,13 @@ public static class DeviceEndpoints
         // Get device to delete
         Device? device = await db.Devices.FindAsync(deviceId);
 
-        // Check if device exisits
+        // Get device link to delete
+        DeviceDeviceGroupLink? link = await db.Devices_DeviceGroup_Link.FindAsync(deviceId);
+
+        // Get device status to delete
+        DevicePolicyStatus? status = await db.DevicePolicyStatus.FindAsync(deviceId);
+
+        // Check if device exists
         if (device == null) return Results.BadRequest("Device does not exist.");
 
         // Prevent deletion of other orgs devices
@@ -86,6 +92,11 @@ public static class DeviceEndpoints
 
         // Remove device and save
         db.Devices.Remove(device);
+
+        if (link != null) db.Devices_DeviceGroup_Link.Remove(link);
+
+        if (status != null) db.DevicePolicyStatus.Remove(status);
+
         await db.SaveChangesAsync();
 
         return Results.Ok();
