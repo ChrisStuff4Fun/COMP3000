@@ -1088,7 +1088,7 @@ function Users({accessLevel}) {
   }
 
   return(
-    <div className="org-layout">
+    <div className="org-content">
     <h2>Organisation Users</h2>
 
     <div>
