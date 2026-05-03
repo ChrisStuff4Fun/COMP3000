@@ -233,6 +233,9 @@ public class apiManager {
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setDoOutput(true);
 
+                conn.setConnectTimeout(30000);
+                conn.setReadTimeout(60000); // 60s read timeout for SEAL processing
+
                 JSONObject json = new JSONObject();
                 json.put("lat", lat);
                 json.put("lon", lon);

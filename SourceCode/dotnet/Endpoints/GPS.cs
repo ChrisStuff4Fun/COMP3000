@@ -61,11 +61,15 @@ public static class GPSEndpoints
     {
         try
         {
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: GPS update received for device {deviceId}\n");
+
             // get device
             Device? device = await db.Devices.FindAsync(deviceId);
             if (device == null) return Results.NotFound("Device not found");
 
             await sealService.initialiseAsync();
+
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: seal init\n");
 
             // get device groups for this device
             List<DeviceDeviceGroupLink> groupLinks = await db.Devices_DeviceGroup_Link
@@ -80,6 +84,8 @@ public static class GPSEndpoints
 
             // process each policy
             bool anyTrackingAllowed = false;
+
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: iteration begun\n");
 
             foreach (Policy policy in policies)
             {
@@ -106,6 +112,7 @@ public static class GPSEndpoints
                     db.DevicePolicyStatus.Add(status);
                 }
 
+                await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: begin geofence checks\n");
                 // compute if device is inside geofence using FHE
                 bool isInside = await isInsideFenceAsync(update.Lat, update.Lon, geofence, sealService);
 
@@ -130,6 +137,8 @@ public static class GPSEndpoints
 
                     status.AlertOnEnterTriggered = false; // reset enter alert
                 }
+
+                await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: alert rules handled\n");
 
                 // check tracking rules
                 bool shouldTrack = ( (isInside && policy.TrackInsideFenceRule) || (!isInside && policy.TrackOutsideFenceRule) );
@@ -198,8 +207,9 @@ public static class GPSEndpoints
 
             return false;
         }
-        catch
+        catch (Exception e)
         {
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: inside fence async error {e}\n");
             return false;
         }
     }
@@ -209,6 +219,7 @@ public static class GPSEndpoints
     private static async Task<bool> isInsideCircleFHE( string encLat, string encLon, double centreLat, double centreLon, double radiusMeters, [FromServices] SealKeyService sealService)
     {
         await sealService.SealLock.WaitAsync();
+        await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: is inside circle fhe begun\n");
         try
         {
             // compute (encLat - centreLat)^2 and (encLon - centreLon)^2 homomorphically
@@ -240,6 +251,7 @@ public static class GPSEndpoints
         finally
         {
             sealService.SealLock.Release();
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: inside circle fhe finished\n");
         }
     }
 
