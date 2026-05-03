@@ -1207,7 +1207,7 @@ function PolicyOverview({ accessLevel }) {
 
   const deletePolicy = async (id) => {
     if (!window.confirm("Delete this policy?")) return;
-    await fetch(`/policy/delete/${id}`, { method: "GET", credentials: "include" });
+    await fetch(`/policy/delete/${id}`, { method: "DELETE", credentials: "include" });
     await fetchAll();
   };
 

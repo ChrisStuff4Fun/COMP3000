@@ -46,7 +46,7 @@ public static class PolicyEndpoints
         await currentUser.getUserFromDBAsync();
 
         // Only admin and root can delete policies
-        if (currentUser.AccessLevel < 3) return Results.Problem("Forbidden", statusCode: 403);
+        if (!currentUser.hasAccessLevel(3)) return Results.Problem("Forbidden", statusCode: 403);
 
         // Get policy to delete
         Policy? policy = await db.Policies.FindAsync(policyId);
@@ -54,8 +54,12 @@ public static class PolicyEndpoints
         // Check if policy exisits
         if (policy == null) return Results.BadRequest("Policy does not exist.");
 
+        List<DevicePolicyStatus> statuses = await db.DevicePolicyStatus.Where(s => s.PolicyID == policy.PolicyID).ToListAsync();
+
         // Prevent deletion of other orgs policies
         if (policy.OrgID != currentUser.OrgID) return Results.Problem("Forbidden", statusCode: 403);
+
+        db.DevicePolicyStatus.RemoveRange(statuses);
 
         // Remove user and save
         db.Policies.Remove(policy);
