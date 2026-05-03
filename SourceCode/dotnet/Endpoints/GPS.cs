@@ -59,7 +59,6 @@ public static class GPSEndpoints
 
     private static async Task<IResult> updateGPS(int deviceId, GPSUpdate update, AppDbContext db, [FromServices] SealKeyService sealService)
     {
-        await sealService.SealLock.WaitAsync();
         try
         {
             // get device
@@ -153,10 +152,7 @@ public static class GPSEndpoints
         {
             return Results.Problem(detail: e.ToString(), statusCode: 500);
         }
-        finally
-        {
-            sealService.SealLock.Release();
-        }
+
     }
 
 // isInsideFenceAsync - responsible for breaking down the geoJSON into usable numbers 
@@ -252,7 +248,6 @@ public static class GPSEndpoints
     // get function for maps
     private static async Task<IResult> getTrackableDevices(AppDbContext db,IHttpContextAccessor httpAccessor, IDataProtector dataProtector, [FromServices] SealKeyService sealService)
     {
-        await sealService.SealLock.WaitAsync();
         try
         {
             // auth check
@@ -330,10 +325,7 @@ public static class GPSEndpoints
         {
             return Results.Problem(detail: e.ToString(), statusCode: 500);
         }
-        finally
-        {
-            sealService.SealLock.Release();
-        }
+
     }
 
 
