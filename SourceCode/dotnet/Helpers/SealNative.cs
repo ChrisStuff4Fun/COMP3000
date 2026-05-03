@@ -33,4 +33,7 @@ public static class SealNative
 
     [DllImport("seal_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     public static extern IntPtr encryptWithPublicKey(string base64PublicKey, long value);
+
+    [DllImport("seal_wrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern long computeDiff(string base64Cipher, double plaintextCentre);
 }

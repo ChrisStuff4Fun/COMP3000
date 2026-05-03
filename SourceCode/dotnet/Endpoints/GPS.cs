@@ -218,38 +218,24 @@ public static class GPSEndpoints
 // isInsideCircleFHE - uses SEAL to compute if a given BFV encrypted coordinate lies inside non-encrypted circle params
     private static async Task<bool> isInsideCircleFHE( string encLat, string encLon, double centreLat, double centreLon, double radiusMeters, [FromServices] SealKeyService sealService)
     {
+
+
         await sealService.SealLock.WaitAsync();
-        await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: is inside circle fhe begun\n");
         try
         {
-            // compute (encLat - centreLat)^2 and (encLon - centreLon)^2 homomorphically
-            IntPtr latDiffPtr = SealNative.computeSquaredDiff(encLat, centreLat);
-            string latDiffB64 = Marshal.PtrToStringAnsi(latDiffPtr)!;
+            long latDiff = SealNative.computeDiff(encLat, centreLat);
+            long lonDiff = SealNative.computeDiff(encLon, centreLon);
 
-            IntPtr lonDiffPtr = SealNative.computeSquaredDiff(encLon, centreLon);
-            string lonDiffB64 = Marshal.PtrToStringAnsi(lonDiffPtr)!;
+            if (latDiff == long.MinValue || lonDiff == long.MinValue) return false;
 
-            // early check for efficiency
-            long latSquared = SealNative.decryptValue(latDiffB64);
-            long lonSquared = SealNative.decryptValue(lonDiffB64);
-
-            if (latSquared < 0 || lonSquared < 0) return false;
-
-            // convert to meters squared
-            // 1 degree lat = 111320m, scaled by 1e6
-            // so 1 unit of latSquared = (1/1e6 degree)^2 = (111320/1e6 m)^2
-            double latMetersSquared = latSquared * Math.Pow(111320.0 / 1e6, 2);
-
+            // convert scaled diffs to metres
+            double latDiffMeters = (latDiff / 1e6) * 111320.0;
             // longitude correction for latitude
-            double lonMetersPerDegree = 111320.0 * Math.Cos(centreLat * Math.PI / 180.0);
-            double lonMetersSquared = lonSquared * Math.Pow(lonMetersPerDegree / 1e6, 2);
+            double lonDiffMeters = (lonDiff / 1e6) * 111320.0 * Math.Cos(centreLat * Math.PI / 180.0);
 
-            double distanceMetersSquared = latMetersSquared + lonMetersSquared;
+            double distanceMetersSquared = latDiffMeters * latDiffMeters + lonDiffMeters * lonDiffMeters;
 
-            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: centre lat {centreLat} centre lon {centreLon}\n");
-            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: lat2 {latSquared} lon2 {lonSquared}\n");
-            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: distanceM2{distanceMetersSquared} radiusMeters2 {radiusMeters*radiusMeters}\n");
-            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: result {distanceMetersSquared <= radiusMeters * radiusMeters}\n");
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"latDiffM: {latDiffMeters}, lonDiffM: {lonDiffMeters}, dist: {Math.Sqrt(distanceMetersSquared)}m, radius: {radiusMeters}m");
 
             return distanceMetersSquared <= radiusMeters * radiusMeters;
         }
@@ -258,6 +244,7 @@ public static class GPSEndpoints
             sealService.SealLock.Release();
             await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: inside circle fhe finished\n");
         }
+
     }
 
 

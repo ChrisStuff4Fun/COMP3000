@@ -320,3 +320,38 @@ const char* encryptWithPublicKey(const char* base64PublicKey, long long value)
         return result.c_str();
     }
 }
+
+extern "C" __declspec(dllexport)
+long long computeDiff(const char* base64Cipher, double plaintextCentre)
+{
+    try
+    {
+        if (!context || !decryptor) return LLONG_MIN;
+
+        std::string cipherBytes = base64Decode(base64Cipher);
+        std::istringstream cipherStream(cipherBytes);
+        Ciphertext cipher;
+        cipher.load(*context, cipherStream);
+
+        BatchEncoder encoder(*context);
+        int64_t scaledCentre = static_cast<int64_t>(plaintextCentre * 1e6);
+        std::vector<int64_t> centreVec(context->key_context_data()->parms().poly_modulus_degree(), scaledCentre);
+        Plaintext centrePlain;
+        encoder.encode(centreVec, centrePlain);
+
+        Evaluator evaluator(*context);
+        Ciphertext diff;
+        evaluator.sub_plain(cipher, centrePlain, diff);
+
+        Plaintext plainDiff;
+        decryptor->decrypt(diff, plainDiff);
+
+        std::vector<int64_t> decoded;
+        encoder.decode(plainDiff, decoded);
+        return decoded[0];
+    }
+    catch (...)
+    {
+        return LLONG_MIN;
+    }
+}
