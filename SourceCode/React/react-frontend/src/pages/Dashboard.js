@@ -1876,8 +1876,6 @@ function AlertsSection({ accessLevel }) {
     try {
       const res = await fetch("/status/alerts/get", { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch alerts");
-      const text = await res.text();
-      console.log("status endpoint body:", text.substring(0, 200));
       setAlerts(await res.json());
     } catch (err) {
       console.error("Failed to fetch alerts", err);
