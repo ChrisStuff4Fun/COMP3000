@@ -246,6 +246,11 @@ public static class GPSEndpoints
 
             double distanceMetersSquared = latMetersSquared + lonMetersSquared;
 
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: centre lat {centreLat} centre lon {centreLon}\n");
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: lat2 {latSquared} lon2 {lonSquared}\n");
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: distanceM2{distanceMetersSquared} radiusMeters2 {radiusMeters*radiusMeters}\n");
+            await File.AppendAllTextAsync("C:\\home\\gps_debug.txt", $"{DateTime.UtcNow}: result {distanceMetersSquared <= radiusMeters * radiusMeters}\n");
+
             return distanceMetersSquared <= radiusMeters * radiusMeters;
         }
         finally
